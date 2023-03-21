@@ -1,4 +1,4 @@
-# Kemecse
+# C Sharks
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://szofttech.inf.elte.hu/szofttech-ab-2023/group-04/kemecse.git
+git remote add origin https://szofttech.inf.elte.hu/szofttech-ab-2023/group-04/csharks.git
 git branch -M master
 git push -uf origin master
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://szofttech.inf.elte.hu/szofttech-ab-2023/group-04/kemecse/-/settings/integrations)
+- [ ] [Set up project integrations](https://szofttech.inf.elte.hu/szofttech-ab-2023/group-04/csharks/-/settings/integrations)
 
 ## Collaborate with your team
 
