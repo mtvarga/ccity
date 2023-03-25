@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CCity.Model
 {
-    public class Model
+    public class MainModel
     {
         #region Fields
 
@@ -27,14 +27,15 @@ namespace CCity.Model
         public Taxes Taxes { get; }
         public int Date { get; }
         public Speed Speed { get; }
-
+        public int Satisfaction { get; }
+        public int Population { get; }
 
 
         #endregion
 
         #region Constructors
 
-        public Model()
+        public MainModel()
         {
             throw new NotImplementedException();
         }

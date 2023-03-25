@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCity", "CCity\CCity.csproj", "{0F6CF8B0-E9E8-49DE-AD49-8F59F6B1590F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCity", "CCity\CCity.csproj", "{0F6CF8B0-E9E8-49DE-AD49-8F59F6B1590F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCity.Model", "CCity.Model\CCity.Model.csproj", "{14EFE480-7356-4370-8876-C50319D5DEAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCity.Model", "CCity.Model\CCity.Model.csproj", "{14EFE480-7356-4370-8876-C50319D5DEAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
