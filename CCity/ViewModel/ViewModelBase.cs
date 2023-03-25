@@ -2,59 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CCity.ViewModel
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : INotifyPropertyChanged
     {
+        protected ViewModelBase() { }
 
-        #region Fields
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-
-
-        #endregion
-
-        #region Properties
-
-
-
-        #endregion
-
-        #region Constructors
-
-        
-
-        #endregion
-
-        #region Public methods
-
-
-
-        #endregion
-
-        #region Private methods
-
-
-
-        #endregion
-
-        #region Events
-
-        event PropertyChangedEventHandler? INotifyPropertyChanged.PropertyChanged
+        protected virtual void OnPropertyChanged([CallerMemberName] String? propertyName = null)
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
+            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        #endregion
     }
 }
