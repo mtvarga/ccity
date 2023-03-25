@@ -37,7 +37,7 @@ namespace CCity.Model
         {
             throw new NotImplementedException();
         }
-        public List<Citizens> Increasepopulation()
+        public List<Citizen> Increasepopulation()
         {
             throw new NotImplementedException ();
         }
