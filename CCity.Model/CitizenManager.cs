@@ -8,6 +8,7 @@ namespace CCity.Model
 {
     public class CitizenManager
     {
+
         #region Fields
 
         public List<Citizen> Citizens;

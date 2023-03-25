@@ -8,6 +8,7 @@ namespace CCity.Model
 {
     public class GlobalManager
     {
+
         #region Fields
 
         public int GlobalSatisfactionScore;
@@ -59,5 +60,6 @@ namespace CCity.Model
 
 
         #endregion
+
     }
 }

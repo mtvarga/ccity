@@ -8,6 +8,7 @@ namespace CCity.Model
 {
     public class Citizen
     {
+
         #region Fields
 
 
