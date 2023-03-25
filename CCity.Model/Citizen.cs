@@ -18,7 +18,7 @@ namespace CCity.Model
 
         public string Name { get; }
         public ResidentialZone Home { get; private set;}
-        public WorkPlaceZone WorkPlace { get; private set;}
+        public WorkplaceZone WorkPlace { get; private set;}
         public double Satisfaction { get; }
 
         #endregion
