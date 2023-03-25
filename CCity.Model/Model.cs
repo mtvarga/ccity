@@ -32,6 +32,15 @@ namespace CCity.Model
 
         #endregion
 
+        #region Constructors
+
+        public Model()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         #region Public methods
 
         public void Place(int x, int y, PlaceableType type)
