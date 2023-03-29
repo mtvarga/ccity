@@ -20,6 +20,7 @@ namespace CCity.Model
         public ResidentialZone Home { get; private set;}
         public WorkplaceZone WorkPlace { get; private set;}
         public double Satisfaction { get; }
+        public int LastCalculatedSatisfaction { get; internal set; }
         
         #endregion
 
@@ -45,6 +46,11 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
+        public int CalculateSatisfaction()
+        {
+            //TODO: Calculate satisfaction
+        }
+        
         #endregion
 
         #region Private methods
