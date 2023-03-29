@@ -9,6 +9,11 @@ namespace CCity.Model
     public class FireDepartment : Placeable
     {
         #region Properties
+
+        public override int PlacementCost => throw new NotImplementedException();
+
+        public override int MaintenanceCost => throw new NotImplementedException();
+
         public int AvailableFiretrucks { get; internal set; }
 
         public override int PlacementCost => throw new NotImplementedException();

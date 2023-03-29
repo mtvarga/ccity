@@ -10,6 +10,10 @@ namespace CCity.Model
     {
         #region Properties
 
+        public override int PlacementCost => throw new NotImplementedException();
+
+        public override int MaintenanceCost => throw new NotImplementedException();
+
         double IFlammable.Pontential => throw new NotImplementedException();
 
         double IFlammable.Health => throw new NotImplementedException();
