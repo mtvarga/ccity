@@ -8,9 +8,13 @@ namespace CCity.Model
 {
     public class Field
     {
-        #region
-        private const int MAX_EFFECT = 10;
+        #region Constants
+        private const int MAX_POLICE_DEPARTMENT_EFFECT = 10;
+        private const int MAX_STADIUM_EFFECT = 10;
+        private const int MAX_FIRE_DEPARTMENT_EFFECT = 10;
+        private const int MAX_FOREST_EFFECT = 10;
         #endregion
+
         #region Fields
 
         public Placeable Placeable { get; internal set; }
@@ -23,10 +27,10 @@ namespace CCity.Model
         private int _fireDepartmentEffect;
         private int _forestEffect;
 
-        public double PoliceDepartmentEffect { get => Math.Min(_policeDepartmentEffect, MAX_EFFECT) / MAX_EFFECT; }
-        public double StadiumEffect { get; }
-        public double FireDepartmentEffect { get; }
-        public double ForestEffect { get; }
+        public double PoliceDepartmentEffect { get => Math.Min(_policeDepartmentEffect, MAX_POLICE_DEPARTMENT_EFFECT) / MAX_POLICE_DEPARTMENT_EFFECT; }
+        public double StadiumEffect { get => Math.Min(_stadiumEffect, MAX_STADIUM_EFFECT) / MAX_STADIUM_EFFECT; }
+        public double FireDepartmentEffect { get => Math.Min(_fireDepartmentEffect, MAX_FIRE_DEPARTMENT_EFFECT) / MAX_FIRE_DEPARTMENT_EFFECT; }
+        public double ForestEffect { get => Math.Min(_forestEffect, MAX_FOREST_EFFECT) / MAX_FOREST_EFFECT; }
 
         #endregion
 
@@ -37,9 +41,9 @@ namespace CCity.Model
             Placeable = null;
             LastCalculatedSatisfaction = 0;
             _policeDepartmentEffect = 0;
-            StadiumEffect = 0;
-            FireDepartmentEffect = 0;
-            ForestEffect = 0;
+            _stadiumEffect = 0;
+            _fireDepartmentEffect = 0;
+            _forestEffect = 0;
         }
 
         #endregion
@@ -58,17 +62,22 @@ namespace CCity.Model
 
         public void ChangePoliceDepartmentEffect(int n)
         {
-            throw new NotImplementedException();
+            _policeDepartmentEffect += n;
         }
 
         public void ChangeStadiumEffect(int n)
         {
-            throw new NotImplementedException();
+            _stadiumEffect += n;
         }
 
         public void ChangeFireDepartmentEffect(int n)
         {
-            throw new NotImplementedException();
+            _fireDepartmentEffect += n;
+        }
+
+        public void ChangeForestEffect(int n)
+        {
+            _forestEffect += n;
         }
 
         #endregion
