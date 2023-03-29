@@ -8,6 +8,12 @@ namespace CCity.Model
 {
     public class FieldManager
     {
+        #region Constants
+
+        
+
+        #endregion
+
         #region Fields
 
         public Field[][] Fields;
@@ -17,6 +23,7 @@ namespace CCity.Model
         #endregion
 
         #region Public methods
+
 
         public List<Field> Place(int x, int y, Placeable placeable)
         {
@@ -46,6 +53,16 @@ namespace CCity.Model
         #endregion
 
         #region Private methods
+
+        private List<Tuple<int, int, double>> GetCoordinatesInRadius(int x, int y, int r)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool OnMap(int x, int y)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
     }

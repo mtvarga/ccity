@@ -45,6 +45,11 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
+        public override int CalculateSatisfaction()
+        {
+            return (int)Citizens.Sum(citizen => citizen.Satisfaction);
+        }
+
         #endregion
     }
 }
