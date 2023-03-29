@@ -8,22 +8,25 @@ namespace CCity.Model
 {
     public class Field
     {
+        #region
+        private const int MAX_EFFECT = 10;
+        #endregion
         #region Fields
 
         public Placeable Placeable { get; internal set; }
         
         //to int
-        public double LastCalculatedSatisfaction { get; internal set; }
+        public int LastCalculatedSatisfaction { get; private set; }
 
         private int _policeDepartmentEffect;
         private int _stadiumEffect;
         private int _fireDepartmentEffect;
         private int _forestEffect;
 
-        public double PoliceDepartmentEffect { get; internal set; }
-        public double StadiumEffect { get; internal set; }
-        public double FireDepartmentEffect { get; internal set; }
-        public double ForestEffect { get; internal set; }
+        public double PoliceDepartmentEffect { get => Math.Min(_policeDepartmentEffect, MAX_EFFECT) / MAX_EFFECT; }
+        public double StadiumEffect { get; }
+        public double FireDepartmentEffect { get; }
+        public double ForestEffect { get; }
 
         #endregion
 
@@ -33,7 +36,7 @@ namespace CCity.Model
         {
             Placeable = null;
             LastCalculatedSatisfaction = 0;
-            PoliceDepartmentEffect = 0;
+            _policeDepartmentEffect = 0;
             StadiumEffect = 0;
             FireDepartmentEffect = 0;
             ForestEffect = 0;
@@ -45,21 +48,27 @@ namespace CCity.Model
 
         public int CalculateSatisfaction()
         {
-            if (Placeable == null || !(Placeable is Zone))
+            if (Placeable == null)
             {
-                LastCalculatedSatisfaction = 0;
                 return 0;
             }
+            LastCalculatedSatisfaction = Placeable.CalculateSatisfaction();
+            return LastCalculatedSatisfaction;
+        }
 
-            Zone zone = Placeable as Zone;
-            double tempSatisfaction = 0;
-            foreach(Citizen citizen in zone.Citizens)
-            {
-                tempSatisfaction += citizen.Satisfaction;
-            }
+        public void ChangePoliceDepartmentEffect(int n)
+        {
+            throw new NotImplementedException();
+        }
 
-            LastCalculatedSatisfaction = tempSatisfaction;
-            return 0;
+        public void ChangeStadiumEffect(int n)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ChangeFireDepartmentEffect(int n)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
