@@ -8,15 +8,6 @@ namespace CCity.Model
 {
     public class Stadium : Placeable, IFlammable, IMultifield
     {
-        #region Constructors
-
-        public Stadium()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
         #region Properties
 
         public override int PlacementCost => throw new NotImplementedException();
@@ -34,6 +25,19 @@ namespace CCity.Model
         int IMultifield.Height => throw new NotImplementedException();
 
         List<Filler> IMultifield.Occupies { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public override int PlacementCost => throw new NotImplementedException();
+
+        public override int MaintenanceCost => throw new NotImplementedException();
+
+        #endregion
+
+        #region Constructors
+
+        public Stadium()
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
     }
