@@ -20,24 +20,21 @@ namespace CCity.Model
         public ResidentialZone Home { get; private set;}
         public WorkplaceZone WorkPlace { get; private set;}
         public double Satisfaction { get; }
-
+        
         #endregion
 
         #region Constructors
 
-        public Citizen()
+        public Citizen(ResidentialZone residentalZone,WorkplaceZone workplaceZone)
         {
-            throw new NotImplementedException();
+            this.Home = residentalZone;
+            this.WorkPlace = workplaceZone;
         }
 
         #endregion
 
         #region Public methods
-
-        public Citizen(ResidentialZone residentalZone,WorkplaceZone workplaceZone)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public void SwapWorkplace(WorkplaceZone workplaceZone)
         {
