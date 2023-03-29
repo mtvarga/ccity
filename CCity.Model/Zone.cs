@@ -37,12 +37,14 @@ namespace CCity.Model
 
         public void AddCitizen(Citizen citizen)
         {
-            throw new NotImplementedException();
+            Citizens.Add(citizen);
+            ++Current;
         }
 
         public void DropCitizen(Citizen citizen)
         {
-            throw new NotImplementedException();
+            Citizens.Remove(citizen);
+            --Current;
         }
 
         public override int CalculateSatisfaction()

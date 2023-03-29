@@ -85,7 +85,7 @@
             return list;
         }
 
-        private bool OnMap(int x, int y)
+        private bool OnMap(int x,int y)
         {
             throw new NotImplementedException();
         }
