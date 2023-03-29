@@ -37,7 +37,21 @@ namespace CCity.Model
 
         public bool ChangeTax(TaxType taxtype, int amount)
         {
-            throw new NotImplementedException();
+            switch (taxtype)
+            {
+                case TaxType.Residental:
+                    _taxes.ResidentalTax = amount;
+                    break;
+                case TaxType.Commercial:
+                    _taxes.CommercialTax = amount;
+                    break;
+                case TaxType.Industrial:
+                    _taxes.IndustrialTax = amount;
+                    break;
+                default:
+                    return false;
+            }
+            return true;
         }
         public void UpdateSatisfaction(List<Field> filelds)
         {
