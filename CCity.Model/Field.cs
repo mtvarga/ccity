@@ -17,8 +17,8 @@ namespace CCity.Model
 
         #region Fields
 
-        public Placeable Placeable { get; internal set; }
-        
+        public Placeable? Placeable { get; internal set; }
+
         //to int
         public int LastCalculatedSatisfaction { get; private set; }
 
@@ -27,6 +27,8 @@ namespace CCity.Model
         private int _fireDepartmentEffect;
         private int _forestEffect;
 
+        public int X { get; }
+        public int Y { get; }
         public double PoliceDepartmentEffect { get => Math.Min(_policeDepartmentEffect, MAX_POLICE_DEPARTMENT_EFFECT) / MAX_POLICE_DEPARTMENT_EFFECT; }
         public double StadiumEffect { get => Math.Min(_stadiumEffect, MAX_STADIUM_EFFECT) / MAX_STADIUM_EFFECT; }
         public double FireDepartmentEffect { get => Math.Min(_fireDepartmentEffect, MAX_FIRE_DEPARTMENT_EFFECT) / MAX_FIRE_DEPARTMENT_EFFECT; }
@@ -36,9 +38,11 @@ namespace CCity.Model
 
         #region Constructors
 
-        public Field()
+        public Field(int x, int y)
         {
             Placeable = null;
+            X = x;
+            Y = y;
             LastCalculatedSatisfaction = 0;
             _policeDepartmentEffect = 0;
             _stadiumEffect = 0;
