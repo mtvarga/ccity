@@ -35,10 +35,9 @@ namespace CCity.Model
 
         #region Public methods
         
-
         public void SwapWorkplace(WorkplaceZone workplaceZone)
         {
-            throw new NotImplementedException();
+            this.WorkPlace = workplaceZone;
         }
 
         public void MoveOut()
