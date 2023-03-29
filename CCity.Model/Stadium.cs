@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CCity.Model
 {
-    public class Stadium : IFlammable, IMultifield
+    public class Stadium : Placeable, IFlammable, IMultifield
     {
         #region Constructors
 
@@ -18,6 +18,10 @@ namespace CCity.Model
         #endregion
 
         #region Properties
+
+        public override int PlacementCost => throw new NotImplementedException();
+
+        public override int MaintenanceCost => throw new NotImplementedException();
 
         double IFlammable.Pontential => throw new NotImplementedException();
 
