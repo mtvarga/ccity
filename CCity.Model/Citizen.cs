@@ -38,6 +38,7 @@ namespace CCity.Model
         
         public void SwapWorkplace(WorkplaceZone workplaceZone)
         {
+            this.WorkPlace.DropCitizen(this);
             this.WorkPlace = workplaceZone;
         }
 
