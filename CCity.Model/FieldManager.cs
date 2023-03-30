@@ -94,14 +94,14 @@ namespace CCity.Model
 
         }
 
-        private void HandleRoadPDemolition(Field field)
+        private void HandleRoadDemolition(Field field)
         {
             Road demolishedRoad = (Road) field.Placeable;
             if(demolishedRoad.IsPublic)
             {
                 foreach(Road road in demolishedRoad.GivesPublicityTo)
                 {
-                    ModifyRoads(road);
+                    ModifyRoad(road);
                 }
 
             }
@@ -132,6 +132,11 @@ namespace CCity.Model
                     SpreadPublicity(road,GetRoadNeighbours(neigbour.X,neigbour.Y));
                 };
             }
+        }
+
+        private void ModifyRoad(Road road)
+        {
+
         }
 
         #endregion
