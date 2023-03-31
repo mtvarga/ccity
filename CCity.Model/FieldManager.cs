@@ -2,6 +2,8 @@
 {
     public class FieldManager
     {
+        //commit test
+
         #region Constants
 
         private const int MAX_EFFECT = 20;
@@ -29,7 +31,7 @@
                 return effectedFields; //empty
             }
             Field field = Fields[x][y];
-            
+
             /*
              * 
              */
@@ -85,7 +87,7 @@
             return list;
         }
 
-        private bool OnMap(int x,int y)
+        private bool OnMap(int x, int y)
         {
             throw new NotImplementedException();
         }
