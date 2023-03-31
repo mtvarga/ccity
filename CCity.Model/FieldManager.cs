@@ -89,7 +89,9 @@
 
         private bool OnMap(int x, int y)
         {
-            throw new NotImplementedException();
+            if(x<0 || x >= WIDTH) return false;
+            if(y<0 || y >= HEIGHT) return false;
+            return true;
         }
 
         private bool CanPlace(int x, int y, Placeable placeable)
@@ -163,8 +165,8 @@
         private void HandleRoadPlacement(Field field)
         {
             if (field.Placeable == null) return;
-            Road placedRoad = (Road) field.Placeable;
-            List<Field> roadNeigbours = GetTypeNeighbours(field,typeof(Road));
+            Road placedRoad = (Road)field.Placeable;
+            List<Field> roadNeigbours = GetTypeNeighbours(field, typeof(Road));
 
             foreach (Field neigbour in roadNeigbours)
             {
@@ -187,17 +189,16 @@
 
         private void HandleRoadDemolition(Field field)
         {
-            if(field.Placeable==null) return;
+            if (field.Placeable == null) return;
             Road demolishedRoad = (Road)field.Placeable;
-            List<Field> givesPublicityTo = demolishedRoad.GivesPublicityTo;
-            demolishedRoad.GivesPublicityTo.Clear();
             if (demolishedRoad.IsPublic)
             {
+                demolishedRoad.GetPublicityFrom = null;
+                List<Field> givesPublicityTo = demolishedRoad.GivesPublicityTo.ToList();
                 foreach (Field roadField in givesPublicityTo)
                 {
                     ModifyRoad(roadField);
                 }
-
             }
         }
 
@@ -207,10 +208,10 @@
             int y = field.Y;
             List<Field> neighbours = new List<Field>();
 
-            if (OnMap(x, y) && Fields[x - 1,y].Has(type)) neighbours.Add(Fields[x - 1,y]);
-            if (OnMap(x, y) && Fields[x + 1,y].Has(type)) neighbours.Add(Fields[x + 1,y]);
-            if (OnMap(x, y) && Fields[x,y - 1].Has(type)) neighbours.Add(Fields[x,y - 1]);
-            if (OnMap(x, y) && Fields[x,y + 1].Has(type)) neighbours.Add(Fields[x,y + 1]);
+            if (OnMap(x-1, y) && Fields[x - 1,y].Has(type)) neighbours.Add(Fields[x - 1,y]);
+            if (OnMap(x+1, y) && Fields[x + 1,y].Has(type)) neighbours.Add(Fields[x + 1,y]);
+            if (OnMap(x, y-1) && Fields[x,y - 1].Has(type)) neighbours.Add(Fields[x,y - 1]);
+            if (OnMap(x, y+1) && Fields[x,y + 1].Has(type)) neighbours.Add(Fields[x,y + 1]);
 
             return neighbours;
         }
@@ -235,14 +236,15 @@
 
         private void ModifyRoad(Field actualField)
         {
-            if(actualField.Placeable == null) return;
-            Road actualRoad = (Road) actualField.Placeable;
+            if (actualField.Placeable == null) return;
+            Road actualRoad = (Road)actualField.Placeable;
+            actualRoad.GetPublicityFrom = null;
             List<Field> roadNeigbourFields = GetTypeNeighbours(actualField, typeof(Road));
-            foreach(Field roadNeigbourField in roadNeigbourFields)
+            foreach (Field roadNeigbourField in roadNeigbourFields)
             {
-                if(roadNeigbourField.Placeable == null) continue;
+                if (roadNeigbourField.Placeable == null) continue;
                 Road neigbourRoad = (Road)roadNeigbourField.Placeable;
-                if(neigbourRoad.IsPublic)
+                if (neigbourRoad.IsPublic)
                 {
                     actualRoad.GetPublicityFrom = neigbourRoad;
                     neigbourRoad.GivesPublicityTo.Add(actualField);
@@ -250,7 +252,7 @@
                 }
             }
 
-            if(actualRoad.IsPublic)
+            if (actualRoad.IsPublic)
             {
                 SpreadRoadPublicity(actualField);
             }
