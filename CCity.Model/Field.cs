@@ -1,4 +1,6 @@
-﻿namespace CCity.Model
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace CCity.Model
 {
     public class Field
     {
@@ -78,6 +80,12 @@
         {
             _forestEffect += n;
         }
+
+        public bool Has(Type type)
+        {
+            if (Placeable == null) return false;
+            return Placeable.GetType() == type;
+        } 
 
         #endregion
 
