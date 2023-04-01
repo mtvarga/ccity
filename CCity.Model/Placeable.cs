@@ -11,6 +11,7 @@ namespace CCity.Model
     {
         #region Properties
 
+        public Field? Owner { get; internal set; }
         public abstract int PlacementCost { get; }
         public abstract int MaintenanceCost { get; }
         public int ElectrifiedNeighbours { get; internal set; }
@@ -24,6 +25,11 @@ namespace CCity.Model
         public virtual int CalculateSatisfaction()
         {
             return 0;
+        }
+
+        public void PlaceAt(Field field)
+        {
+            Owner = field;
         }
 
         #endregion
