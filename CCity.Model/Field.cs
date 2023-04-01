@@ -104,6 +104,20 @@ namespace CCity.Model
             }
         }
 
+        internal bool Place(Placeable placeable)
+        {
+            if (Placeable != null) return false;
+            Placeable = placeable;
+            return true;
+        }
+
+        internal bool Demolish()
+        {
+            if (Placeable == null) return false;
+            Placeable = null;
+            return true;
+        }
+
         #endregion
 
     }
