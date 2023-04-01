@@ -4,7 +4,7 @@
     {
         #region Constants
 
-        private const int MAX_EFFECT = 20;
+        private const int MAX_EFFECT = 10;
         private const int EFFECT_RADIUS = 10;
         private const int HEIGHT = 50;
         private const int WIDTH = 50;
@@ -18,6 +18,27 @@
         public int Height { get; private set; }
         private Dictionary<Forest, int> _growingForests;
         private List<Field> _burningBuildings;
+
+        #endregion
+
+        #region Constructors
+
+        public FieldManager()
+        {
+            Width = WIDTH;
+            Height = HEIGHT;
+            Fields = new Field[Width, Height];
+
+            for (int i = 0; i < Width; i++)
+                for (int j = 0; j < Height; j++)
+                    Fields[i, j] = new Field(i, j);
+
+            //todo: Place forests
+
+            //lists
+            _growingForests = new();
+            _burningBuildings = new();
+        }
 
         #endregion
 
@@ -41,6 +62,8 @@
             return effectedFields; //empty
         }
 
+        #region Placeables with effect
+
         public List<Field> Place(int x, int y, FireDepartment fireDepartment)
         {
             return PlacePlaceableWithEffect(x, y, fireDepartment, (f, i) => f.ChangeFireDepartmentEffect(i));
@@ -55,6 +78,13 @@
         {
             return PlacePlaceableWithEffect(x, y, stadium, (f, i) => f.ChangeStadiumEffect(i));
         }
+
+        public List<Field> Place(int x, int y, IndustrialZone industrialZone)
+        {
+            return PlacePlaceableWithEffect(x, y, industrialZone, (f, i) => f.ChangeIndustrialEffect(i));
+        }
+
+        #endregion
 
         public List<Field> Upgrade(int x, int y)
         {
@@ -149,7 +179,7 @@
             return true;
         }
 
-        private List<Field> PlacePlaceableWithEffect(int x, int y, Placeable placeable, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS)
+        private List<Field> PlacePlaceableWithEffect(int x, int y, Placeable placeable, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS, int maxEffect = MAX_EFFECT)
         {
             List<Field> effectedFields = new();
             if(!CanPlace(x, y, placeable))
@@ -168,7 +198,7 @@
                 int tupleX = coord.Item1; int tupleY = coord.Item2; double percentage = coord.Item3;
                 if (OnMap(tupleX, tupleY))
                 {
-                    int effect = (int)Math.Round(percentage * MAX_EFFECT);
+                    int effect = (int)Math.Round(percentage * maxEffect);
                     Field effectedField = Fields[tupleX,tupleY];
                     effectFunction(effectedField, effect);
                     effectedFields.Add(effectedField);
