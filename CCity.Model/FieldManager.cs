@@ -1,4 +1,6 @@
-﻿namespace CCity.Model
+﻿using System.Runtime.InteropServices;
+
+namespace CCity.Model
 {
     public class FieldManager
     {
@@ -54,7 +56,7 @@
                 return effectedFields; //empty
             }
             Field field = Fields[x,y];
-            if (!field.Place(placeable))
+            if (!PlaceOnField(field, placeable))
             {
                 throw new Exception();
             };
@@ -71,7 +73,7 @@
                 return effectedFields; //empty
             }
             Field field = Fields[x, y];
-            if (!field.Place(road))
+            if (!PlaceOnField(field, road))
             {
                 throw new Exception();
             };
@@ -91,7 +93,7 @@
                 return effectedFields; //empty
             }
             Field field = Fields[x, y];
-            if (!field.Place(powerPlant))
+            if (!PlaceOnField(field, powerPlant))
             {
                 throw new Exception();
             };
@@ -109,7 +111,7 @@
                 return effectedFields; //empty
             }
             Field field = Fields[x, y];
-            if (!field.Place(forest))
+            if (!PlaceOnField(field, forest))
             {
                 throw new Exception();
             };
@@ -206,11 +208,10 @@
             {
                 return false;
             }
-            if (field is IMultifield)
+            if (placeable is IMultifield)
             {
-                int width = ((IMultifield)field).Width;
-                int height = ((IMultifield)field).Height;
-                List<Field> neededFields = new();
+                int width = ((IMultifield)placeable).Width;
+                int height = ((IMultifield)placeable).Height;
                 for (int i = 0; i < width; i++)
                 {
                     for (int j = 0; j < height; j++)
@@ -219,7 +220,7 @@
                         int currentY = field.Y + j;
                         if (!OnMap(currentX, currentY))
                         {
-                            Field currentField = Fields[currentX,currentY];
+                            Field currentField = Fields[currentX, currentY];
                             if (currentField.HasPlaceable)
                             {
                                 return false;
@@ -260,11 +261,47 @@
                     effectedFields.Add(effectedField);
                 }
             }
-            if (!field.Place(placeable))
+            if (!PlaceOnField(field, placeable))
             {
                 throw new Exception();
             };
             return effectedFields;
+        }
+
+        private bool PlaceOnField(Field field, Placeable placeable)
+        {
+            int x = field.X;
+            int y = field.Y;
+            if(!CanPlace(x, y, placeable))
+            {
+                return false;
+            }
+
+            if (placeable is IMultifield)
+            {
+                IMultifield multifield = (IMultifield)placeable;
+                int width = multifield.Width;
+                int height = multifield.Height;
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        int currentX = field.X + i;
+                        int currentY = field.Y + j;
+                        if (currentX != field.X || currentY != field.Y)
+                        {
+                            Field currentField = Fields[currentX, currentY];
+                            Filler filler = new Filler(multifield);
+                            if (!currentField.Place(filler))
+                            {
+                                return false;
+                            }
+                            multifield.Occupies.Add(filler);
+                        }
+                    }
+                }
+            }
+            return field.Place(placeable);
         }
 
         private bool CanDemolishRoad(Field field)

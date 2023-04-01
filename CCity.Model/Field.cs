@@ -100,6 +100,7 @@ namespace CCity.Model
         {
             if (Placeable != null) return false;
             Placeable = placeable;
+            placeable.PlaceAt(this);
             return true;
         }
 
