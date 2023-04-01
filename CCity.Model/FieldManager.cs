@@ -41,6 +41,21 @@
             return effectedFields; //empty
         }
 
+        public List<Field> Place(int x, int y, FireDepartment fireDepartment)
+        {
+            return PlacePlaceableWithEffect(x, y, fireDepartment, (f, i) => f.ChangeFireDepartmentEffect(i));
+        }
+
+        public List<Field> Place(int x, int y, PoliceDepartment policeDepartment)
+        {
+            return PlacePlaceableWithEffect(x, y, policeDepartment, (f, i) => f.ChangePoliceDepartmentEffect(i));
+        }
+
+        public List<Field> Place(int x, int y, Stadium stadium)
+        {
+            return PlacePlaceableWithEffect(x, y, stadium, (f, i) => f.ChangeStadiumEffect(i));
+        }
+
         public List<Field> Upgrade(int x, int y)
         {
             throw new NotImplementedException();
@@ -134,15 +149,20 @@
             return true;
         }
 
-        private List<Field> PlacePlaceableWithEffect(Field field, Placeable placeable, Action<Field, int> effectFunction)
+        private List<Field> PlacePlaceableWithEffect(int x, int y, Placeable placeable, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS)
         {
+            List<Field> effectedFields = new();
+            if(!CanPlace(x, y, placeable))
+            {
+                // event
+                return effectedFields; //empty
+            }
+            Field field = Fields[x, y];
             if (!(placeable is FireDepartment || placeable is PoliceDepartment || placeable is Stadium))
             {
                 throw new ArgumentException("Illegal argument.");
             }
-
-            List<Field> effectedFields = new();
-            List<Tuple<int, int, double>> coordinates = GetCoordinatesInRadius(field.X, field.Y, EFFECT_RADIUS);
+            List<Tuple<int, int, double>> coordinates = GetCoordinatesInRadius(field.X, field.Y, radius);
             foreach (Tuple<int, int, double> coord in coordinates)
             {
                 int tupleX = coord.Item1; int tupleY = coord.Item2; double percentage = coord.Item3;
