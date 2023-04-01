@@ -53,9 +53,14 @@ namespace CCity.Model
             }
             return true;
         }
-        public void UpdateSatisfaction(List<Field> filelds)
+        public void UpdateSatisfaction(List<Field> fields)
         {
-            throw new NotImplementedException();
+            foreach (Field field in fields)
+            {
+                GlobalSatisfactionScore -= field.LastCalculatedSatisfaction;
+                field.CalculateSatisfaction();
+                GlobalSatisfactionScore += field.LastCalculatedSatisfaction;
+            }
         }
         public void UpdateSatisfaction(Dictionary<WorkplaceZone, Citizen> changes)
         {
