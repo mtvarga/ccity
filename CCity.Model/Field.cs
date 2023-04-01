@@ -9,6 +9,7 @@ namespace CCity.Model
         private const int MAX_STADIUM_EFFECT = 10;
         private const int MAX_FIRE_DEPARTMENT_EFFECT = 10;
         private const int MAX_FOREST_EFFECT = 10;
+        private const int MAX_INDUSTRIAL_EFFECT = 10;
         #endregion
 
         #region Fields
@@ -22,6 +23,7 @@ namespace CCity.Model
         private int _stadiumEffect;
         private int _fireDepartmentEffect;
         private int _forestEffect;
+        private int _industrialEffect;
 
         public int X { get; }
         public int Y { get; }
@@ -30,6 +32,7 @@ namespace CCity.Model
         public double StadiumEffect { get => Math.Min(_stadiumEffect, MAX_STADIUM_EFFECT) / MAX_STADIUM_EFFECT; }
         public double FireDepartmentEffect { get => Math.Min(_fireDepartmentEffect, MAX_FIRE_DEPARTMENT_EFFECT) / MAX_FIRE_DEPARTMENT_EFFECT; }
         public double ForestEffect { get => Math.Min(_forestEffect, MAX_FOREST_EFFECT) / MAX_FOREST_EFFECT; }
+        public double IndustrialEffect { get => Math.Min(_industrialEffect, MAX_INDUSTRIAL_EFFECT) / MAX_INDUSTRIAL_EFFECT; }
 
         #endregion
 
@@ -45,6 +48,7 @@ namespace CCity.Model
             _stadiumEffect = 0;
             _fireDepartmentEffect = 0;
             _forestEffect = 0;
+            _industrialEffect = 0;
         }
 
         #endregion
@@ -79,6 +83,11 @@ namespace CCity.Model
         public void ChangeForestEffect(int n)
         {
             _forestEffect += n;
+        }
+
+        public void ChangeIndustrialEffect(int n)
+        {
+            _industrialEffect += n;
         }
 
         public bool Has(Type type)
