@@ -14,6 +14,8 @@
         #region Fields
 
         public Field[,] Fields;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
         private Dictionary<Forest, int> _growingForests;
         private List<Field> _burningBuildings;
 
@@ -89,9 +91,7 @@
 
         private bool OnMap(int x, int y)
         {
-            if(x<0 || x >= WIDTH) return false;
-            if(y<0 || y >= HEIGHT) return false;
-            return true;
+            return 0 <= x && x < Width && 0 <= y && y < Height;
         }
 
         private bool CanPlace(int x, int y, Placeable placeable)
