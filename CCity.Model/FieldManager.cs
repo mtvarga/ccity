@@ -44,7 +44,7 @@
 
         #region Public methods
 
-
+        //Pole, ResidentalZone, CommercialZone
         public List<Field> Place(int x, int y, Placeable placeable)
         {
             List<Field> effectedFields = new();
@@ -54,12 +54,68 @@
                 return effectedFields; //empty
             }
             Field field = Fields[x,y];
-
-            /*
-             * 
-             */
-
+            if (!field.Place(placeable))
+            {
+                throw new Exception();
+            };
+            effectedFields.Add(field);
             return effectedFields; //empty
+        }
+
+        public List<Field> Place(int x, int y, Road road)
+        {
+            List<Field> effectedFields = new();
+            if (!CanPlace(x, y, road))
+            {
+                // event
+                return effectedFields; //empty
+            }
+            Field field = Fields[x, y];
+            if (!field.Place(road))
+            {
+                throw new Exception();
+            };
+            HandleRoadPlacement(field);
+            effectedFields.Add(field);
+            /*TO DO: HandleRoadPlacement returns List<Field>
+            with Roads affected and Placeables become public*/
+            return effectedFields;
+        }
+
+        public List<Field> Place(int x, int y, PowerPlant powerPlant)
+        {
+            List<Field> effectedFields = new();
+            if (!CanPlace(x, y, powerPlant))
+            {
+                // event
+                return effectedFields; //empty
+            }
+            Field field = Fields[x, y];
+            if (!field.Place(powerPlant))
+            {
+                throw new Exception();
+            };
+            /*TO DO: Electricity,
+             fill effectedFields */
+            return effectedFields;
+        }
+
+        public List<Field> Place(int x, int y, Forest forest)
+        {
+            List<Field> effectedFields = new();
+            if (!CanPlace(x, y, forest))
+            {
+                // event
+                return effectedFields; //empty
+            }
+            Field field = Fields[x, y];
+            if (!field.Place(forest))
+            {
+                throw new Exception();
+            };
+            /*TO DO: Forest effect,
+             fill effectedFields */
+            return effectedFields;
         }
 
         #region Placeables with effect
@@ -204,6 +260,10 @@
                     effectedFields.Add(effectedField);
                 }
             }
+            if (!field.Place(placeable))
+            {
+                throw new Exception();
+            };
             return effectedFields;
         }
 
