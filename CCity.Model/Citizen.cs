@@ -40,6 +40,7 @@ namespace CCity.Model
         {
             this.WorkPlace.DropCitizen(this);
             this.WorkPlace = workplaceZone;
+            this.WorkPlace.AddCitizen(this);
         }
 
         public void MoveOut()
