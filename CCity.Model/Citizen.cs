@@ -25,7 +25,7 @@ namespace CCity.Model
 
         #region Constructors
 
-        public Citizen(ResidentialZone residentalZone,WorkplaceZone workplaceZone)
+        public Citizen(ResidentialZone home, WorkplaceZone workplace)
         {
             Home = residentalZone;
             Home.AddCitizen(this);
