@@ -8,6 +8,13 @@ namespace CCity.Model
 {
     public class MainModel
     {
+        #region Constants
+        
+        public const int MaxCitizenSatisfactionScore =
+            2 * GlobalManager.MaxFieldSatisfactionFactors + GlobalManager.MaxCitizenSatisfactionFactors;
+
+        #endregion
+        
         #region Fields
 
         private FieldManager _fieldManager;
