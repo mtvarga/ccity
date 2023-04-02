@@ -45,7 +45,8 @@ namespace CCity.Model
 
         public void MoveOut()
         {
-            throw new NotImplementedException();
+            Home.DropCitizen(this);
+            WorkPlace.DropCitizen(this);
         }
 
         public int CalculateSatisfaction()
