@@ -28,11 +28,11 @@ namespace CCity.Model
         } 
         
         public static IEnumerable<(int X, int Y, double Weight)> GetPointsInRadiusWeighted(int x, int y, int r) => 
-            from coordinate in GetPointsInRadius(x, y, r) 
+            from point in GetPointsInRadius(x, y, r) 
             select (
-                coordinate.X, 
-                coordinate.Y, 
-                Math.Sin(Math.Round(Math.Sqrt(Math.Pow(coordinate.X - x, 2) + Math.Pow(coordinate.Y - y, 2))) / r)
+                point.X, 
+                point.Y, 
+                Math.Sin(Math.Round(Math.Sqrt(Math.Pow(point.X - x, 2) + Math.Pow(point.Y - y, 2))) / r)
             );
     }
 }
