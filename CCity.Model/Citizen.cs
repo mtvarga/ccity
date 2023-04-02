@@ -27,8 +27,10 @@ namespace CCity.Model
 
         public Citizen(ResidentialZone residentalZone,WorkplaceZone workplaceZone)
         {
-            this.Home = residentalZone;
-            this.WorkPlace = workplaceZone;
+            Home = residentalZone;
+            Home.AddCitizen(this);
+            WorkPlace = workplaceZone;
+            WorkPlace.AddCitizen(this);
         }
 
         #endregion
