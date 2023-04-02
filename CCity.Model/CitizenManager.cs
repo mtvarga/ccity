@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public class CitizenManager
     {
-
         #region Fields
 
-        public List<Citizen> Citizens;
-        public int Population;
-
+        private readonly int _citizenMoveOutThreshold = Convert.ToInt32(Math.Round(0.25 * MainModel.MaxCitizenSatisfactionScore));
+        
         #endregion
 
         #region Properties
 
-
+        public List<Citizen> Citizens { get; }
+        public int Population => Citizens.Count;
 
         #endregion
 
@@ -26,33 +19,88 @@ namespace CCity.Model
 
         public CitizenManager()
         {
-            throw new NotImplementedException();
+            Citizens = new List<Citizen>();
         }
 
         #endregion
 
         #region Public methods
 
-        public Dictionary<WorkplaceZone, Citizen> OptimazeWorkplaces()
+        public List<Citizen> IncreasePopulation(List<ResidentialZone> vacantHomes, List<WorkplaceZone> vacantWorkplaces)
         {
-            throw new NotImplementedException();
+            var result = new List<Citizen>();
+            
+            // For now, the method will take all the vacant homes and put some citizens in them
+            // It might not fill up a home entirely -- there might still be empty slots left in a home or a workplace after this algorithm is done
+            // TODO: Improve algorithm? - Select some homes randomly and fill those up
+            // TODO: Implement some sort of updating of these vacant homes in FieldManager
+            foreach (var home in vacantHomes)
+            {
+                var freeSlots = home.Capacity - home.Current;
+                var newCitizenCount = freeSlots > 2 
+                    ? new Random(DateTime.Now.Millisecond).Next(3, Math.Min(6, freeSlots)) 
+                    : freeSlots;
+
+                for (var i = 0; i < newCitizenCount; i++)
+                {
+                    var workplace = FindNearestWorkplace(home, vacantWorkplaces);
+                    var citizen = new Citizen(home, workplace);
+                    
+                    Citizens.Add(citizen);
+                    result.Add(citizen);
+
+                    if (workplace.Capacity - workplace.Current == 0)
+                        vacantWorkplaces.Remove(workplace);
+                }
+            }
+
+            return result;
         }
-        public List<Citizen> Increasepopulation()
-        {
-            throw new NotImplementedException ();
-        }
+
         public List<Citizen> DecreasePopulation()
         {
-            throw new NotImplementedException();
+            var result = new List<Citizen>();
+
+            foreach (var citizen in Citizens)
+            {
+                if (citizen.LastCalculatedSatisfaction < _citizenMoveOutThreshold)
+                {
+                    citizen.MoveOut();
+                    
+                    result.Add(citizen);
+                    Citizens.Remove(citizen);
+                }
+            }
+
+            return result;
+        }
+
+        public Dictionary<WorkplaceZone, Citizen> OptimizeWorkplaces()
+        {
+            // TODO: Implement workplace optimization algorithm
+            return new Dictionary<WorkplaceZone, Citizen>();
         }
 
         #endregion
 
         #region Private methods
 
+        private static WorkplaceZone FindNearestWorkplace(Placeable p, List<WorkplaceZone> vacantWorkplaces)
+        {
+            var nearestWorkplace = vacantWorkplaces.First();
+            var smallestDistance = Utilities.AbsoluteDistance(p, nearestWorkplace);
+            
+            foreach (var workplace in vacantWorkplaces)
+            {
+                var currentDistance = Utilities.AbsoluteDistance(p, workplace);
 
+                if (currentDistance < smallestDistance)
+                    (nearestWorkplace, smallestDistance) = (workplace, currentDistance);
+            }
+
+            return nearestWorkplace;
+        }
 
         #endregion
-
     }
 }
