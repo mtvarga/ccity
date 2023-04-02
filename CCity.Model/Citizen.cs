@@ -17,7 +17,7 @@ namespace CCity.Model
 
         public string Name { get; }
         public ResidentialZone Home { get; private set; }
-        public WorkplaceZone WorkPlace { get; private set; }
+        public WorkplaceZone Workplace { get; private set; }
         public double Satisfaction { get; }
         public int LastCalculatedSatisfaction { get; internal set; }
         
