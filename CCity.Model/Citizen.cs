@@ -27,27 +27,27 @@ namespace CCity.Model
 
         public Citizen(ResidentialZone home, WorkplaceZone workplace)
         {
-            Home = residentalZone;
+            Home = home;
             Home.AddCitizen(this);
-            WorkPlace = workplaceZone;
-            WorkPlace.AddCitizen(this);
+            Workplace = workplace;
+            Workplace.AddCitizen(this);
         }
 
         #endregion
 
         #region Public methods
         
-        public void SwapWorkplace(WorkplaceZone workplaceZone)
+        public void SwapWorkplace(WorkplaceZone workplace)
         {
-            this.WorkPlace.DropCitizen(this);
-            this.WorkPlace = workplaceZone;
-            this.WorkPlace.AddCitizen(this);
+            Workplace.DropCitizen(this);
+            Workplace = workplace;
+            Workplace.AddCitizen(this);
         }
 
         public void MoveOut()
         {
             Home.DropCitizen(this);
-            WorkPlace.DropCitizen(this);
+            Workplace.DropCitizen(this);
         }
 
         public int CalculateSatisfaction()
