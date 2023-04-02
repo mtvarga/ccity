@@ -8,7 +8,6 @@ namespace CCity.Model
 {
     public class Citizen
     {
-
         #region Fields
 
 
@@ -17,8 +16,8 @@ namespace CCity.Model
         #region Properties
 
         public string Name { get; }
-        public ResidentialZone Home { get; private set;}
-        public WorkplaceZone WorkPlace { get; private set;}
+        public ResidentialZone Home { get; private set; }
+        public WorkplaceZone WorkPlace { get; private set; }
         public double Satisfaction { get; }
         public int LastCalculatedSatisfaction { get; internal set; }
         
@@ -51,14 +50,14 @@ namespace CCity.Model
 
         public int CalculateSatisfaction()
         {
-            //TODO: Calculate satisfaction
+            // TODO: Calculate satisfaction
+            return 0;
         }
         
         #endregion
 
         #region Private methods
-
-
+        
 
         #endregion
 
