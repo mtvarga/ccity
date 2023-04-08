@@ -178,8 +178,8 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
-        public List<ResidentialZone> AvailableResidentalZones() => _residentialZones.FindAll(zone => !zone.IsFull);
-        public List<WorkplaceZone> AvailableWorkplaceZones() => _workplaceZones.FindAll(zone => !zone.IsFull);
+        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.FindAll(zone => !zone.IsFull || showUnavailable);
+        public List<WorkplaceZone> WorkplaceZones(bool showUnavailable) => _workplaceZones.FindAll(zone => !zone.IsFull || showUnavailable);
 
         #endregion
 
