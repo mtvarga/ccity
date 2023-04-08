@@ -21,6 +21,7 @@ namespace CCity
         //private MainViewModel _viewModel;
         private MainWindow _mainWindow;
         private UserControl _startupWindow;
+        private UserControl _gameWindow;
 
         App()
         {
@@ -33,9 +34,12 @@ namespace CCity
             //_viewModel = new(_model);
             _mainWindow = new();
             _startupWindow = new StartupWindow();
+            _gameWindow = new GameWindow();
 
             //_mainWindow.DataContext = _viewModel;
-            _mainWindow.NavigateTo(_startupWindow);
+
+            //_mainWindow.NavigateTo(_startupWindow);
+            _mainWindow.NavigateTo(_gameWindow); //for testing purposes
             _mainWindow.Show();
 
         }
