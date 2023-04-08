@@ -7,8 +7,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="550"
              d:DesignWidth="900"
-             Background="#dff0ef"
              FontFamily="Arial">
+    <UserControl.Background>
+        <ImageBrush ImageSource="Images/background.jpg"/>
+    </UserControl.Background>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

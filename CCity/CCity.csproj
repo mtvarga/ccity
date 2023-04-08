@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="View\Images\background.jpg" />
     <None Remove="View\Images\banner.png" />
     <None Remove="View\Images\icon.ico" />
     <None Remove="View\Images\profile.png" />
@@ -19,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="View\Images\background.jpg" />
     <Resource Include="View\Images\profile.png" />
   </ItemGroup>
 
