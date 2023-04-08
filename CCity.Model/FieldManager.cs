@@ -21,6 +21,9 @@ namespace CCity.Model
         private Dictionary<Forest, int> _growingForests;
         private List<Field> _burningBuildings;
 
+        private List<ResidentialZone> _residentialZones;
+        private List<WorkplaceZone> _workplaceZones;
+
         #endregion
 
         #region Constructors
@@ -59,7 +62,17 @@ namespace CCity.Model
             if (!PlaceOnField(field, placeable))
             {
                 throw new Exception();
-            };
+            }
+
+            if(placeable is ResidentialZone)
+            {
+                _residentialZones.Add((ResidentialZone)placeable);
+            }
+            else if (placeable is CommercialZone)
+            {
+                _workplaceZones.Add((WorkplaceZone)placeable);
+            }
+
             effectedFields.Add(field);
             return effectedFields; //empty
         }
@@ -164,6 +177,9 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
+        public List<ResidentialZone> AvailableResidentalZones() => _residentialZones.FindAll(zone => !zone.IsFull);
+        public List<WorkplaceZone> AvailableWorkplaceZones() => _workplaceZones.FindAll(zone => !zone.IsFull);
+
         #endregion
 
         #region Private methods
@@ -245,7 +261,7 @@ namespace CCity.Model
                 return effectedFields; //empty
             }
             Field field = Fields[x, y];
-            if (!(placeable is FireDepartment || placeable is PoliceDepartment || placeable is Stadium))
+            if (!(placeable is FireDepartment || placeable is PoliceDepartment || placeable is Stadium || placeable is IndustrialZone))
             {
                 throw new ArgumentException("Illegal argument.");
             }
@@ -265,6 +281,10 @@ namespace CCity.Model
             {
                 throw new Exception();
             };
+            if (placeable is IndustrialZone)
+            {
+                _workplaceZones.Add((WorkplaceZone)placeable);
+            }
             return effectedFields;
         }
 
