@@ -55,6 +55,7 @@ namespace CCity.Model
         }
         public void UpdateSatisfaction(List<Field> fields)
         {
+            // TODO: Update this based on issue #27
             foreach (Field field in fields)
             {
                 GlobalSatisfactionScore -= field.LastCalculatedSatisfaction;
@@ -62,10 +63,17 @@ namespace CCity.Model
                 GlobalSatisfactionScore += field.LastCalculatedSatisfaction;
             }
         }
-        public void UpdateSatisfaction(Dictionary<WorkplaceZone, Citizen> changes)
+        
+        public void UpdateSatisfaction(List<Citizen> changes)
         {
-            throw new NotImplementedException();
+            foreach (var citizen in changes)
+            {
+                GlobalSatisfactionScore -= citizen.LastCalculatedSatisfaction;
+                CalculateSatisfaction(citizen);
+                GlobalSatisfactionScore += citizen.LastCalculatedSatisfaction;
+            }
         }
+        
         public void UpdateSatisfaction(bool movedIn, List<Citizen> changes)
         {
             throw new NotImplementedException();
@@ -76,7 +84,10 @@ namespace CCity.Model
 
         #region Private methods
 
-
+        private static void CalculateSatisfaction(Citizen citizen)
+        {
+            
+        }
 
         #endregion
 
