@@ -64,9 +64,9 @@ namespace CCity.Model
             }
         }
         
-        public void UpdateSatisfaction(List<Citizen> changes)
+        public void UpdateSatisfaction(List<Citizen> citizens)
         {
-            foreach (var citizen in changes)
+            foreach (var citizen in citizens)
             {
                 GlobalSatisfactionScore -= citizen.LastCalculatedSatisfaction;
                 CalculateSatisfaction(citizen);
@@ -74,9 +74,15 @@ namespace CCity.Model
             }
         }
         
-        public void UpdateSatisfaction(bool movedIn, List<Citizen> changes)
+        public void UpdateSatisfaction(bool movedIn, List<Citizen> citizens)
         {
-            throw new NotImplementedException();
+            foreach (var citizen in citizens)
+            {
+                if (movedIn)
+                    CalculateSatisfaction(citizen);
+                
+                GlobalSatisfactionScore += (movedIn ? 1 : -1) * citizen.LastCalculatedSatisfaction;
+            }
         }
 
 
