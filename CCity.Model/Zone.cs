@@ -33,6 +33,8 @@ namespace CCity.Model
 
         public bool IsFull => Capacity <= Current;
 
+        public bool HasCitizen => Current > 0;
+
         #endregion
 
         #region Public methods

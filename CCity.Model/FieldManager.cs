@@ -163,9 +163,27 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
-        public bool Demolish(int x, int y)
+        public List<Field>? Demolish(int x, int y)
         {
-            throw new NotImplementedException();
+            if(!CanDemolish(x, y))
+            {
+                return null;
+            }
+            Field field = Fields[x, y];
+            Placeable placeable = field.Placeable;
+            List<Field>? effectedFields = new();
+
+            if (placeable is Road) effectedFields = DemolishRoad(field);
+            else if (placeable is FireDepartment) effectedFields = DemolishPlaceableWithEffect(field, (f, i) => f.ChangeFireDepartmentEffect(i));
+            else if (placeable is PoliceDepartment) effectedFields = DemolishPlaceableWithEffect(field, (f, i) => f.ChangePoliceDepartmentEffect(i));
+            else if (placeable is Stadium) effectedFields = DemolishPlaceableWithEffect(field, (f, i) => f.ChangeStadiumEffect(i));
+            else if (placeable is IndustrialZone) effectedFields = DemolishPlaceableWithEffect(field, (f, i) => f.ChangeIndustrialEffect(i));
+            else
+            {
+                field.Demolish();
+                effectedFields.Add(field);
+            }
+            return effectedFields;
         }
 
         public List<Field> GrowForests()
@@ -253,6 +271,22 @@ namespace CCity.Model
             return true;
         }
 
+        private bool CanDemolish(int x, int y)
+        {
+            if (!OnMap(x, y)) return false;
+            Field field = Fields[x, y];
+            if (!field.HasPlaceable)
+            {
+                return false;
+            }
+
+            Placeable placeable = field.Placeable;
+            if (placeable is Road) return CanDemolishRoad(field);
+            else if (placeable is FireDepartment fireDepartment) return fireDepartment.AvailableFiretrucks == 1; //every firetruck is available
+            else if (placeable is Zone zone) return zone.HasCitizen;
+            return true;
+        }
+
         private List<Field> PlacePlaceableWithEffect(int x, int y, Placeable placeable, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS, int maxEffect = MAX_EFFECT)
         {
             List<Field> effectedFields = new();
@@ -298,9 +332,8 @@ namespace CCity.Model
                 return false;
             }
 
-            if (placeable is IMultifield)
+            if (placeable is IMultifield multifield)
             {
-                IMultifield multifield = (IMultifield)placeable;
                 int width = multifield.Width;
                 int height = multifield.Height;
                 for (int i = 0; i < width; i++)
@@ -323,6 +356,87 @@ namespace CCity.Model
                 }
             }
             return field.Place(placeable);
+        }
+
+        private List<Field> DemolishFromField(Field field)
+        {
+            int x = field.X;
+            int y = field.Y;
+            List<Field> effectedFields = new();
+            if(!CanDemolish(x, y))
+            {
+                return null;
+            }
+
+            Placeable placeable = field.Placeable;
+
+            if (placeable is IMultifield || placeable is Filler)
+            {
+                IMultifield multifield = (IMultifield)GetRoot(placeable);
+                foreach(Filler filler in multifield.Occupies)
+                {
+                    Field fillerField = filler.Owner;
+                    if (!fillerField.Demolish())
+                    {
+                        throw new Exception();
+                    }
+                    effectedFields.Add(fillerField);
+                }
+                Field multifieldField = ((Placeable)multifield).Owner;
+                multifieldField.Demolish();
+                effectedFields.Add(multifieldField);
+            }
+            else
+            {
+                field.Demolish();
+                effectedFields.Add(field);
+            }
+            return effectedFields;
+
+        }
+
+        private Placeable GetRoot(Placeable placeable)
+        { 
+            if (placeable is Filler) return (Placeable)(((Filler)placeable).Main);
+            else return placeable;
+        }
+
+        private List<Field>? DemolishRoad(Field field)
+        {
+            List<Field> effectedFields = new();
+            //blocked by issue #51
+            return null;
+
+        }
+
+        private List<Field>? DemolishPlaceableWithEffect(Field field, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS, int maxEffect = MAX_EFFECT)
+        {
+            List<Field> effectedFields = new();
+            Placeable placeable = GetRoot(field.Placeable);
+            field = placeable.Owner;
+            if (!(placeable is FireDepartment || placeable is PoliceDepartment || placeable is Stadium || placeable is IndustrialZone))
+            {
+                throw new ArgumentException("Illegal argument.");
+            }
+            List<Tuple<int, int, double>> coordinates = GetCoordinatesInRadius(field.X, field.Y, radius);
+            foreach (Tuple<int, int, double> coord in coordinates)
+            {
+                int tupleX = coord.Item1; int tupleY = coord.Item2; double percentage = coord.Item3;
+                if (OnMap(tupleX, tupleY))
+                {
+                    int effect = (int)Math.Round(percentage * maxEffect);
+                    Field effectedField = Fields[tupleX, tupleY];
+                    effectFunction(effectedField, (-1) * effect);
+                    effectedFields.Add(effectedField);
+                }
+            }
+            List<Field> demolishedFields = DemolishFromField(field);
+            demolishedFields.ForEach(field => effectedFields.Add(field));
+            if (placeable is IndustrialZone)
+            {
+                _workplaceZones.Remove((WorkplaceZone)placeable);
+            }
+            return effectedFields;
         }
 
         private bool CanDemolishRoad(Field field)
