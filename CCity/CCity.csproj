@@ -5,12 +5,17 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>View\Images\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="View\Images\banner.png" />
     <None Remove="View\Images\icon.ico" />
     <None Remove="View\Images\profile.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="View\Images\icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
