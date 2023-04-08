@@ -20,7 +20,6 @@ namespace CCity.Model
         public int Height { get; private set; }
         private Dictionary<Forest, int> _growingForests;
         private List<Field> _burningBuildings;
-
         private List<ResidentialZone> _residentialZones;
         private List<WorkplaceZone> _workplaceZones;
 
@@ -43,6 +42,8 @@ namespace CCity.Model
             //lists
             _growingForests = new();
             _burningBuildings = new();
+            _residentialZones = new();
+            _workplaceZones = new();
         }
 
         #endregion
