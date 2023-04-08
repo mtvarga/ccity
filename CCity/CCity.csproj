@@ -8,7 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="View\Images\banner.png" />
+    <None Remove="View\Images\icon.ico" />
+    <None Remove="View\Images\profile.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="View\Images\profile.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CCity.Model\CCity.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="View\Images\banner.png" />
+    <Resource Include="View\Images\icon.ico" />
   </ItemGroup>
 
 </Project>
