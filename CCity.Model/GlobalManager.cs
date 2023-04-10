@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Win32.SafeHandles;
 
 namespace CCity.Model
 {
@@ -56,14 +57,17 @@ namespace CCity.Model
             }
             return true;
         }
-        public void UpdateSatisfaction(List<Field> fields)
+        public void UpdateSatisfaction(List<Zone> zones)
         {
             // TODO: Update this based on issue #27
-            foreach (Field field in fields)
+            foreach (var zone in zones)
             {
-                GlobalSatisfactionScore -= field.LastCalculatedSatisfaction;
-                field.CalculateSatisfaction();
-                GlobalSatisfactionScore += field.LastCalculatedSatisfaction;
+                foreach (var citizen in zone.Citizens)
+                {
+                    GlobalSatisfactionScore -= citizen.LastCalculatedSatisfaction;
+                    CalculateSatisfaction(citizen);
+                    GlobalSatisfactionScore += citizen.LastCalculatedSatisfaction;
+                }
             }
         }
         
