@@ -5,13 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CCity.View"
              mc:Ignorable="d" 
-             d:DesignHeight="550"
-             d:DesignWidth="900"
+             d:DesignHeight="650"
+             d:DesignWidth="950"
              FontFamily="Arial">
-    <UserControl.Background>
-        <ImageBrush ImageSource="Images/background.jpg"/>
-    </UserControl.Background>
-    <Grid>
+        <UserControl.Background>
+            <ImageBrush ImageSource="Images/background.jpg"/>
+        </UserControl.Background>
+        <Grid>
+            <MediaElement x:Name="videoPlayer" Source="https://people.inf.elte.hu/beszn1/background.mp4" Stretch="UniformToFill" LoadedBehavior="Play" UnloadedBehavior="Manual" IsMuted="True" MediaEnded="VideoPlayer_MediaEnded"/>
+        <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="2*"/>
@@ -24,40 +26,59 @@
                RenderOptions.BitmapScalingMode="HighQuality"/>
         <StackPanel Orientation="Vertical" Grid.Row="1" VerticalAlignment="Top">
             <StackPanel Orientation="Vertical" Margin="10">
-                <Image
+                <Grid>
+                    <Image
                     Source="Images/profile.png"
                     Margin="5"
                     Width="75"
                     Height="75"
                     RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <!--<Button
+                        Style="{StaticResource IconButtonStyle}"
+                        Width="30"
+                        Height="30"
+                        VerticalAlignment="Bottom"
+                        Margin="60 0 0 0"
+                        >
+                        📷
+                    </Button>-->
+                </Grid>
+                
                 <Label
                     HorizontalAlignment="Center"
-                    FontSize="24"
-                    FontWeight="Bold">
-                    Polgármester
+                    FontSize="20"
+                    FontWeight="Bold"
+                    Foreground="#333333">
+                        Polgármester
                 </Label>
                 <Label
                     HorizontalAlignment="Center"
-                    FontSize="18">
-                    "Városvezetés a hobbim"
+                    FontSize="16"
+                    Foreground="#333333">
+                    "Városvezetés a hobbim."
                 </Label>
             </StackPanel>
             <StackPanel Orientation="Vertical" Margin="10">
                 <TextBox
+                    Style="{StaticResource StartupTextboxStyle}"
+                    Tag="Polgármester neve"
                     Width="250"
                     />
                 <TextBox
+                    Style="{StaticResource StartupTextboxStyle}"
+                    Tag="Város neve"
                     Width="250"
                     />
             </StackPanel>
             <StackPanel Orientation="Vertical" Margin="10">
                 <Button
-                    Style="{StaticResource PrimaryButtonStyle}"
+                    Style="{StaticResource StartupButtonStyle}"
                     Width="150"
                     IsEnabled="False">
                     Játék indítása
                 </Button>
                 <Button
+                    Style="{StaticResource StartupButtonStyle}"
                     Width="150">
                     Kilépés
                 </Button>
@@ -66,8 +87,16 @@
         <Label
             Margin="10"
             Grid.Row="2"
+            Foreground="#333333"
+            FontWeight="Bold"
             HorizontalAlignment="Center">
             @ C Sharks 2023
         </Label>
+        <!--<MediaElement x:Name="mediaPlayer" Source="Images/background.mp4" 
+              LoadedBehavior="Manual" UnloadedBehavior="Stop" 
+              Stretch="UniformToFill" IsMuted="True"/>-->
+        
+        
+    </Grid>
     </Grid>
 </UserControl>

@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="CCity" 
         Height="650" 
-        Width="1000"
+        Width="950"
         MinHeight="650"
-        MinWidth="1000"
+        MinWidth="950"
         WindowState="Maximized">
     <Grid>
 
