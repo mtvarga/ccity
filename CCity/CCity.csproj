@@ -33,4 +33,10 @@
     <Resource Include="View\Images\icon.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="View\Images\background.mp4">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

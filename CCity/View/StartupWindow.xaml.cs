@@ -24,5 +24,11 @@ namespace CCity.View
         {
             InitializeComponent();
         }
+
+        private void VideoPlayer_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            videoPlayer.Position = TimeSpan.Zero;
+            videoPlayer.Play();
+        }
     }
 }
