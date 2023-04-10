@@ -106,6 +106,14 @@ namespace CCity.Model
             }
             return res_tax+work_tax;
         }
+        
+        public void PayMonthlyMaintenance(List<Placeable> facilities)
+        {
+            foreach (var facility in facilities)
+            {
+                Budget -= facility.MaintenanceCost;
+            }
+        }
         #endregion
 
         #region Private methods
