@@ -92,19 +92,19 @@ namespace CCity.Model
             }
         }
 
-        public double CollectTax(List<ResidentialZone> residentialZones, List<WorkplaceZone> workplaceZones)
+        public void CollectTax(List<ResidentialZone> residentialZones, List<WorkplaceZone> workplaceZones)
         {
             double res_tax = 0;
             double work_tax = 0;
             foreach (var residentalZone in residentialZones)
             {
-                res_tax=res_tax_norm * _taxes.ResidentalTax * residentalZone.Current;
+                res_tax = Math.Floor(res_tax_norm * _taxes.ResidentalTax * residentalZone.Current);
             }
             foreach (var workplaceZone in workplaceZones)
             {
-                work_tax = com_tax_norm * _taxes.CommercialTax * workplaceZone.Current;
+                work_tax = Math.Floor(com_tax_norm * _taxes.CommercialTax * workplaceZone.Current);
             }
-            return res_tax+work_tax;
+            Budget += (int)res_tax + (int)work_tax;
         }
         
         public void PayMonthlyMaintenance(List<Placeable> facilities)
