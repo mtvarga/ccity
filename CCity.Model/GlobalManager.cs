@@ -114,6 +114,14 @@ namespace CCity.Model
                 Budget -= facility.MaintenanceCost;
             }
         }
+        
+        public void PayYearlyMaintenance(List<Placeable> facilities)
+        {
+            foreach (var facility in facilities)
+            {
+                Budget -= facility.MaintenanceCost;
+            }
+        }
         #endregion
 
         #region Private methods
