@@ -35,18 +35,18 @@ namespace CCity.Model
 
         #region Public methods
 
-        public bool ChangeTax(TaxType taxtype, int amount)
+        public bool ChangeTax(TaxType taxtype, double amount)
         {
             switch (taxtype)
             {
                 case TaxType.Residental:
-                    _taxes.ResidentalTax = amount;
+                    _taxes.ResidentalTax += amount;
                     break;
                 case TaxType.Commercial:
-                    _taxes.CommercialTax = amount;
+                    _taxes.CommercialTax += amount;
                     break;
                 case TaxType.Industrial:
-                    _taxes.IndustrialTax = amount;
+                    _taxes.IndustrialTax += amount;
                     break;
                 default:
                     return false;
@@ -84,7 +84,7 @@ namespace CCity.Model
                 GlobalSatisfactionScore += (movedIn ? 1 : -1) * citizen.LastCalculatedSatisfaction;
             }
         }
-
+        
 
         #endregion
 
