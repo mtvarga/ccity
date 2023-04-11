@@ -31,6 +31,10 @@ namespace CCity.Model
 
         bool IUpgradeable.CanUpgrade => throw new NotImplementedException();
 
+        public bool IsFull => Capacity <= Current;
+
+        public bool HasCitizen => Current > 0;
+
         #endregion
 
         #region Public methods
