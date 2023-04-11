@@ -159,7 +159,16 @@
 
         private bool CanDemolishRoad(Field field)
         {
-            throw new NotImplementedException();
+            List<Field> neigbours = GetTypeNeighbours(field, typeof(Placeable));
+            foreach (Field neigbour in neigbours)
+            {
+                if (neigbour.Placeable == null) continue;
+                if(neigbour.Placeable.PublicRoadNeighboursCount == 1)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void HandleRoadPlacement(Field field)
@@ -187,9 +196,14 @@
 
         }
 
-        private void HandleRoadDemolition(Field field)
+        private bool HandleRoadDemolition(Field field)
         {
-            if (field.Placeable == null) return;
+            if (field.Placeable == null || !CanDemolishRoad(field))
+            {
+                SpreadRoadPublicity(field);
+                return false;
+            }
+
             Road demolishedRoad = (Road)field.Placeable;
             if (demolishedRoad.IsPublic)
             {
@@ -199,6 +213,17 @@
                 {
                     ModifyRoad(roadField);
                 }
+                List<Field> neigbours = GetTypeNeighbours(field, typeof(Placeable));
+                foreach (Field neigbour in neigbours)
+                {
+                    if (neigbour.Placeable == null) continue;
+                    neigbour.Placeable.PublicRoadNeighboursCount--;
+                }
+                return true;
+            }
+            else
+            {
+                return true;
             }
         }
 
@@ -221,6 +246,7 @@
             if (field.Placeable == null) return;
             Road actualRoad = (Road)field.Placeable;
             List<Field> roadNeigbours = GetTypeNeighbours(field, typeof(Road));
+            List<Field> neigbours = GetTypeNeighbours(field,typeof(Placeable));
             foreach (Field neigbour in roadNeigbours)
             {
                 if(neigbour.Placeable == null) continue;
@@ -231,6 +257,11 @@
                     actualRoad.GivesPublicityTo.Add(neigbour);
                     SpreadRoadPublicity(neigbour);
                 };
+            }
+            foreach(Field neigbour in neigbours)
+            {
+                if(neigbour.Placeable == null) continue; 
+                neigbour.Placeable.PublicRoadNeighboursCount++;
             }
         }
 
@@ -261,6 +292,22 @@
                 HandleRoadDemolition(actualField);
             }
 
+        }
+
+        private bool StayPublic(Field field)
+        {
+            int count = 0;
+            if (field.Placeable == null || !field.Placeable.isPublic) return true;
+            List<Field> neigbours = GetNeighbours(field);
+            foreach (Field neigbbour in neigbours)
+            {
+                if (neigbbour.Has(typeof(Road)))
+                {
+                    ++count;
+                }
+            }
+            if (count < 2) return false;
+            else return true;
         }
 
 
