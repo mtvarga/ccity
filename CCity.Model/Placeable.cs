@@ -22,11 +22,6 @@ namespace CCity.Model
 
         #region Public methods
 
-        public virtual int CalculateSatisfaction()
-        {
-            return 0;
-        }
-
         public void PlaceAt(Field field)
         {
             Owner = field;
