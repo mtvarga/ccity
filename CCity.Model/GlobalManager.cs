@@ -16,9 +16,9 @@ namespace CCity.Model
         public int Budget;
         public Taxes Taxes { get; }
         private Taxes _taxes;
-        private const int res_tax_norm = 1500;
-        private const int com_tax_norm = 5000;
-        private const int ind_tax_norm = 7500;
+        private const int ResTaxNorm = 1500;
+        private const int ComTaxNorm = 5000;
+        private const int IndTaxNorm = 7500;
 
         #endregion
 
@@ -94,19 +94,20 @@ namespace CCity.Model
 
         public void CollectTax(List<ResidentialZone> residentialZones, List<WorkplaceZone> workplaceZones)
         {
-            double res_tax = 0;
-            double work_tax = 0;
-            foreach (var residentalZone in residentialZones)
+            foreach (var residentialZone in residentialZones)
             {
-                res_tax = Math.Floor(res_tax_norm * _taxes.ResidentalTax * residentalZone.Current);
+                Budget += Convert.ToInt32(Math.Round(ResTaxNorm * _taxes.ResidentalTax * residentialZone.Current));
             }
             foreach (var workplaceZone in workplaceZones)
             {
-                work_tax = Math.Floor(com_tax_norm * _taxes.CommercialTax * workplaceZone.Current);
+                Budget += workplaceZone switch
+                {
+                    IndustrialZone => Convert.ToInt32(Math.Round(IndTaxNorm * _taxes.IndustrialTax * workplaceZone.Current)),
+                    CommercialZone => Convert.ToInt32(Math.Round(ComTaxNorm * _taxes.CommercialTax * workplaceZone.Current)),
+                    _ => 0,
+                };
             }
-            Budget += (int)res_tax + (int)work_tax;
         }
-        
         public void PayMonthlyMaintenance(List<Placeable> facilities)
         {
             foreach (var facility in facilities)
@@ -128,7 +129,6 @@ namespace CCity.Model
 
         private static void CalculateSatisfaction(Citizen citizen)
         {
-            
         }
 
         #endregion
