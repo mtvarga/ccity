@@ -241,16 +241,35 @@
             return neighbours;
         }
 
+        private List<Field> GetNeighbours(Field field)
+        {
+            int x = field.X;
+            int y = field.Y;
+            List<Field> neighbours = new List<Field>();
+
+            if (OnMap(x - 1, y)) neighbours.Add(Fields[x - 1, y]);
+            if (OnMap(x + 1, y)) neighbours.Add(Fields[x + 1, y]);
+            if (OnMap(x, y - 1)) neighbours.Add(Fields[x, y - 1]);
+            if (OnMap(x, y + 1)) neighbours.Add(Fields[x, y + 1]);
+
+            return neighbours;
+        }
+
+
         private void SpreadRoadPublicity(Field field)
         {
             if (field.Placeable == null) return;
             Road actualRoad = (Road)field.Placeable;
             List<Field> roadNeigbours = GetTypeNeighbours(field, typeof(Road));
-            List<Field> neigbours = GetTypeNeighbours(field,typeof(Placeable));
+            List<Field> neigbours = GetNeighbours(field);
+            foreach (Field neigbour in neigbours)
+            {
+                neigbour.RefreshPublicity();
+            }
             foreach (Field neigbour in roadNeigbours)
             {
-                if(neigbour.Placeable == null) continue;
-                Road road = (Road) neigbour.Placeable;
+                if (neigbour.Placeable == null) continue;
+                Road road = (Road)neigbour.Placeable;
                 if (!road.IsPublic)
                 {
                     road.GetPublicityFrom = actualRoad;
@@ -258,14 +277,9 @@
                     SpreadRoadPublicity(neigbour);
                 };
             }
-            foreach(Field neigbour in neigbours)
-            {
-                if(neigbour.Placeable == null) continue; 
-                neigbour.Placeable.PublicRoadNeighboursCount++;
-            }
         }
 
-        private void ModifyRoad(Field actualField)
+        private bool ModifyRoad(Field actualField)
         {
             if (actualField.Placeable == null) return false;
             Road actualRoad = (Road)actualField.Placeable;
