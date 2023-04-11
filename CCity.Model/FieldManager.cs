@@ -267,10 +267,12 @@
 
         private void ModifyRoad(Field actualField)
         {
-            if (actualField.Placeable == null) return;
+            if (actualField.Placeable == null) return false;
             Road actualRoad = (Road)actualField.Placeable;
             actualRoad.GetPublicityFrom = null;
             List<Field> roadNeigbourFields = GetTypeNeighbours(actualField, typeof(Road));
+            List<Field> neigbours = GetNeighbours(actualField);
+
             foreach (Field roadNeigbourField in roadNeigbourFields)
             {
                 if (roadNeigbourField.Placeable == null) continue;
@@ -286,10 +288,16 @@
             if (actualRoad.IsPublic)
             {
                 SpreadRoadPublicity(actualField);
+                return true;
             }
             else
             {
-                HandleRoadDemolition(actualField);
+                if (!HandleRoadDemolition(actualField))
+                {
+                    SpreadRoadPublicity(actualField);
+                    return false;
+                }
+                return true;
             }
 
         }
