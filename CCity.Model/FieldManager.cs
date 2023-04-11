@@ -159,11 +159,10 @@
 
         private bool CanDemolishRoad(Field field)
         {
-            List<Field> neigbours = GetTypeNeighbours(field, typeof(Placeable));
+            List<Field> neigbours = GetNeighbours(field);
             foreach (Field neigbour in neigbours)
             {
-                if (neigbour.Placeable == null) continue;
-                if(neigbour.Placeable.PublicRoadNeighboursCount == 1)
+                if (!neigbour.Has(typeof(Road)) && !StayPublic(neigbour))
                 {
                     return false;
                 }
@@ -193,14 +192,12 @@
             {
                 SpreadRoadPublicity(field);
             }
-
         }
 
         private bool HandleRoadDemolition(Field field)
         {
             if (field.Placeable == null || !CanDemolishRoad(field))
             {
-                SpreadRoadPublicity(field);
                 return false;
             }
 
@@ -211,20 +208,11 @@
                 List<Field> givesPublicityTo = demolishedRoad.GivesPublicityTo.ToList();
                 foreach (Field roadField in givesPublicityTo)
                 {
-                    ModifyRoad(roadField);
+                    if (!ModifyRoad(roadField)) return false; ;
                 }
-                List<Field> neigbours = GetTypeNeighbours(field, typeof(Placeable));
-                foreach (Field neigbour in neigbours)
-                {
-                    if (neigbour.Placeable == null) continue;
-                    neigbour.Placeable.PublicRoadNeighboursCount--;
-                }
-                return true;
+                List<Field> neigbours = GetNeighbours(field);
             }
-            else
-            {
-                return true;
-            }
+            return true;
         }
 
         private List<Field> GetTypeNeighbours(Field field,Type type)
