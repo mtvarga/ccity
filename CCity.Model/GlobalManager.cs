@@ -108,7 +108,7 @@ namespace CCity.Model
                 };
             }
         }
-        public void PayMonthlyMaintenance(List<Placeable> facilities)
+        public void PayMaintenance(List<Placeable> facilities)
         {
             foreach (var facility in facilities)
             {
@@ -116,13 +116,6 @@ namespace CCity.Model
             }
         }
         
-        public void PayYearlyMaintenance(List<Placeable> facilities)
-        {
-            foreach (var facility in facilities)
-            {
-                Budget -= facility.MaintenanceCost;
-            }
-        }
         #endregion
 
         #region Private methods
