@@ -30,7 +30,8 @@ namespace CCity.Model
 
         public Road()
         {
-            throw new NotImplementedException();
+            GetPublicityFrom = null;
+            GivesPublicityTo = new List<Field>();
         }
 
         #endregion

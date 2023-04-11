@@ -85,7 +85,15 @@ namespace CCity.Model
         {
             if (Placeable == null) return false;
             return Placeable.GetType() == type;
-        } 
+        }
+
+        public void RefreshPublicity()
+        {
+            if (Placeable != null)
+            {
+                Placeable.isPublic = true;
+            }
+        }
 
         #endregion
 
