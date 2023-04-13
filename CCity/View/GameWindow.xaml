@@ -35,7 +35,30 @@
                     <Button Width="40" Height="40" Margin="2">Bldzr</Button>
                 </WrapPanel>
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical" Margin="0 5">
+                    <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
+                        <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center">7</TextBlock>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                            <Button Height="14">+</Button>
+                            <Button Height="14">-</Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
+                        <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center">7</TextBlock>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                            <Button Height="14">+</Button>
+                            <Button Height="14">-</Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
+                        <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center">7</TextBlock>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                            <Button Height="14">+</Button>
+                            <Button Height="14">-</Button>
+                        </StackPanel>
+                    </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0 5">
                         <!--<local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="12 0 0 12">-</local:CustomButton>
                         <local:CustomButton Style="{StaticResource SpeedButtonStyle}">||</local:CustomButton>
                         <local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="0 12 12 0">+</local:CustomButton>-->
