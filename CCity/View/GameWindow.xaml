@@ -15,15 +15,118 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left"  Grid.Row="1">
-            <Label>Kemecse</Label>
-            <Label>Polgár Jenő</Label>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1">
-            <Label>🤵3.232</Label>
-            <Label>👍94%</Label>
-            <Label>💎99.999</Label>
-            <Label>📆2023.03.20</Label>
-        </StackPanel>
+        <Grid Grid.Row="0" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="102"/>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Background="#eee">
+                <WrapPanel Margin="7" VerticalAlignment="Top">
+                    <Button Width="40" Height="40" Margin="2">Crsr</Button>
+                    <Button Width="40" Height="40" Margin="2">Lkzn</Button>
+                    <Button Width="40" Height="40" Margin="2">Kkdzn</Button>
+                    <Button Width="40" Height="40" Margin="2">Iprzn</Button>
+                    <Button Width="40" Height="40" Margin="2">Pd</Button>
+                    <Button Width="40" Height="40" Margin="2">Fd</Button>
+                    <Button Width="40" Height="40" Margin="2">Stdm</Button>
+                    <Button Width="40" Height="40" Margin="2">Pp</Button>
+                    <Button Width="40" Height="40" Margin="2">Pl</Button>
+                    <Button Width="40" Height="40" Margin="2">Road</Button>
+                    <Button Width="40" Height="40" Margin="2">Bldzr</Button>
+                </WrapPanel>
+                <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="12 0 0 12">-</local:CustomButton>
+                        <local:CustomButton Style="{StaticResource SpeedButtonStyle}">||</local:CustomButton>
+                        <local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="0 12 12 0">+</local:CustomButton>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid>
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Fields}">
+                        <!--az mezőket tároló vezérlő-->
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <!--a gombokat egy rácsba fűzzük fel-->
+                                <UniformGrid Rows="9" Columns="9" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <!--az elemek gombok lesznek-->
+                            <DataTemplate>
+                                <Button Command="{Binding StepCommand}" CommandParameter="{Binding Number}" Content="{Binding Text}" Focusable="False" RenderTransformOrigin="0.5, 0.5" FontSize="24" FontWeight="Bold">
+                                    <!-- gomb háttérszíne -->
+                                    <!-- gomb méretezése (csak az animációnál használjuk ki) -->
+                                    <Button.RenderTransform>
+                                        <ScaleTransform ScaleX="1" ScaleY="1" />
+                                    </Button.RenderTransform>
+                                    <Button.Style>
+                                        <!-- gomb stílusa, ahol a színét megadjuk -->
+                                        <Style TargetType="Button">
+                                            <Style.Triggers>
+                                                <!-- a szín egy adatkötés hatására fog változni -->
+                                                <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                    <Setter Property="Background" Value="Yellow" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsLocked}" Value="False">
+                                                    <Setter Property="Background" Value="White" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <Button.Triggers>
+                                        <!-- animációk végrehajtása esemény hatására -->
+                                        <EventTrigger RoutedEvent="Button.Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Duration="0:00:02" From="0" To="1" Storyboard.TargetProperty="Opacity" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.Click">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimationUsingKeyFrames Duration="0:00:00.2" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
+                                                        <ColorAnimationUsingKeyFrames.KeyFrames>
+                                                            <DiscreteColorKeyFrame Value="Red" KeyTime="0:00:00" />
+                                                            <DiscreteColorKeyFrame Value="Black" KeyTime="0:00:00.2" />
+                                                        </ColorAnimationUsingKeyFrames.KeyFrames>
+                                                    </ColorAnimationUsingKeyFrames>
+                                                    <DoubleAnimation Duration="0:00:00.1" From="1" To="0.5" AutoReverse="True" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" />
+                                                    <DoubleAnimation Duration="0:00:00.1" From="1" To="0.5" AutoReverse="True" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemContainerStyle>
+                            <!--a függőségi tulajdonságokat kjülön kell kötnünk-->
+                            <Style>
+                                <Setter Property="Grid.Row" Value="{Binding X}" />
+                                <Setter Property="Grid.Column" Value="{Binding Y}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
+                </Grid>
+            </Grid>
+        </Grid>
+
+
+        <!--Statusbar-->
+        <Grid Grid.Row="1" Background="#EEE">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <Label>Kemecse</Label>
+                <Label>Polgár Jenő</Label>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Label>🤵3.232</Label>
+                <Label>👍94%</Label>
+                <Label>💎99.999</Label>
+                <Label>📆2023.03.20</Label>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
