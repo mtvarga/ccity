@@ -147,7 +147,7 @@
         <Setter Property="Background" Value="{StaticResource PrimaryColor}" />
     </Style>
 
-    <Style x:Key="SpeedButtonStyle" TargetType="{x:Type local:CustomButton}">
+    <!--<Style x:Key="SpeedButtonStyle" TargetType="{x:Type local:CustomButton}">
         <Setter Property="Width" Value="24"/>
         <Setter Property="Height" Value="24"/>
         <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
@@ -159,5 +159,5 @@
                 <Setter Property="Cursor" Value="Hand"/>
             </Trigger>
         </Style.Triggers>
-    </Style>
+    </Style>-->
 </ResourceDictionary>

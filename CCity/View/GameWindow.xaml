@@ -36,9 +36,12 @@
                 </WrapPanel>
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
-                        <local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="12 0 0 12">-</local:CustomButton>
+                        <!--<local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="12 0 0 12">-</local:CustomButton>
                         <local:CustomButton Style="{StaticResource SpeedButtonStyle}">||</local:CustomButton>
-                        <local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="0 12 12 0">+</local:CustomButton>
+                        <local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="0 12 12 0">+</local:CustomButton>-->
+                        <Button Width="24" Height="24">-</Button>
+                        <Button Width="24" Height="24">||</Button>
+                        <Button Width="24" Height="24">+</Button>
                     </StackPanel>
                 </StackPanel>
             </Grid>
