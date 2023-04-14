@@ -3,12 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CCity.View"
+             xmlns:view="clr-namespace:CCity.View"
+             xmlns:viewmodel="clr-namespace:CCity.ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="550"
              d:DesignWidth="900"
              Background="White"
              FontFamily="Arial">
+    <UserControl.Resources>
+        <viewmodel:TextureEnumToPath x:Key="TextureEnumToPath" />
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -107,9 +111,9 @@
                 <TextBlock Text="{Binding MayorName}" Margin="7"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="{Binding Population, StringFormat='🤵 {0}'}" Margin="7"/>
+                <TextBlock Text="{Binding Population, StringFormat='🤵 {0:N0}'}" Margin="7"/>
                 <TextBlock Text="{Binding Satisfaction, StringFormat='👍 {0}%'}" Margin="7"/>
-                <TextBlock Text="{Binding Budget, StringFormat='💎 {0}'}" Margin="7"/>
+                <TextBlock Text="{Binding Budget, StringFormat='💎 {0:N0}'}" Margin="7"/>
                 <TextBlock Text="{Binding Date, StringFormat='📆 {0}'}" Margin="7"/>
             </StackPanel>
         </Grid>
