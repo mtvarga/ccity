@@ -409,9 +409,24 @@ namespace CCity.Model
 
         private List<Field>? DemolishRoad(Field field)
         {
+            if(field.Placeable == null) return null;
+            Road road = (Road)field.Placeable;
             List<Field> effectedFields = new();
-            //blocked by issue #51
-            return null;
+            HashSet<Placeable> privatedPlaceables = new();
+            List<Road> gavePublicityTo = road.GivesPublicityTo.ToList();
+            //TO DO demolish road
+            foreach (Road giftedRoad in gavePublicityTo)
+            {
+                ModifyRoad(giftedRoad, privatedPlaceables, effectedFields);
+            }
+            
+            if(privatedPlaceables.Count > 0 && !privatedPlaceables.All(e => WouldStayPublic(e)))
+            {
+                Place(field.X, field.Y, road);
+                return null;
+            }
+
+            return effectedFields;
 
         }
 
@@ -473,38 +488,17 @@ namespace CCity.Model
         private bool RefreshPublicity(Placeable placeable)
         {
             List<Placeable> neighbours = GetTypeNeighbours(placeable, typeof(Road));
-            if (placeable is Road || placeable.isPublic) return false;
+            if (placeable is Road || placeable.IsPublic) return false;
             foreach (Road neighbour in neighbours)
             {
-                if (neighbour.isPublic)
+                if (neighbour.IsPublic)
                 {
-                    placeable.isPublic = true;
+                    placeable.IsPublic = true;
                     return true;
                 }
             }
             return false;
         }
-
-        /*private bool HandleRoadDemolition(Field field)
-        {
-            if (field.Placeable == null)
-            {
-                return false;
-            }
-
-            Road demolishedRoad = (Road)field.Placeable;
-            if (demolishedRoad.IsPublic)
-            {
-                demolishedRoad.GetPublicityFrom = null;
-                List<Road> givesPublicityTo = demolishedRoad.GivesPublicityTo.ToList();
-                foreach (Field roadField in givesPublicityTo)
-                {
-                    if (!ModifyRoad(roadField)) return false; ;
-                }
-                List<Field> neigbours = GetNeighbours(field);
-            }
-            return true;
-        }*/
 
         private List<Placeable> GetTypeNeighbours(Placeable placeable, Type type, bool pessimist = false)
         {
@@ -572,60 +566,60 @@ namespace CCity.Model
             }
         }
 
-        /*private bool ModifyRoad(Field actualField)
+        private void ModifyRoad(Road actualRoad, HashSet<Placeable> privatedPlaceables, List<Field> effectedFields)
         {
-            if (actualField.Placeable == null) return false;
-            Road actualRoad = (Road)actualField.Placeable;
-            actualRoad.GetPublicityFrom = null;
-            List<Field> roadNeigbourFields = GetTypeNeighbours(actualField, typeof(Road));
-            List<Field> neigbours = GetNeighbours(actualField);
+            List<Placeable> roadNeighbours = GetTypeNeighbours(actualRoad, typeof(Road));
+            List<Placeable> notRoadNeighbours = GetTypeNeighbours(actualRoad, typeof(Road), false);
 
-            foreach (Field roadNeigbourField in roadNeigbourFields)
+            actualRoad.GetPublicityFrom = null;
+            foreach (Road roadNeighbour in roadNeighbours)
             {
-                if (roadNeigbourField.Placeable == null) continue;
-                Road neigbourRoad = (Road)roadNeigbourField.Placeable;
-                if (neigbourRoad.IsPublic)
+                if (roadNeighbour.IsPublic && roadNeighbour.GetPublicityFrom != actualRoad.GetPublicityFrom)
                 {
-                    actualRoad.GetPublicityFrom = neigbourRoad;
-                    neigbourRoad.GivesPublicityTo.Add(actualField);
+                    actualRoad.GetPublicityFrom = roadNeighbour;
+                    roadNeighbour.GivesPublicityTo.Add(actualRoad);
                     break;
                 }
             }
 
-            //TO DO
-            List<Field> placeholder = new();
             if (actualRoad.IsPublic)
             {
-                SpreadRoadPublicity(actualField, placeholder);
-                return true;
+                actualRoad.GetPublicityFrom = null;
+                foreach (Road giftedRoad in actualRoad.GivesPublicityTo)
+                {
+                    ModifyRoad(giftedRoad, privatedPlaceables, effectedFields);
+                }
             }
             else
             {
-                if (!HandleRoadDemolition(actualField))
+                effectedFields.Add(actualRoad.Owner);
+                foreach (Placeable notRoadNeighbour in notRoadNeighbours)
                 {
-                    SpreadRoadPublicity(actualField, placeholder);
-                    return false;
+                    if(WouldStayPublic(notRoadNeighbour))
+                    {
+                        privatedPlaceables.Remove(notRoadNeighbour);
+                    }
+                    else
+                    {
+                        privatedPlaceables.Add(notRoadNeighbour);
+                    }
                 }
-                return true;
             }
-
         }
 
-        private bool StayPublic(Field field)
+
+        private bool WouldStayPublic(Placeable placeable)
         {
-            int count = 0;
-            if (field.Placeable == null || !field.Placeable.isPublic) return true;
-            List<Field> neigbours = GetNeighbours(field);
-            foreach (Field neigbbour in neigbours)
+            List<Placeable> roadNeighbours = GetTypeNeighbours(placeable,typeof(Road));
+            foreach (Road roadNeighbour in roadNeighbours)
             {
-                if (neigbbour.Has(typeof(Road)))
+                if (roadNeighbour.IsPublic)
                 {
-                    ++count;
+                    return true;
                 }
             }
-            if (count < 2) return false;
-            else return true;
-        }*/
+            return false;
+        }
 
 
         #endregion

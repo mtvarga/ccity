@@ -9,7 +9,7 @@ namespace CCity.Model
     public class Road : Placeable
     {
 
-        #region Fileds
+        #region Fields
 
         public Road? GetPublicityFrom; 
         public List<Road> GivesPublicityTo;
@@ -22,7 +22,7 @@ namespace CCity.Model
 
         public override int MaintenanceCost => throw new NotImplementedException();
 
-        public bool IsPublic { get { return GetPublicityFrom != null; } }
+        public new bool IsPublic { get { return GetPublicityFrom != null; } }
 
         #endregion
 
@@ -31,7 +31,7 @@ namespace CCity.Model
         public Road()
         {
             GetPublicityFrom = null;
-            GivesPublicityTo = new List<Field>();
+            GivesPublicityTo = new List<Road>();
         }
 
         #endregion

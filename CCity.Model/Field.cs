@@ -86,7 +86,7 @@ namespace CCity.Model
         {
             if (Placeable != null)
             {
-                Placeable.isPublic = true;
+                Placeable.IsPublic = true;
             }
         }
 
