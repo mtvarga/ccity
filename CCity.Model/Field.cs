@@ -82,12 +82,6 @@ namespace CCity.Model
             return Placeable.GetType() == type;
         }
 
-        public bool RefreshPublicity()
-        {
-            if (Placeable == null || Placeable.isPublic == true) return false;
-            else return true;
-        }
-
         internal bool Place(Placeable placeable)
         {
             if (Placeable != null) return false;

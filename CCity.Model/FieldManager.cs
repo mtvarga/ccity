@@ -1,4 +1,6 @@
 ﻿using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CCity.Model
 {
@@ -91,8 +93,7 @@ namespace CCity.Model
             {
                 throw new Exception();
             };
-            HandleRoadPlacement(field);
-            effectedFields.Add(field);
+            effectedFields = HandleRoadPlacement(field);
             /*TO DO: HandleRoadPlacement returns List<Field>
             with Roads affected and Placeables become public*/
             return effectedFields;
@@ -452,12 +453,12 @@ namespace CCity.Model
             return true;
         }
 
-        private void HandleRoadPlacement(Field field)
+        private List<Field> HandleRoadPlacement(Field field)
         {
-            if (field.Placeable == null) return;
+            List<Field> modifiedFields = new() { field };
+            if (field.Placeable == null) return modifiedFields;
             Road placedRoad = (Road)field.Placeable;
             List<Field> roadNeigbours = GetTypeNeighbours(field, typeof(Road));
-
             foreach (Field neigbour in roadNeigbours)
             {
                 if (neigbour.Placeable == null) continue;
@@ -472,8 +473,26 @@ namespace CCity.Model
 
             if (placedRoad.IsPublic)
             {
-                SpreadRoadPublicity(field);
+                List<Field> modifiedFieldsByRecursion = new();
+                SpreadRoadPublicity(field, modifiedFieldsByRecursion);
+                modifiedFields = modifiedFields.Concat(modifiedFieldsByRecursion).ToList();
             }
+            return modifiedFields;
+        }
+
+        private bool RefreshPublicity(Field field)
+        {
+            List<Field> neighbours = GetTypeNeighbours(field, typeof(Road));
+            if (field.Placeable == null || field.Has(typeof(Road)) || field.Placeable.isPublic) return false;
+            foreach(Field neighbour in neighbours)
+            {
+                if(neighbour.Placeable != null && neighbour.Placeable.isPublic)
+                {
+                    field.Placeable.isPublic = true;
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool HandleRoadDemolition(Field field)
@@ -526,7 +545,7 @@ namespace CCity.Model
         }
 
 
-        private void SpreadRoadPublicity(Field field)
+        private void SpreadRoadPublicity(Field field, List<Field> modifiedFields)
         {
             if (field.Placeable == null) return;
             Road actualRoad = (Road)field.Placeable;
@@ -534,7 +553,7 @@ namespace CCity.Model
             List<Field> neigbours = GetNeighbours(field);
             foreach (Field neigbour in neigbours)
             {
-                neigbour.RefreshPublicity();
+                if(RefreshPublicity(neigbour)) modifiedFields.Add(neigbour);
             }
             foreach (Field neigbour in roadNeigbours)
             {
@@ -544,7 +563,9 @@ namespace CCity.Model
                 {
                     road.GetPublicityFrom = actualRoad;
                     actualRoad.GivesPublicityTo.Add(neigbour);
-                    SpreadRoadPublicity(neigbour);
+                    modifiedFields.Add(neigbour);
+                    SpreadRoadPublicity(neigbour, modifiedFields);
+
                 };
             }
         }
@@ -569,16 +590,18 @@ namespace CCity.Model
                 }
             }
 
+            //TO DO
+            List<Field> placeholder = new();
             if (actualRoad.IsPublic)
             {
-                SpreadRoadPublicity(actualField);
+                SpreadRoadPublicity(actualField, placeholder);
                 return true;
             }
             else
             {
                 if (!HandleRoadDemolition(actualField))
                 {
-                    SpreadRoadPublicity(actualField);
+                    SpreadRoadPublicity(actualField, placeholder);
                     return false;
                 }
                 return true;
