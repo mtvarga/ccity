@@ -23,7 +23,8 @@ namespace CCity.Model
         private Dictionary<Forest, int> _growingForests;
         private List<Field> _burningBuildings;
         private List<ResidentialZone> _residentialZones;
-        private List<WorkplaceZone> _workplaceZones;
+        private List<CommercialZone> _commercialZones;
+        private List<IndustrialZone> _industrialZones;
 
         #endregion
 
@@ -45,119 +46,32 @@ namespace CCity.Model
             _growingForests = new();
             _burningBuildings = new();
             _residentialZones = new();
-            _workplaceZones = new();
+            _commercialZones = new();
+            _industrialZones = new();
         }
 
         #endregion
 
-        #region Public methods
+        #region Public methods  
 
-        //Pole, ResidentalZone, CommercialZone
-        public List<Field> Place(int x, int y, Placeable placeable)
+        public List<Field>? Place(int x, int y, Placeable placeable)
         {
-            List<Field> effectedFields = new();
-            if (!CanPlace(x, y, placeable))
-            {
-                // event
-                return effectedFields; //empty
-            }
+            if (!OnMap(x, y)) return null;
+
             Field field = Fields[x, y];
-            if (!PlaceOnField(field, placeable))
-            {
-                throw new Exception();
-            }
+            List<Field>? effectedFields = PlaceOnField(field, placeable);
+            if (effectedFields == null) return null;
 
-            if (placeable is ResidentialZone)
+            switch (placeable)
             {
-                _residentialZones.Add((ResidentialZone)placeable);
+                case Road _: effectedFields = effectedFields.Concat(HandleRoadPlacement(field)).ToList(); break;
+                default:
+                    List<Field>? effectedFieldsBySpreading = RefreshPublicity(placeable);
+                    if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
+                    break;
             }
-            else if (placeable is CommercialZone)
-            {
-                _workplaceZones.Add((WorkplaceZone)placeable);
-            }
-
-            effectedFields.Add(field);
-            return effectedFields; //empty
-        }
-
-        public List<Field> Place(int x, int y, Road road)
-        {
-            List<Field> effectedFields = new();
-            if (!CanPlace(x, y, road))
-            {
-                // event
-                return effectedFields; //empty
-            }
-            Field field = Fields[x, y];
-            if (!PlaceOnField(field, road))
-            {
-                throw new Exception();
-            };
-            effectedFields = HandleRoadPlacement(field);
-            /*TO DO: HandleRoadPlacement returns List<Field>
-            with Roads affected and Placeables become public*/
             return effectedFields;
         }
-
-        public List<Field> Place(int x, int y, PowerPlant powerPlant)
-        {
-            List<Field> effectedFields = new();
-            if (!CanPlace(x, y, powerPlant))
-            {
-                // event
-                return effectedFields; //empty
-            }
-            Field field = Fields[x, y];
-            if (!PlaceOnField(field, powerPlant))
-            {
-                throw new Exception();
-            };
-            /*TO DO: Electricity,
-             fill effectedFields */
-            return effectedFields;
-        }
-
-        public List<Field> Place(int x, int y, Forest forest)
-        {
-            List<Field> effectedFields = new();
-            if (!CanPlace(x, y, forest))
-            {
-                // event
-                return effectedFields; //empty
-            }
-            Field field = Fields[x, y];
-            if (!PlaceOnField(field, forest))
-            {
-                throw new Exception();
-            };
-            /*TO DO: Forest effect,
-             fill effectedFields */
-            return effectedFields;
-        }
-
-        #region Placeables with effect
-
-        public List<Field> Place(int x, int y, FireDepartment fireDepartment)
-        {
-            return PlacePlaceableWithEffect(x, y, fireDepartment, (f, i) => f.ChangeFireDepartmentEffect(i));
-        }
-
-        public List<Field> Place(int x, int y, PoliceDepartment policeDepartment)
-        {
-            return PlacePlaceableWithEffect(x, y, policeDepartment, (f, i) => f.ChangePoliceDepartmentEffect(i));
-        }
-
-        public List<Field> Place(int x, int y, Stadium stadium)
-        {
-            return PlacePlaceableWithEffect(x, y, stadium, (f, i) => f.ChangeStadiumEffect(i));
-        }
-
-        public List<Field> Place(int x, int y, IndustrialZone industrialZone)
-        {
-            return PlacePlaceableWithEffect(x, y, industrialZone, (f, i) => f.ChangeIndustrialEffect(i));
-        }
-
-        #endregion
 
         public List<Field> Upgrade(int x, int y)
         {
@@ -166,7 +80,7 @@ namespace CCity.Model
 
         public List<Field>? Demolish(int x, int y)
         {
-            if (!CanDemolish(x, y))
+            /*if (!CanDemolish(x, y))
             {
                 return null;
             }
@@ -184,7 +98,8 @@ namespace CCity.Model
                 field.Demolish();
                 effectedFields.Add(field);
             }
-            return effectedFields;
+            return effectedFields;*/
+            throw new NotImplementedException();
         }
 
         public List<Field> GrowForests()
@@ -198,57 +113,25 @@ namespace CCity.Model
         }
 
         public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.FindAll(zone => !zone.IsFull || showUnavailable);
-        public List<WorkplaceZone> WorkplaceZones(bool showUnavailable) => _workplaceZones.FindAll(zone => !zone.IsFull || showUnavailable);
+        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.FindAll(zone => !zone.IsFull || showUnavailable);
+        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.FindAll(zone => !zone.IsFull || showUnavailable);
 
         #endregion
 
         #region Private methods
-
-        private List<Tuple<int, int, double>> GetCoordinatesInRadius(int x, int y, int r)
-        {
-            int size = r * 2 + 1;
-            int startX = x - r;
-            int startY = y - r;
-            List<Tuple<int, int, double>> list = new List<Tuple<int, int, double>>();
-            for (int i = 0; i < size; i++)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    int currentX = startX + i;
-                    int currentY = startY + j;
-                    double distance = Math.Sqrt(Math.Pow(Math.Abs(currentX - x), 2) + Math.Pow(Math.Abs(currentY - y), 2));
-                    int roundedDistance = (int)Math.Round(distance);
-                    if (roundedDistance <= r)
-                    {
-                        double percentage = Math.Sin((double)roundedDistance / (double)r);
-                        list.Add(new Tuple<int, int, double>(currentX, currentY, percentage));
-                    }
-                }
-            }
-            return list;
-        }
 
         private bool OnMap(int x, int y)
         {
             return 0 <= x && x < Width && 0 <= y && y < Height;
         }
 
-        private bool OnMap(Tuple<int, int> coordinates)
+        private bool CanPlace(Field field, Placeable placeable)
         {
-            return 0 <= coordinates.Item1 && coordinates.Item1 < Width && 0 <= coordinates.Item2 && coordinates.Item2 < Height;
-        }
-
-        private bool CanPlace(int x, int y, Placeable placeable)
-        {
-            if (!OnMap(x, y))
-            {
-                return false;
-            }
-            Field field = Fields[x, y];
             if (field.HasPlaceable)
             {
                 return false;
             }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (placeable is IMultifield)
             {
                 int width = ((IMultifield)placeable).Width;
@@ -293,51 +176,43 @@ namespace CCity.Model
             return true;
         }
 
-        private List<Field> PlacePlaceableWithEffect(int x, int y, Placeable placeable, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS, int maxEffect = MAX_EFFECT)
+        private List<Field> SpreadPlaceableEffectConditional(Placeable placeable)
+        {
+            switch (placeable)
+            {
+                case FireDepartment _: return SpreadPlaceableEffect(placeable, (f, i) => f.ChangeFireDepartmentEffect(i));
+                case PoliceDepartment _: return SpreadPlaceableEffect(placeable, (f, i) => f.ChangePoliceDepartmentEffect(i));
+                case Stadium _: return SpreadPlaceableEffect(placeable, (f, i) => f.ChangeStadiumEffect(i));
+                case IndustrialZone _: return SpreadPlaceableEffect(placeable, (f, i) => f.ChangeIndustrialEffect(i));
+                default: return new List<Field>();
+            }
+        }
+
+        private List<Field> SpreadPlaceableEffect(Placeable placeable, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS, int maxEffect = MAX_EFFECT)
         {
             List<Field> effectedFields = new();
-            if (!CanPlace(x, y, placeable))
+            Field field = placeable.Owner;
+            List<(int, int, double)> coordinates = (Utilities.GetPointsInRadiusWeighted(field, radius).ToList());
+            foreach ((int X, int Y, double weight) coord in coordinates)
             {
-                // event
-                return effectedFields; //empty
-            }
-            Field field = Fields[x, y];
-            if (!(placeable is FireDepartment || placeable is PoliceDepartment || placeable is Stadium || placeable is IndustrialZone))
-            {
-                throw new ArgumentException("Illegal argument.");
-            }
-            List<Tuple<int, int, double>> coordinates = GetCoordinatesInRadius(field.X, field.Y, radius);
-            foreach (Tuple<int, int, double> coord in coordinates)
-            {
-                int tupleX = coord.Item1; int tupleY = coord.Item2; double percentage = coord.Item3;
-                if (OnMap(tupleX, tupleY))
+                if (OnMap(coord.X, coord.Y))
                 {
-                    int effect = (int)Math.Round(percentage * maxEffect);
-                    Field effectedField = Fields[tupleX, tupleY];
+                    int effect = (int)Math.Round(coord.weight * maxEffect);
+                    Field effectedField = Fields[coord.X, coord.Y];
                     effectFunction(effectedField, effect);
                     effectedFields.Add(effectedField);
                 }
             }
-            if (!PlaceOnField(field, placeable))
-            {
-                throw new Exception();
-            };
-            if (placeable is IndustrialZone)
-            {
-                _workplaceZones.Add((WorkplaceZone)placeable);
-            }
             return effectedFields;
         }
 
-        private bool PlaceOnField(Field field, Placeable placeable)
+        private List<Field>? PlaceOnField(Field field, Placeable placeable)
         {
-            int x = field.X;
-            int y = field.Y;
-            if (!CanPlace(x, y, placeable))
+            if (!CanPlace(field, placeable))
             {
-                return false;
+                return null;
             }
-
+            List<Field> effectedFields = new();
             if (placeable is IMultifield multifield)
             {
                 int width = multifield.Width;
@@ -352,16 +227,15 @@ namespace CCity.Model
                         {
                             Field currentField = Fields[currentX, currentY];
                             Filler filler = new Filler(multifield);
-                            if (!currentField.Place(filler))
-                            {
-                                return false;
-                            }
                             multifield.Occupies.Add(filler);
+                            currentField.Place(filler);
+                            effectedFields.Add(currentField);
                         }
                     }
                 }
             }
-            return field.Place(placeable);
+            effectedFields.Add(field);
+            return effectedFields;
         }
 
         private List<Field> DemolishFromField(Field field)
@@ -430,7 +304,7 @@ namespace CCity.Model
 
         }
 
-        private List<Field>? DemolishPlaceableWithEffect(Field field, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS, int maxEffect = MAX_EFFECT)
+        /*private List<Field>? DemolishPlaceableWithEffect(Field field, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS, int maxEffect = MAX_EFFECT)
         {
             List<Field> effectedFields = new();
             Placeable placeable = GetRoot(field.Placeable);
@@ -458,7 +332,7 @@ namespace CCity.Model
                 _workplaceZones.Remove((WorkplaceZone)placeable);
             }
             return effectedFields;
-        }
+        }*/
 
         private List<Field> HandleRoadPlacement(Field field)
         {
@@ -485,19 +359,21 @@ namespace CCity.Model
             return modifiedFields;
         }
 
-        private bool RefreshPublicity(Placeable placeable)
+        private List<Field>? RefreshPublicity(Placeable placeable)
         {
             List<Placeable> neighbours = GetTypeNeighbours(placeable, typeof(Road));
-            if (placeable is Road || placeable.IsPublic) return false;
+            if (placeable is Road || placeable.IsPublic) return null;
+            List<Field> effectedFields = new();
             foreach (Road neighbour in neighbours)
             {
                 if (neighbour.IsPublic)
                 {
                     placeable.IsPublic = true;
-                    return true;
+                    effectedFields = effectedFields.Concat(SpreadPlaceableEffectConditional(placeable)).ToList();
+                    return effectedFields;
                 }
             }
-            return false;
+            return null;
         }
 
         private List<Placeable> GetTypeNeighbours(Placeable placeable, Type type, bool pessimist = false)
@@ -546,13 +422,14 @@ namespace CCity.Model
         }
 
 
-        private void SpreadRoadPublicity(Road road, List<Field> modifiedFields)
+        private void SpreadRoadPublicity(Road road, List<Field> effectedFields)
         {
             List<Placeable> roadNeighbours = GetTypeNeighbours(road, typeof(Road));
             List<Placeable> placeableNeighbours = GetTypeNeighbours(road, typeof(Road), false);
             foreach (Placeable neigbour in placeableNeighbours)
             {
-                if (RefreshPublicity(neigbour)) modifiedFields.Add(neigbour.Owner);
+                List<Field>? effectedFieldsBySpreading = RefreshPublicity(neigbour);
+                if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
             }
             foreach (Road neighbourRoad in roadNeighbours)
             {
@@ -560,8 +437,8 @@ namespace CCity.Model
                 {
                     neighbourRoad.GetPublicityFrom = road;
                     road.GivesPublicityTo.Add(neighbourRoad);
-                    modifiedFields.Add(neighbourRoad.Owner);
-                    SpreadRoadPublicity(neighbourRoad, modifiedFields);
+                    effectedFields.Add(neighbourRoad.Owner);
+                    SpreadRoadPublicity(neighbourRoad, effectedFields);
                 };
             }
         }
@@ -620,7 +497,6 @@ namespace CCity.Model
             }
             return false;
         }
-
 
         #endregion
     }
