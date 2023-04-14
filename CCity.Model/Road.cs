@@ -12,7 +12,7 @@ namespace CCity.Model
         #region Fileds
 
         public Road? GetPublicityFrom; 
-        public List<Field> GivesPublicityTo;
+        public List<Road> GivesPublicityTo;
 
         #endregion
 
