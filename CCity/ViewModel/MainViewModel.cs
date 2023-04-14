@@ -27,16 +27,16 @@ namespace CCity.ViewModel
         #region Properties
 
         public ObservableCollection<FieldItem> Fields { get; private set; }
-        public string MayorName { get; }
-        public string CityName { get; }
-        public int Budget { get; }
-        public int Satisfaction { get; }
-        public int Population { get; }
-        public bool Paused { get; }
-        public Speed Speed { get; }
-        public int CommercialTax { get; }
-        public int ResidentialTax { get; }
-        public int IndustrialTax { get; }
+        public string MayorName { get => _model.MayorName; }
+        public string CityName { get => _model.CityName; }
+        public int Budget { get => _model.Budget; }
+        public int Satisfaction { get => _model.Satisfaction; }
+        public int Population { get => _model.Population; }
+        public bool Paused { get; } //TO DO
+        public Speed Speed { get => _model.Speed; }
+        public int CommercialTax { get => _model.Taxes.CommercialTax; }
+        public int ResidentialTax { get => _model.Taxes.ResidentalTax; }
+        public int IndustrialTax { get => _model.Taxes.IndustrialTax; }
         public string SelectedFieldName { get; }
         public string SelectedFieldHealth { get; }
         public string SelectedFieldIsOnFire { get; }
@@ -150,7 +150,7 @@ namespace CCity.ViewModel
 
         private void Model_BudgetChanged(object o, FieldEventArgs e)
         {
-            throw new NotImplementedException();
+            OnPropertyChanged(nameof(Budget));
         }
 
         private void Model_SatisfactionChanged(object o, FieldEventArgs e)

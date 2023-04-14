@@ -86,18 +86,5 @@ namespace CCity.ViewModel
         }
 
         #endregion
-
-        #region Private methods
-
-
-
-        #endregion
-
-        #region Events
-
-
-
-        #endregion
-
     }
 }
