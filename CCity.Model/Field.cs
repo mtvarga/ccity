@@ -12,7 +12,7 @@ namespace CCity.Model
         internal const int MAX_INDUSTRIAL_EFFECT = 20;
         #endregion
 
-        #region Fields
+        #region Fields  
 
         public Placeable? Placeable { get; internal set; }
 
@@ -82,12 +82,10 @@ namespace CCity.Model
             return Placeable.GetType() == type;
         }
 
-        public void RefreshPublicity()
+        public bool RefreshPublicity()
         {
-            if (Placeable != null)
-            {
-                Placeable.isPublic = true;
-            }
+            if (Placeable == null || Placeable.isPublic == true) return false;
+            else return true;
         }
 
         internal bool Place(Placeable placeable)
