@@ -20,6 +20,9 @@
                 <ColumnDefinition Width="102"/>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+            
+            
+            <!--Sidebar-->
             <Grid Grid.Column="0" Background="#eee">
                 <WrapPanel Margin="7" VerticalAlignment="Top">
                     <Button Width="40" Height="40" Margin="2">Crsr</Button>
@@ -37,104 +40,60 @@
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                     <StackPanel Orientation="Vertical" Margin="0 5">
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
-                        <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center">7</TextBlock>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                            <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResidentialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
                             <Button Height="14">+</Button>
                             <Button Height="14">-</Button>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
-                        <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center">7</TextBlock>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                            <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding CommercialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
                             <Button Height="14">+</Button>
                             <Button Height="14">-</Button>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
-                        <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" TextAlignment="Center">7</TextBlock>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                            <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding IndustrialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
                             <Button Height="14">+</Button>
                             <Button Height="14">-</Button>
                         </StackPanel>
                     </StackPanel>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0 5">
+                    <TextBlock Text="{Binding Speed, StringFormat='🕜: {0}'}" Margin="0 0 0 5"/>
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
                         <!--<local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="12 0 0 12">-</local:CustomButton>
                         <local:CustomButton Style="{StaticResource SpeedButtonStyle}">||</local:CustomButton>
                         <local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="0 12 12 0">+</local:CustomButton>-->
                         <Button Width="24" Height="24">-</Button>
-                        <Button Width="24" Height="24">||</Button>
+                        <Button Width="24" Height="24" Content="||" FontWeight="Bold">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPaused}" Value="True">
+                                            <Setter Property="Content" Value="▶"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                         <Button Width="24" Height="24">+</Button>
                     </StackPanel>
                 </StackPanel>
             </Grid>
+            
+            
+            <!--Center-->
             <Grid Grid.Column="1">
                 <Grid>
+                    <StackPanel Orientation="Vertical" Background="#eee" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
+                        <Button Width="20" Height="20" HorizontalAlignment="Right">×</Button>
+                    </StackPanel>
+                </Grid>
+                <Grid>
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding Fields}">
-                        <!--az mezőket tároló vezérlő-->
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <!--a gombokat egy rácsba fűzzük fel-->
-                                <UniformGrid Rows="9" Columns="9" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <!--az elemek gombok lesznek-->
-                            <DataTemplate>
-                                <Button Command="{Binding StepCommand}" CommandParameter="{Binding Number}" Content="{Binding Text}" Focusable="False" RenderTransformOrigin="0.5, 0.5" FontSize="24" FontWeight="Bold">
-                                    <!-- gomb háttérszíne -->
-                                    <!-- gomb méretezése (csak az animációnál használjuk ki) -->
-                                    <Button.RenderTransform>
-                                        <ScaleTransform ScaleX="1" ScaleY="1" />
-                                    </Button.RenderTransform>
-                                    <Button.Style>
-                                        <!-- gomb stílusa, ahol a színét megadjuk -->
-                                        <Style TargetType="Button">
-                                            <Style.Triggers>
-                                                <!-- a szín egy adatkötés hatására fog változni -->
-                                                <DataTrigger Binding="{Binding IsLocked}" Value="True">
-                                                    <Setter Property="Background" Value="Yellow" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsLocked}" Value="False">
-                                                    <Setter Property="Background" Value="White" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                    <Button.Triggers>
-                                        <!-- animációk végrehajtása esemény hatására -->
-                                        <EventTrigger RoutedEvent="Button.Loaded">
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <DoubleAnimation Duration="0:00:02" From="0" To="1" Storyboard.TargetProperty="Opacity" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                        <EventTrigger RoutedEvent="Button.Click">
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <ColorAnimationUsingKeyFrames Duration="0:00:00.2" Storyboard.TargetProperty="(Foreground).(SolidColorBrush.Color)">
-                                                        <ColorAnimationUsingKeyFrames.KeyFrames>
-                                                            <DiscreteColorKeyFrame Value="Red" KeyTime="0:00:00" />
-                                                            <DiscreteColorKeyFrame Value="Black" KeyTime="0:00:00.2" />
-                                                        </ColorAnimationUsingKeyFrames.KeyFrames>
-                                                    </ColorAnimationUsingKeyFrames>
-                                                    <DoubleAnimation Duration="0:00:00.1" From="1" To="0.5" AutoReverse="True" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" />
-                                                    <DoubleAnimation Duration="0:00:00.1" From="1" To="0.5" AutoReverse="True" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </Button.Triggers>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                        <ItemsControl.ItemContainerStyle>
-                            <!--a függőségi tulajdonságokat kjülön kell kötnünk-->
-                            <Style>
-                                <Setter Property="Grid.Row" Value="{Binding X}" />
-                                <Setter Property="Grid.Column" Value="{Binding Y}" />
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
+                        
                     </ItemsControl>
                 </Grid>
             </Grid>
@@ -144,14 +103,14 @@
         <!--Statusbar-->
         <Grid Grid.Row="1" Background="#EEE">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Label>Kemecse</Label>
-                <Label>Polgár Jenő</Label>
+                <TextBlock Text="{Binding CityName}" Margin="7"/>
+                <TextBlock Text="{Binding MayorName}" Margin="7"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Label>🤵3.232</Label>
-                <Label>👍94%</Label>
-                <Label>💎99.999</Label>
-                <Label>📆2023.03.20</Label>
+                <TextBlock Text="{Binding Population, StringFormat='🤵 {0}'}" Margin="7"/>
+                <TextBlock Text="{Binding Satisfaction, StringFormat='👍 {0}%'}" Margin="7"/>
+                <TextBlock Text="{Binding Budget, StringFormat='💎 {0}'}" Margin="7"/>
+                <TextBlock Text="{Binding Date, StringFormat='📆 {0}'}" Margin="7"/>
             </StackPanel>
         </Grid>
     </Grid>
