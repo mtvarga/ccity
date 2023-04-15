@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Linq;
+using System.Drawing;
 
 namespace CCity.Model
 {
@@ -149,15 +150,11 @@ namespace CCity.Model
                 List<(int, int)> fillerCoordinates = GetMultifieldFillerCoordinates(field, multifield);
                 foreach((int X, int Y) coord in fillerCoordinates)
                 {
-                    if (coord.X != field.X || coord.Y != field.Y)
-                    {
-                        Field currentField = Fields[coord.X, coord.Y];
-                        Filler filler = new Filler(multifield);
-                        multifield.Occupies.Add(filler);
-                        currentField.Place(filler);
-                        effectedFields.Add(currentField);
-                    }
-                    
+                    Field currentField = Fields[coord.X, coord.Y];
+                    Filler filler = new Filler(multifield);
+                    multifield.Occupies.Add(filler);
+                    currentField.Place(filler);
+                    effectedFields.Add(currentField);                    
                 }
             }
             field.Place(placeable);
@@ -439,11 +436,18 @@ namespace CCity.Model
             List<(int, int)> coordinates = new List<(int, int)>();
             int width = multifield.Width;
             int height = multifield.Height;
+            int currentX;
+            int currentY;
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
                 {
-                    coordinates.Add((field.X + i, field.Y - j));
+                    currentX = field.X + i;
+                    currentY = field.Y - j;
+                    if (currentX != field.X || currentY != field.Y)
+                    {
+                        coordinates.Add((field.X + i, field.Y - j));
+                    }
                 }
             }
             return coordinates;
