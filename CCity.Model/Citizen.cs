@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,52 +9,70 @@ namespace CCity.Model
 {
     public class Citizen
     {
+        #region Constants
 
-        #region Fields
-
-
+        private const int CloseProximityRadius = 10;
+        
         #endregion
-
+        
         #region Properties
 
         public string Name { get; }
-        public ResidentialZone Home { get; private set;}
-        public WorkplaceZone WorkPlace { get; private set;}
-        public double Satisfaction { get; }
-
+        
+        public ResidentialZone Home { get; }
+        
+        public WorkplaceZone Workplace { get; private set; }
+        
+        public double HomeWorkplaceDistanceEffect { get; private set; }
+        
+        public double LastCalculatedSatisfaction { get; internal set; }
+        
         #endregion
 
         #region Constructors
 
-        public Citizen()
+        public Citizen(ResidentialZone home, WorkplaceZone workplace)
         {
-            throw new NotImplementedException();
+            Home = home;
+            Home.AddCitizen(this);
+            Workplace = workplace;
+            Workplace.AddCitizen(this);
+            
+            CalculateHomeWorkplaceDistanceEffect();
         }
 
         #endregion
 
         #region Public methods
-
-        public Citizen(ResidentialZone residentalZone,WorkplaceZone workplaceZone)
+        
+        public void SwapWorkplace(WorkplaceZone workplace)
         {
-            throw new NotImplementedException();
-        }
+            Workplace.DropCitizen(this);
+            Workplace = workplace;
+            Workplace.AddCitizen(this);
 
-        public void SwapWorkplace(WorkplaceZone workplaceZone)
-        {
-            throw new NotImplementedException();
+            CalculateHomeWorkplaceDistanceEffect();
         }
 
         public void MoveOut()
         {
-            throw new NotImplementedException();
+            Home.DropCitizen(this);
+            Workplace.DropCitizen(this);
         }
 
         #endregion
 
         #region Private methods
 
+        private void CalculateHomeWorkplaceDistanceEffect()
+        {
+            var proximityEffectValues = 
+                Utilities.GetCoordinatesInRadiusWeighted(Home.Owner, CloseProximityRadius)
+                    .Where((x, y, weight) => x == Workplace.Owner.X && y == Workplace.Owner.Y)
+                    .Select((_, _, weight) => weight);
 
+            HomeWorkplaceDistanceEffect = proximityEffectValues.Count > 0 ? proximityEffectValues.First : 0;
+        }
 
         #endregion
 
