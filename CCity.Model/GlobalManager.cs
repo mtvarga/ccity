@@ -161,7 +161,7 @@
             if (_population <= 0)
                 return;
             
-            UpdateSatisfaction(zones.SelectMany(zone => zone.Citizens).ToList());
+            UpdateSatisfaction(zones.SelectMany(zone => zone.Citizens));
         }
         
         public void UpdateSatisfaction(IEnumerable<Citizen> citizens)
@@ -181,7 +181,7 @@
         
         public void UpdateSatisfaction(bool movedIn, List<Citizen> changes, List<Citizen> citizens)
         {
-            if (citizens.Count <= 0)
+            if (citizens.Count == 0)
             {
                 _population = 0;
                 TotalSatisfaction = 0;
