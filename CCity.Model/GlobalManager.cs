@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Win32.SafeHandles;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public class GlobalManager
     {
@@ -30,9 +23,6 @@ namespace CCity.Model
 
         #region Fields
 
-        public int GlobalSatisfactionScore;
-        public int Budget;
-        public Taxes Taxes { get; }
         private Taxes _taxes;
 
         private double _safetyRatio;
@@ -91,6 +81,41 @@ namespace CCity.Model
 
         #region Public methods
 
+        public void Pay(int price)
+        {
+            var newBudget = Budget - price;
+            
+            switch (newBudget)
+            {
+                case <= 0 when Budget > 0:
+                    IncreaseNegativeBudgetRatio();
+                    break;
+                case > 0 when Budget <= 0:
+                    ResetNegativeBudgetRatio();
+                    break;
+            }
+
+            Budget = newBudget;
+        }
+        
+        public void CollectTax(List<ResidentialZone> residentialZones, List<WorkplaceZone> workplaceZones)
+        {
+            foreach (var residentialZone in residentialZones)
+            {
+                Budget += Convert.ToInt32(Math.Round(ResTaxNorm * _taxes.ResidentalTax * residentialZone.Current));
+            }
+            
+            foreach (var workplaceZone in workplaceZones)
+            {
+                Budget += workplaceZone switch
+                {
+                    IndustrialZone => Convert.ToInt32(Math.Round(IndTaxNorm * _taxes.IndustrialTax * workplaceZone.Current)),
+                    CommercialZone => Convert.ToInt32(Math.Round(ComTaxNorm * _taxes.CommercialTax * workplaceZone.Current)),
+                    _ => 0,
+                };
+            }
+        }
+        
         public bool ChangeTax(TaxType taxType, double amount)
         {
             switch (taxType)
@@ -180,28 +205,10 @@ namespace CCity.Model
             RecalculateTotalSatisfaction();
         }
 
-        public void CollectTax(List<ResidentialZone> residentialZones, List<WorkplaceZone> workplaceZones)
+        public void PassYear()
         {
-            foreach (var residentialZone in residentialZones)
-            {
-                Budget += Convert.ToInt32(Math.Round(ResTaxNorm * _taxes.ResidentalTax * residentialZone.Current));
-            }
-            foreach (var workplaceZone in workplaceZones)
-            {
-                Budget += workplaceZone switch
-                {
-                    IndustrialZone => Convert.ToInt32(Math.Round(IndTaxNorm * _taxes.IndustrialTax * workplaceZone.Current)),
-                    CommercialZone => Convert.ToInt32(Math.Round(ComTaxNorm * _taxes.CommercialTax * workplaceZone.Current)),
-                    _ => 0,
-                };
-            }
-        }
-        public void PayMaintenance(List<Placeable> facilities)
-        {
-            foreach (var facility in facilities)
-            {
-                Budget -= facility.MaintenanceCost;
-            }
+            if (Budget <= 0)
+                IncreaseNegativeBudgetRatio();
         }
         
         #endregion
