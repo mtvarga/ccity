@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
@@ -144,6 +144,67 @@ namespace CCity.ViewModel
         #endregion
 
         #region Private methods
+
+        private void CreateTable()
+        {
+            Fields = new();
+            for(int i = 0; i < _model.Width; i++) {
+                for(int j = 0; j < _model.Height; j++)
+                {
+                    Fields.Add(new FieldItem
+                    {
+                        Texture = Texture.None,
+                        MinimapColor = Color.Green,
+                        OverLayColor = Color.Transparent,
+                        X = i,
+                        Y = j,
+                        Number = i * _model.Width + j,
+                        ClickCommand = new DelegateCommand(param => FieldClicked(Convert.ToInt32(param)))
+                    });
+
+                }
+            }
+            foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem);
+        }
+
+        private void RefreshFieldItem(FieldItem fieldItem)
+        {
+            Field field = _model.Fields[fieldItem.X, fieldItem.Y];
+            fieldItem.Texture = GetTextureFromField(field);
+            fieldItem.MinimapColor = GetMinimapColorFromTexture(fieldItem.Texture);
+        }
+
+        private Color GetMinimapColorFromTexture(Texture texture)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Texture GetTextureFromField(Field field)
+        {
+            if (!field.HasPlaceable) return Texture.None;
+            switch (field.Placeable)
+            {
+                case FireDepartment _: return Texture.FireDepartment;
+                case PoliceDepartment _: return Texture.PoliceDepartment;
+                case Stadium _: return Texture.StadiumBottomLeft;
+                case PowerPlant _: return Texture.PowerPlantBottomLeft;
+                case Road _: return GetRoadTexture(field);
+                case Filler _: return GetFillerTexture(field);
+                default: return Texture.Unhandled;
+            }
+        }
+
+        private Texture GetFillerTexture(Field field)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Texture GetRoadTexture(Field field)
+        {
+            if (!field.Has(typeof(Road))) return Texture.Unhandled;
+            (int t, int r, int b, int l) = GetRoadNeighbours(field);
+            throw new NotImplementedException();
+        }
 
         private void FieldClicked(int index)
         {
