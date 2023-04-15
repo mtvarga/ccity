@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
@@ -97,6 +98,7 @@ namespace CCity.ViewModel
         public DelegateCommand NewGameCommand { get; private set; }
         public DelegateCommand PauseGameCommand { get; private set; }
         public DelegateCommand ExitGameCommand { get; private set; }
+        public DelegateCommand CloseApplicationCommand { get; private set; }
         public DelegateCommand SelectToolCommand { get; private set; }
         public DelegateCommand ChangeResidentialTaxCommand { get; private set; }
         public DelegateCommand ChangeCommercialTaxCommand { get; private set; }
@@ -119,6 +121,7 @@ namespace CCity.ViewModel
             NewGameCommand = new DelegateCommand(param => OnNewGame());
             PauseGameCommand = new DelegateCommand(param => OnPauseGame());
             ExitGameCommand = new DelegateCommand(param => OnExitGame());
+            CloseApplicationCommand = new DelegateCommand(param => OnCloseApplication());
             SelectToolCommand = new DelegateCommand(param => OnSelectTool((Tool)param!));
             ChangeResidentialTaxCommand = new DelegateCommand(param => OnChangeResidentialTax((int)param!));
             ChangeCommercialTaxCommand = new DelegateCommand(param => OnChangeCommercialTax((int)param!));
@@ -322,6 +325,7 @@ namespace CCity.ViewModel
         public EventHandler? NewGame;
         public EventHandler? PauseGame;
         public EventHandler? ExitGame;
+        public EventHandler? CloseApplication;
 
         #endregion
 
@@ -340,6 +344,11 @@ namespace CCity.ViewModel
         private void OnExitGame()
         {
             ExitGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnCloseApplication()
+        {
+            CloseApplication?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion

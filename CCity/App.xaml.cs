@@ -50,6 +50,7 @@ namespace CCity
             _viewModel.NewGame += new EventHandler(ViewModel_NewGame);
             _viewModel.PauseGame += new EventHandler(ViewModel_PauseGame);
             _viewModel.ExitGame += new EventHandler(ViewModel_ExitGame);
+            _viewModel.CloseApplication += new EventHandler(ViewModel_CloseApplication);
 
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromMilliseconds(250);
@@ -122,6 +123,11 @@ namespace CCity
             {
                 _timer.Stop();
             }
+        }
+
+        private void ViewModel_CloseApplication(object? sender, EventArgs e)
+        {
+            _mainWindow.Close();
         }
 
         #endregion
