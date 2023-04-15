@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
@@ -21,7 +21,7 @@ namespace CCity.ViewModel
         private bool _minimapMinimized;
         private Tool _selectedTool;
         private int _mapPosition;
-        private bool _fieldSelected;
+        private Field? _selectedField;
 
         #endregion
 
@@ -38,17 +38,19 @@ namespace CCity.ViewModel
         public int CommercialTax { get => _model.Taxes.CommercialTax; }
         public int ResidentialTax { get => _model.Taxes.ResidentalTax; }
         public int IndustrialTax { get => _model.Taxes.IndustrialTax; }
-        public string SelectedFieldName { get; }
-        public string SelectedFieldHealth { get; }
-        public string SelectedFieldIsOnFire { get; }
-        public string SelectedFieldIsUpgradeable { get; }
-        public int SelectedFieldUpgradeCost { get; }
-        public string SelectedFieldStadiumEffect { get; }
-        public string SelectedFieldForestEffect { get; }
-        public string SelectedFieldFiredepartmentEffect { get; }
-        public string SelectedFieldPoliceEffect { get; }
-        public string SelectedFieldSatisfaction { get; }
-        public string SelectedFieldCitizenName { get; }
+        public bool IsFieldSelected { get => _selectedField != null; }
+        public string SelectedFieldName { get => IsFieldSelected ? GetFieldName(_selectedField) : ""; }
+        //public int SelectedFieldHealth { get; }
+        //public string SelectedFieldIsOnFire { get; }
+        //public string SelectedFieldIsUpgradeable { get; }
+        //public int SelectedFieldUpgradeCost { get; }
+        public int SelectedFieldPoliceDeparmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.PoliceDepartmentEffect) : 0; }
+        public int SelectedFieldFiredepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.FireDepartmentEffect) : 0; }
+        public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField.StadiumEffect) : 0; }
+        public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
+        public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField.IndustrialEffect) : 0; }
+        public int SelectedFieldSatisfaction { get; }
+        //public string SelectedFieldCitizenName { get; }
 
         public bool MinimapMinimized
         { 
@@ -171,12 +173,12 @@ namespace CCity.ViewModel
         private void RefreshFieldItem(FieldItem fieldItem)
         {
             fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
-            fieldItem.MinimapColor = GetMinimapColorFromTexture(fieldItem.Texture);
+            fieldItem.MinimapColor = GetMinimapColorFromFieldItem(fieldItem);
         }
 
-        private Color GetMinimapColorFromTexture(Texture texture)
+        private Color GetMinimapColorFromFieldItem(FieldItem fieldItem)
         {
-            throw new NotImplementedException();
+            return Color.Green;
         }
 
         private Texture GetTextureFromFieldItem(FieldItem fieldItem)
@@ -253,28 +255,40 @@ namespace CCity.ViewModel
 
         private void FieldClicked(int index)
         {
-            (int, int) cordinates = GetCordinates(index);
+            (int x, int y) coord = GetCordinates(index);
             switch (SelectedTool)
             {
-                case Tool.Cursor: SelectedField(index) break;
-                case Tool.ResidentalZone: _model.Place(cordinates.Item1, cordinates.Item2,PlaceableType.ResidentalZone); break;
-                case Tool.IndustrialZone: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.IndustrialZone); break;
-                case Tool.CommercialZone: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.CommercialZone); break;
-                case Tool.Road: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.Road); break;
-                case Tool.PoliceDepartment: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.PoliceDepartment); break;
-                case Tool.Stadium: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.Stadium); break;
-                case Tool.FireDepartment: _model.Place(cordinates.Item1,cordinates.Item2, PlaceableType.FireDepartment); break;
-                case Tool.Bulldozer: _model.Demolish(cordinates.Item1, cordinates.Item2); break;
+                case Tool.Cursor: SelectField(index); break;
+                case Tool.ResidentalZone: _model.Place(coord.x, coord.y, PlaceableType.ResidentalZone); break;
+                case Tool.IndustrialZone: _model.Place(coord.x, coord.y, PlaceableType.IndustrialZone); break;
+                case Tool.CommercialZone: _model.Place(coord.x, coord.y, PlaceableType.CommercialZone); break;
+                case Tool.Road: _model.Place(coord.x, coord.y, PlaceableType.Road); break;
+                case Tool.PoliceDepartment: _model.Place(coord.x, coord.y, PlaceableType.PoliceDepartment); break;
+                case Tool.Stadium: _model.Place(coord.x, coord.y, PlaceableType.Stadium); break;
+                case Tool.FireDepartment: _model.Place(coord.x, coord.y, PlaceableType.FireDepartment); break;
+                case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
                 default: throw new Exception();
-                
             }
         }
+
+        private void SelectField(int index)
+        {
+            (int x, int y) coord = GetCordinates(index);
+            _selectedField = _model.Fields[coord.x, coord.y];
+        }
+
+        private int PercentToInt(double percent) => (int)Math.Floor(percent * 100);
 
         private (int, int) GetCordinates(int index)
         {
             int x = index % _model.Width;
             int y = index / _model.Width;
             return (x, y);
+        }
+
+        private string GetFieldName(Field? selectedField)
+        {
+            throw new NotImplementedException();
         }
 
         private void Model_GameTicked(object o, EventArgs e)
