@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
+using System.Xml.Serialization;
 using CCity.Model;
 
 namespace CCity.ViewModel
@@ -15,8 +17,6 @@ namespace CCity.ViewModel
         #region Fields
 
         private MainModel _model;
-        private Tool _currentTool;
-
         private bool _minimapMinimized;
         private Tool _selectedTool;
         private int _mapPosition;
@@ -106,14 +106,16 @@ namespace CCity.ViewModel
         #region Commands
 
         public DelegateCommand NewGameCommand { get; private set; }
+        public DelegateCommand PauseGameCommand { get; private set; }
+        public DelegateCommand ExitGameCommand { get; private set; }
         public DelegateCommand SelectToolCommand { get; private set; }
         public DelegateCommand ChangeResidentialTaxCommand { get; private set; }
         public DelegateCommand ChangeCommercialTaxCommand { get; private set; }
         public DelegateCommand ChangeIndustrialTaxCommand { get; private set; }
+        //TO DO
         public DelegateCommand SendFiretruckCommand { get; private set; }
         public DelegateCommand UpgradeCommand { get; private set; }
         public DelegateCommand ChangeMinimapSizeCommand { get; private set; }
-        public DelegateCommand ExitGameCommand { get; private set; }
 
         #endregion
 
@@ -121,7 +123,17 @@ namespace CCity.ViewModel
 
         public MainViewModel(MainModel model)
         {
-            throw new NotImplementedException();
+            _model = model;
+
+
+            NewGameCommand = new DelegateCommand(param => OnNewGame());
+            PauseGameCommand = new DelegateCommand(param => OnPauseGame());
+            ExitGameCommand = new DelegateCommand(param => OnExitGame());
+            SelectToolCommand = new DelegateCommand(param => OnSelectTool((Tool)param!));
+            ChangeResidentialTaxCommand = new DelegateCommand(param => OnChangeResidentialTax((int)param!));
+            ChangeCommercialTaxCommand = new DelegateCommand(param => OnChangeCommercialTax((int)param!));
+            ChangeIndustrialTaxCommand = new DelegateCommand(param => OnChangeIndustrialTax((int)param!));
+
         }
 
         #endregion
@@ -135,7 +147,7 @@ namespace CCity.ViewModel
 
         private void FieldClicked(int index)
         {
-            throw new NotImplementedException();
+
         }
 
         private void Model_GameTicked(object o, EventArgs e)
@@ -145,7 +157,7 @@ namespace CCity.ViewModel
 
         private void Model_PopulationChanged(object o, FieldEventArgs e)
         {
-            throw new NotImplementedException();
+            OnPropertyChanged(nameof(Population));
         }
 
         private void Model_BudgetChanged(object o, FieldEventArgs e)
@@ -155,23 +167,69 @@ namespace CCity.ViewModel
 
         private void Model_SatisfactionChanged(object o, FieldEventArgs e)
         {
-            throw new NotImplementedException();
+            OnPropertyChanged(nameof(Satisfaction));
         }
 
         private void Model_TaxChanged(object o, FieldEventArgs e)
         {
-            throw new NotImplementedException();
+            OnPropertyChanged(nameof(ResidentialTax));
+            OnPropertyChanged(nameof(IndustrialTax));
+            OnPropertyChanged(nameof(CommercialTax));
         }
 
         #endregion
 
         #region Events
 
-        public EventHandler<EventArgs> NewGame;
-        public EventHandler<EventArgs> ExitGame;
-        public EventHandler<EventArgs> InspectField;
+        public EventHandler? NewGame;
+        public EventHandler? PauseGame;
+        public EventHandler? ExitGame;
 
         #endregion
 
+        #region Model event methods
+
+        private void OnNewGame()
+        {
+            NewGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnPauseGame()
+        {
+            PauseGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnExitGame()
+        {
+            ExitGame?.Invoke(this, EventArgs.Empty);
+        }
+
+        #endregion
+
+        #region Delegatecommand methods
+
+        private void OnSelectTool(Tool tool)
+        {
+            _selectedTool = tool;
+        }
+
+        private  void OnChangeResidentialTax(int n)
+        {
+            //_model.ChangeTax(TaxType.Residental, n);
+        }
+
+        private void OnChangeCommercialTax(int n)
+        {
+            //_model.ChangeTax(TaxType.Commercial, n);
+        }
+
+        private void OnChangeIndustrialTax(int n)
+        {
+            //_model.ChangeTax(TaxType.Industrial, n);
+        }
+
+
+
+        #endregion
     }
 }
