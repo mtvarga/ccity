@@ -8,6 +8,14 @@
         private const int ComTaxNorm = 5000;
         private const int IndTaxNorm = 7500;
 
+        private const int MaxResTax = 50;
+        private const int MaxComTax = 25;
+        private const int MaxIndTax = 25;
+        
+        private const int MinResTax = 15;
+        private const int MinComTax = 10;
+        private const int MinIndTax = 5;
+        
         private const int StartingBudget = 10000;
 
         private const double MinSafetyRatio = 0.25;
@@ -121,12 +129,18 @@
             switch (taxType)
             {
                 case TaxType.Residental:
+                    if(amount < MinResTax || amount > MaxResTax)
+                        return false;
                     _taxes.ResidentalTax += amount;
                     break;
                 case TaxType.Commercial:
+                    if (amount < MinComTax || amount > MaxComTax)
+                        return false;
                     _taxes.CommercialTax += amount;
                     break;
                 case TaxType.Industrial:
+                    if (amount < MinIndTax || amount > MaxIndTax)
+                        return false;
                     _taxes.IndustrialTax += amount;
                     break;
                 default:
