@@ -121,66 +121,6 @@ namespace CCity.Model
 
         #region Private methods
 
-        #region Helpers
-
-        private bool OnMap(int x, int y)
-        {
-            return 0 <= x && x < Width && 0 <= y && y < Height;
-        }
-
-        private Placeable GetRoot(Placeable placeable)
-        {
-            if (placeable is Filler) return (Placeable)(((Filler)placeable).Main);
-            else return placeable;
-        }
-
-        private List<Placeable> GetTypeNeighbours(Placeable placeable, Type type, bool pessimist = false)
-        {
-            List<Placeable> placeables = GetNeighbours(placeable);
-            placeables = placeables.FindAll(p => (p.GetType() == type && !pessimist) || (p.GetType() != type && pessimist));
-            return placeables;
-        }
-
-        private List<Placeable> GetNeighbours(Placeable placeable)
-        {
-            List<Placeable> placeables = new();
-            Placeable mainPlaceable = GetRoot(placeable);
-            Field field = mainPlaceable.Owner;
-            if (field == null) return placeables;
-            int x = field.X;
-            int y = field.Y;
-            int width = 1;
-            int height = 1;
-            if (mainPlaceable is IMultifield multifield)
-            {
-                width = multifield.Width;
-                height = multifield.Height;
-            }
-            IterateThroughSide(x - 1, y, false, height, placeables); //left side
-            IterateThroughSide(x, y + 1, true, width, placeables); //bottom
-            IterateThroughSide(x, y - Height, true, width, placeables); //top
-            IterateThroughSide(x + Width, y, false, height, placeables); //right side
-            return placeables;
-        }
-
-        private void IterateThroughSide(int startX, int startY, bool xIterates, int iterationNumber, List<Placeable> placeables)
-        {
-            int currentX;
-            int currentY;
-            for (int i = 0; i < iterationNumber; i++)
-            {
-                currentX = xIterates ? startX + i : startX;
-                currentY = xIterates ? startY : startY - i;
-                if (OnMap(currentX, currentY))
-                {
-                    Field neighbour = Fields[currentX, currentY];
-                    if (neighbour.HasPlaceable) placeables.Add(neighbour.Placeable);
-                }
-            }
-        }
-
-        #endregion
-
         #region Place related
 
         private bool CanPlace(Field field, Placeable placeable)
@@ -189,31 +129,10 @@ namespace CCity.Model
             {
                 return false;
             }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (placeable is IMultifield)
+            if (placeable is IMultifield multifield)
             {
-                int width = ((IMultifield)placeable).Width;
-                int height = ((IMultifield)placeable).Height;
-                for (int i = 0; i < width; i++)
-                {
-                    for (int j = 0; j < height; j++)
-                    {
-                        int currentX = field.X + i;
-                        int currentY = field.Y - j;
-                        if (!OnMap(currentX, currentY))
-                        {
-                            Field currentField = Fields[currentX, currentY];
-                            if (currentField.HasPlaceable)
-                            {
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                }
+                List<(int X, int Y)> fillerCoordinates = GetMultifieldFillerCoordinates(field, multifield);
+                return fillerCoordinates.All(coord => OnMap(coord.X, coord.Y) && !Fields[coord.X, coord.Y].HasPlaceable);
             }
             return true;
         }
@@ -227,25 +146,21 @@ namespace CCity.Model
             List<Field> effectedFields = new();
             if (placeable is IMultifield multifield)
             {
-                int width = multifield.Width;
-                int height = multifield.Height;
-                for (int i = 0; i < width; i++)
+                List<(int, int)> fillerCoordinates = GetMultifieldFillerCoordinates(field, multifield);
+                foreach((int X, int Y) coord in fillerCoordinates)
                 {
-                    for (int j = 0; j < height; j++)
+                    if (coord.X != field.X || coord.Y != field.Y)
                     {
-                        int currentX = field.X + i;
-                        int currentY = field.Y - j;
-                        if (currentX != field.X || currentY != field.Y)
-                        {
-                            Field currentField = Fields[currentX, currentY];
-                            Filler filler = new Filler(multifield);
-                            multifield.Occupies.Add(filler);
-                            currentField.Place(filler);
-                            effectedFields.Add(currentField);
-                        }
+                        Field currentField = Fields[coord.X, coord.Y];
+                        Filler filler = new Filler(multifield);
+                        multifield.Occupies.Add(filler);
+                        currentField.Place(filler);
+                        effectedFields.Add(currentField);
                     }
+                    
                 }
             }
+            field.Place(placeable);
             effectedFields.Add(field);
             return effectedFields;
         }
@@ -457,6 +372,81 @@ namespace CCity.Model
                 }
             }
             return false;
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private bool OnMap(int x, int y)
+        {
+            return 0 <= x && x < Width && 0 <= y && y < Height;
+        }
+
+        private Placeable GetRoot(Placeable placeable)
+        {
+            if (placeable is Filler) return (Placeable)(((Filler)placeable).Main);
+            else return placeable;
+        }
+
+        private List<Placeable> GetTypeNeighbours(Placeable placeable, Type type, bool pessimist = false)
+        {
+            List<Placeable> placeables = GetNeighbours(placeable);
+            placeables = placeables.FindAll(p => (p.GetType() == type && !pessimist) || (p.GetType() != type && pessimist));
+            return placeables;
+        }
+
+        private List<Placeable> GetNeighbours(Placeable placeable)
+        {
+            List<Placeable> placeables = new();
+            Placeable mainPlaceable = GetRoot(placeable);
+            Field field = mainPlaceable.Owner;
+            if (field == null) return placeables;
+            int x = field.X;
+            int y = field.Y;
+            int width = 1;
+            int height = 1;
+            if (mainPlaceable is IMultifield multifield)
+            {
+                width = multifield.Width;
+                height = multifield.Height;
+            }
+            IterateThroughSide(x - 1, y, false, height, placeables); //left side
+            IterateThroughSide(x, y + 1, true, width, placeables); //bottom
+            IterateThroughSide(x, y - Height, true, width, placeables); //top
+            IterateThroughSide(x + Width, y, false, height, placeables); //right side
+            return placeables;
+        }
+
+        private void IterateThroughSide(int startX, int startY, bool xIterates, int iterationNumber, List<Placeable> placeables)
+        {
+            int currentX;
+            int currentY;
+            for (int i = 0; i < iterationNumber; i++)
+            {
+                currentX = xIterates ? startX + i : startX;
+                currentY = xIterates ? startY : startY - i;
+                if (OnMap(currentX, currentY))
+                {
+                    Field neighbour = Fields[currentX, currentY];
+                    if (neighbour.HasPlaceable) placeables.Add(neighbour.Placeable);
+                }
+            }
+        }
+
+        private List<(int, int)> GetMultifieldFillerCoordinates(Field field, IMultifield multifield)
+        {
+            List<(int, int)> coordinates = new List<(int, int)>();
+            int width = multifield.Width;
+            int height = multifield.Height;
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    coordinates.Add((field.X + i, field.Y - j));
+                }
+            }
+            return coordinates;
         }
 
         #endregion
