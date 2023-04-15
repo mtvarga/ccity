@@ -2,15 +2,16 @@
 {
     public class CitizenManager
     {
-        #region Fields
+        #region Constants
 
-        private readonly int _citizenMoveOutThreshold = Convert.ToInt32(Math.Round(0.25 * MainModel.MaxCitizenSatisfactionScore));
+        private const double CitizenMoveOutThreshold = 0.25;
         
         #endregion
 
         #region Properties
 
         public List<Citizen> Citizens { get; }
+        
         public int Population => Citizens.Count;
 
         #endregion
@@ -63,7 +64,7 @@
 
             foreach (var citizen in Citizens)
             {
-                if (citizen.LastCalculatedSatisfaction < _citizenMoveOutThreshold)
+                if (citizen.LastCalculatedSatisfaction < CitizenMoveOutThreshold)
                 {
                     citizen.MoveOut();
                     
