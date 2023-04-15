@@ -252,13 +252,13 @@ namespace CCity.ViewModel
             switch (SelectedTool)
             {
                 case Tool.Cursor: SelectField(index); break;
-                case Tool.ResidentalZone: _model.Place(coord.x, coord.y, PlaceableType.ResidentalZone); break;
-                case Tool.IndustrialZone: _model.Place(coord.x, coord.y, PlaceableType.IndustrialZone); break;
-                case Tool.CommercialZone: _model.Place(coord.x, coord.y, PlaceableType.CommercialZone); break;
-                case Tool.Road: _model.Place(coord.x, coord.y, PlaceableType.Road); break;
-                case Tool.PoliceDepartment: _model.Place(coord.x, coord.y, PlaceableType.PoliceDepartment); break;
-                case Tool.Stadium: _model.Place(coord.x, coord.y, PlaceableType.Stadium); break;
-                case Tool.FireDepartment: _model.Place(coord.x, coord.y, PlaceableType.FireDepartment); break;
+                case Tool.ResidentalZone: _model.Place(coord.x, coord.y, new ResidentialZone()); break;
+                case Tool.CommercialZone: _model.Place(coord.x, coord.y, new CommercialZone()); break;
+                case Tool.IndustrialZone: _model.Place(coord.x, coord.y, new IndustrialZone()); break;
+                case Tool.FireDepartment: _model.Place(coord.x, coord.y, new FireDepartment()); break;
+                case Tool.PoliceDepartment: _model.Place(coord.x, coord.y, new PoliceDepartment()); break;
+                case Tool.Stadium: _model.Place(coord.x, coord.y, new Stadium()); break;
+                case Tool.Road: _model.Place(coord.x, coord.y, new Road()); break;
                 case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
                 default: throw new Exception();
             }
