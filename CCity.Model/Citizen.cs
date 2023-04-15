@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,18 +9,23 @@ namespace CCity.Model
 {
     public class Citizen
     {
-        #region Fields
+        #region Constants
 
-
+        private const int CloseProximityRadius = 10;
+        
         #endregion
-
+        
         #region Properties
 
         public string Name { get; }
-        public ResidentialZone Home { get; private set; }
+        
+        public ResidentialZone Home { get; }
+        
         public WorkplaceZone Workplace { get; private set; }
-        public double Satisfaction { get; }
-        public int LastCalculatedSatisfaction { get; internal set; }
+        
+        public double HomeWorkplaceDistanceEffect { get; private set; }
+        
+        public double LastCalculatedSatisfaction { get; internal set; }
         
         #endregion
 
@@ -31,6 +37,8 @@ namespace CCity.Model
             Home.AddCitizen(this);
             Workplace = workplace;
             Workplace.AddCitizen(this);
+            
+            CalculateHomeWorkplaceDistanceEffect();
         }
 
         #endregion
@@ -42,6 +50,8 @@ namespace CCity.Model
             Workplace.DropCitizen(this);
             Workplace = workplace;
             Workplace.AddCitizen(this);
+
+            CalculateHomeWorkplaceDistanceEffect();
         }
 
         public void MoveOut()
@@ -50,16 +60,19 @@ namespace CCity.Model
             Workplace.DropCitizen(this);
         }
 
-        public int CalculateSatisfaction()
-        {
-            // TODO: Calculate satisfaction
-            return 0;
-        }
-        
         #endregion
 
         #region Private methods
-        
+
+        private void CalculateHomeWorkplaceDistanceEffect()
+        {
+            var proximityEffectValues = 
+                Utilities.GetCoordinatesInRadiusWeighted(Home.Owner, CloseProximityRadius)
+                    .Where((x, y, weight) => x == Workplace.Owner.X && y == Workplace.Owner.Y)
+                    .Select((_, _, weight) => weight);
+
+            HomeWorkplaceDistanceEffect = proximityEffectValues.Count > 0 ? proximityEffectValues.First : 0;
+        }
 
         #endregion
 
