@@ -47,8 +47,8 @@ namespace CCity.ViewModel
         public int SelectedFieldPoliceDeparmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.PoliceDepartmentEffect) : 0; }
         public int SelectedFieldFiredepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.FireDepartmentEffect) : 0; }
         public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField.StadiumEffect) : 0; }
-        public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
         public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField.IndustrialEffect) : 0; }
+        //public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
         public int SelectedFieldSatisfaction { get; }
         //public string SelectedFieldCitizenName { get; }
 
@@ -90,20 +90,6 @@ namespace CCity.ViewModel
             }
         }
 
-        public bool FieldSelected
-        {
-            get { return _fieldSelected; }
-            set
-            {
-                if (value != _fieldSelected)
-                {
-                    _fieldSelected = value;
-                    OnPropertyChanged(nameof(_fieldSelected));
-                }
-            }
-        }
-
-
         #endregion
 
         #region Commands
@@ -119,6 +105,7 @@ namespace CCity.ViewModel
         public DelegateCommand SendFiretruckCommand { get; private set; }
         public DelegateCommand UpgradeCommand { get; private set; }
         public DelegateCommand ChangeMinimapSizeCommand { get; private set; }
+        public DelegateCommand CloseSelectedFieldWindow { get; private set; }
 
         #endregion
 
@@ -136,6 +123,7 @@ namespace CCity.ViewModel
             ChangeResidentialTaxCommand = new DelegateCommand(param => OnChangeResidentialTax((int)param!));
             ChangeCommercialTaxCommand = new DelegateCommand(param => OnChangeCommercialTax((int)param!));
             ChangeIndustrialTaxCommand = new DelegateCommand(param => OnChangeIndustrialTax((int)param!));
+            CloseSelectedFieldWindow = new DelegateCommand(OnCloseSelectedFieldWindow);
 
         }
 
@@ -253,6 +241,8 @@ namespace CCity.ViewModel
             throw new NotImplementedException();
         }
 
+        private void UnselectField() => _selectedField = null;
+
         private void FieldClicked(int index)
         {
             (int x, int y) coord = GetCordinates(index);
@@ -275,6 +265,13 @@ namespace CCity.ViewModel
         {
             (int x, int y) coord = GetCordinates(index);
             _selectedField = _model.Fields[coord.x, coord.y];
+            OnPropertyChanged(nameof(IsFieldSelected));
+            OnPropertyChanged(nameof(SelectedFieldName));
+            OnPropertyChanged(nameof(SelectedFieldPoliceDeparmentEffect));
+            OnPropertyChanged(nameof(SelectedFieldFiredepartmentEffect));
+            OnPropertyChanged(nameof(SelectedFieldStadiumEffect));
+            OnPropertyChanged(nameof(SelectedFieldIndustrialEffect));
+            OnPropertyChanged(nameof(SelectedFieldSatisfaction));
         }
 
         private int PercentToInt(double percent) => (int)Math.Floor(percent * 100);
@@ -369,7 +366,11 @@ namespace CCity.ViewModel
             //_model.ChangeTax(TaxType.Industrial, n);
         }
 
-
+        private void OnCloseSelectedFieldWindow(object? obj)
+        {
+            UnselectField();
+            OnPropertyChanged(nameof(IsFieldSelected));
+        }
 
         #endregion
     }
