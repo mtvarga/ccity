@@ -147,7 +147,28 @@ namespace CCity.ViewModel
 
         private void FieldClicked(int index)
         {
+            (int, int) cordinates = GetCordinates(index);
+            switch (SelectedTool)
+            {
+                case Tool.Cursor: SelectedField(index) break;
+                case Tool.ResidentalZone: _model.Place(cordinates.Item1, cordinates.Item2,PlaceableType.ResidentalZone); break;
+                case Tool.IndustrialZone: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.IndustrialZone); break;
+                case Tool.CommercialZone: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.CommercialZone); break;
+                case Tool.Road: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.Road); break;
+                case Tool.PoliceDepartment: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.PoliceDepartment); break;
+                case Tool.Stadium: _model.Place(cordinates.Item1, cordinates.Item2, PlaceableType.Stadium); break;
+                case Tool.FireDepartment: _model.Place(cordinates.Item1,cordinates.Item2, PlaceableType.FireDepartment); break;
+                case Tool.Bulldozer: _model.Demolish(cordinates.Item1, cordinates.Item2); break;
+                default: throw new Exception();
+                
+            }
+        }
 
+        private (int, int) GetCordinates(int index)
+        {
+            int x = index % _model.Width;
+            int y = index / _model.Width;
+            return (x, y);
         }
 
         private void Model_GameTicked(object o, EventArgs e)
