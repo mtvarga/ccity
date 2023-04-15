@@ -14,7 +14,7 @@
 
         public string CityName { get; private set; }
         public string MayorName { get; private set; }
-        public Field[][] Fields { get; private set; }
+        public Field[,] Fields { get; private set; }
         public List<Citizen> Citizens { get; }
         public int GlobalSatisfactionScore { get; }
         public int Budget { get; }
@@ -23,6 +23,9 @@
         public Speed Speed { get; }
         public int Satisfaction { get; }
         public int Population { get; }
+
+        public int Width { get; }
+        public int Height { get; }
 
 
         #endregion
