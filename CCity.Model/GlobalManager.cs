@@ -9,16 +9,20 @@ namespace CCity.Model
 {
     public class GlobalManager
     {
-
+        #region Constants 
+        
+        private const int ResTaxNorm = 1500;
+        private const int ComTaxNorm = 5000;
+        private const int IndTaxNorm = 7500;
+        
+        #endregion
+        
         #region Fields
 
         public int GlobalSatisfactionScore;
         public int Budget;
         public Taxes Taxes { get; }
         private Taxes _taxes;
-        private const int ResTaxNorm = 1500;
-        private const int ComTaxNorm = 5000;
-        private const int IndTaxNorm = 7500;
 
         #endregion
 
@@ -39,9 +43,9 @@ namespace CCity.Model
 
         #region Public methods
 
-        public bool ChangeTax(TaxType taxtype, double amount)
+        public bool ChangeTax(TaxType taxType, double amount)
         {
-            switch (taxtype)
+            switch (taxType)
             {
                 case TaxType.Residental:
                     _taxes.ResidentalTax += amount;
