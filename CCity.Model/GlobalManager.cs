@@ -14,9 +14,20 @@ namespace CCity.Model
         private const int ResTaxNorm = 1500;
         private const int ComTaxNorm = 5000;
         private const int IndTaxNorm = 7500;
+
+        private const int StartingBudget = 10000;
+
+        private const double MinSafetyRatio = 0.25;
+        private const double MaxSafetyRatio = 0.5;
+        private const double SafetyRatioParts = 10;
+        private const double MaxSafetyRatioPopulation = 1000;
         
+        private const double MinNegativeBudgetRatio = 0;
+        private const double MaxNegativeBudgetRatio = 0.25;
+        private const double NegativeBudgetRatioParts = 4;
+
         #endregion
-        
+
         #region Fields
 
         public int GlobalSatisfactionScore;
@@ -24,19 +35,56 @@ namespace CCity.Model
         public Taxes Taxes { get; }
         private Taxes _taxes;
 
+        private double _safetyRatio;
+        private double _negativeBudgetRatio;
+
+        private double _citizenAverageSatisfactionFactors;
+        private double _normalSatisfactionFactors;
+
+        private int _commercialZoneCount;
+        private int _industrialZoneCount;
+        private int _population;
+
         #endregion
 
         #region Properties
 
+        public double TotalSatisfaction { get; private set; }
 
+        public int Budget { get; private set; }
 
+        public Taxes Taxes => _taxes;
+
+        private double GlobalSatisfactionFactors => (double)2 / 3 * TaxFactors + (double)1 / 3 * IndustrialCommercialBalance;
+        
+        private double TaxFactors =>
+            1.3 - (double) 2 / 3 * (Taxes.ResidentalTax + 2 * Taxes.CommercialTax + 2 * Taxes.IndustrialTax);
+
+        private double IndustrialCommercialBalance => 1 - (Math.Abs(_commercialZoneCount - _industrialZoneCount) / _commercialZoneCount + _industrialZoneCount);
+        
         #endregion
 
         #region Constructors
 
         public GlobalManager()
         {
-            throw new NotImplementedException();
+            TotalSatisfaction = 0;
+
+            _negativeBudgetRatio = MinNegativeBudgetRatio;
+            _safetyRatio = MinSafetyRatio;
+
+            Budget = StartingBudget;
+            
+            _taxes = new Taxes
+            {
+                ResidentalTax = 0.27,
+                CommercialTax = 0.15,
+                IndustrialTax = 0.05
+            };
+
+            _population = 0;
+            _commercialZoneCount = 0;
+            _industrialZoneCount = 0;
         }
 
         #endregion
@@ -61,39 +109,75 @@ namespace CCity.Model
             }
             return true;
         }
-        public void UpdateSatisfaction(List<Zone> zones)
+        
+        public void UpdateSatisfaction(IEnumerable<Zone> zones, int commercialZoneCount, int industrialZoneCount)
         {
-            // TODO: Update this based on issue #27
-            foreach (var zone in zones)
+            _commercialZoneCount = commercialZoneCount;
+            _industrialZoneCount = industrialZoneCount;
+
+            if (_population <= 0)
+                return;
+            
+            UpdateSatisfaction(zones.SelectMany(zone => zone.Citizens).ToList());
+        }
+        
+        public void UpdateSatisfaction(IEnumerable<Citizen> citizens)
+        {
+            var citizenSatisfactionSum = _citizenAverageSatisfactionFactors * _population;
+
+            foreach (var citizen in citizens)
             {
-                foreach (var citizen in zone.Citizens)
+                citizenSatisfactionSum -= citizen.LastCalculatedSatisfaction;
+                CalculateSatisfaction(citizen);
+                citizenSatisfactionSum += citizen.LastCalculatedSatisfaction;
+            }
+            
+            _citizenAverageSatisfactionFactors = citizenSatisfactionSum / _population;
+            RecalculateTotalSatisfaction();
+        }
+        
+        public void UpdateSatisfaction(bool movedIn, List<Citizen> changes, List<Citizen> citizens)
+        {
+            if (citizens.Count <= 0)
+            {
+                _population = 0;
+                TotalSatisfaction = 0;
+                return;
+            }
+
+            var citizenSatisfactionSum = 
+                _citizenAverageSatisfactionFactors * _population;
+            var newSafetyRatio = 
+                Math.Floor(Math.Min(citizens.Count, MaxSafetyRatioPopulation) / (MaxSafetyRatioPopulation / SafetyRatioParts)) *
+                ((MaxSafetyRatio - MinSafetyRatio) / SafetyRatioParts);
+            
+            _population = citizens.Count;
+            
+            if (newSafetyRatio < _safetyRatio || newSafetyRatio > _safetyRatio)
+            {
+                _safetyRatio = newSafetyRatio;
+                
+                citizenSatisfactionSum = 0;
+                
+                foreach (var citizen in citizens)
                 {
-                    GlobalSatisfactionScore -= citizen.LastCalculatedSatisfaction;
                     CalculateSatisfaction(citizen);
-                    GlobalSatisfactionScore += citizen.LastCalculatedSatisfaction;
+                    citizenSatisfactionSum += citizen.LastCalculatedSatisfaction;
                 }
             }
-        }
-        
-        public void UpdateSatisfaction(List<Citizen> citizens)
-        {
-            foreach (var citizen in citizens)
+            else
             {
-                GlobalSatisfactionScore -= citizen.LastCalculatedSatisfaction;
-                CalculateSatisfaction(citizen);
-                GlobalSatisfactionScore += citizen.LastCalculatedSatisfaction;
-            }
-        }
-        
-        public void UpdateSatisfaction(bool movedIn, List<Citizen> citizens)
-        {
-            foreach (var citizen in citizens)
-            {
-                if (movedIn)
-                    CalculateSatisfaction(citizen);
+                foreach (var citizen in changes)
+                {
+                    if (movedIn)
+                        CalculateSatisfaction(citizen);
                 
-                GlobalSatisfactionScore += (movedIn ? 1 : -1) * citizen.LastCalculatedSatisfaction;
+                    citizenSatisfactionSum += (movedIn ? 1 : -1) * citizen.LastCalculatedSatisfaction;
+                }
             }
+
+            _citizenAverageSatisfactionFactors = citizenSatisfactionSum / _population;
+            RecalculateTotalSatisfaction();
         }
 
         public void CollectTax(List<ResidentialZone> residentialZones, List<WorkplaceZone> workplaceZones)
@@ -124,8 +208,38 @@ namespace CCity.Model
 
         #region Private methods
 
-        private static void CalculateSatisfaction(Citizen citizen)
+        private void RecalculateTotalSatisfaction()
         {
+            _normalSatisfactionFactors = (double)2 / 3 * _citizenAverageSatisfactionFactors + (double)1 / 3 * GlobalSatisfactionFactors;
+            TotalSatisfaction = _negativeBudgetRatio * _normalSatisfactionFactors;
+        }
+
+        private void CalculateSatisfaction(Citizen citizen)
+        {
+            var homeFactors = 
+                _safetyRatio       * citizen.Home.Owner.PoliceDepartmentEffect + 
+                (1 - _safetyRatio) * (0.75 * (1 - citizen.Home.Owner.IndustrialEffect) + 
+                                                0.25 * citizen.Home.Owner.StadiumEffect);
+
+            var workplaceFactors = 
+                _safetyRatio       * citizen.Workplace.Owner.PoliceDepartmentEffect +
+                (1 - _safetyRatio) * citizen.Workplace.Owner.StadiumEffect;
+
+            citizen.LastCalculatedSatisfaction = 0.5 * homeFactors + 0.25 * workplaceFactors + 0.25 * citizen.HomeWorkplaceDistanceEffect;
+        }
+        
+        private void IncreaseNegativeBudgetRatio()
+        {
+            _negativeBudgetRatio += MaxNegativeBudgetRatio / NegativeBudgetRatioParts;
+            
+            RecalculateTotalSatisfaction();
+        }
+
+        private void ResetNegativeBudgetRatio()
+        {
+            _negativeBudgetRatio = 0;
+            
+            RecalculateTotalSatisfaction();
         }
 
         #endregion
