@@ -71,6 +71,7 @@ namespace CCity.Model
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
                     break;
             }
+            ListPlaceable(placeable, true);
             return effectedFields;
         }
 
@@ -84,6 +85,7 @@ namespace CCity.Model
             if (!OnMap(x, y)) return null;
 
             Field field = Fields[x, y];
+            if (!field.HasPlaceable) return null;
             Placeable placeable = field.Placeable;
             List<Field>? effectedFields = new();
 
@@ -101,6 +103,7 @@ namespace CCity.Model
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
                     break;
             }
+            ListPlaceable(placeable, false);
             return effectedFields;
         }
 
@@ -171,6 +174,17 @@ namespace CCity.Model
                 case Stadium _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeStadiumEffect(i));
                 case IndustrialZone _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeIndustrialEffect(i));
                 default: return new List<Field>();
+            }
+        }
+
+        private void ListPlaceable(Placeable placeable, bool add)
+        {
+            switch (placeable)
+            {
+                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.RemoveAll(e => e == residentialZone); break;
+                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.RemoveAll(e => e == commercialZone); break;
+                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.RemoveAll(e => e == industrialZone); break;
+                default: break;
             }
         }
 
