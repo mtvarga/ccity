@@ -8,12 +8,6 @@ namespace CCity.Model
 {
     public class GlobalManager
     {
-        #region Constants
-
-        internal const int MaxFieldSatisfactionFactors = 100;
-        internal const int MaxCitizenSatisfactionFactors = 100;
-
-        #endregion
         
         #region Fields
 
