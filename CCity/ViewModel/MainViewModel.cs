@@ -171,6 +171,40 @@ namespace CCity.ViewModel
         private void RefreshFieldItem(FieldItem fieldItem)
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
+            fieldItem.Texture = GetTextureFromField(field);
+            fieldItem.MinimapColor = GetMinimapColorFromTexture(fieldItem.Texture);
+        }
+
+        private Color GetMinimapColorFromTexture(Texture texture)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Texture GetTextureFromField(Field field)
+        {
+            if (!field.HasPlaceable) return Texture.None;
+            switch (field.Placeable)
+            {
+                case FireDepartment _: return Texture.FireDepartment;
+                case PoliceDepartment _: return Texture.PoliceDepartment;
+                case Stadium _: return Texture.StadiumBottomLeft;
+                case PowerPlant _: return Texture.PowerPlantBottomLeft;
+                case Road _: return GetRoadTexture(field);
+                case Filler _: return GetFillerTexture(field);
+                default: return Texture.Unhandled;
+            }
+        }
+
+        private Texture GetFillerTexture(Field field)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Texture GetRoadTexture(Field field)
+        {
+            if (!field.Has(typeof(Road))) return Texture.Unhandled;
+            (int t, int r, int b, int l) = GetRoadNeighbours(field);
+            throw new NotImplementedException();
         }
 
         private void FieldClicked(int index)
