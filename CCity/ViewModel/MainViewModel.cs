@@ -159,8 +159,7 @@ namespace CCity.ViewModel
 
         private void RefreshFieldItem(FieldItem fieldItem)
         {
-            Field field = _model.Fields[fieldItem.X, fieldItem.Y];
-            fieldItem.Texture = GetTextureFromField(field);
+            fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
             fieldItem.MinimapColor = GetMinimapColorFromTexture(fieldItem.Texture);
         }
 
@@ -169,8 +168,9 @@ namespace CCity.ViewModel
             throw new NotImplementedException();
         }
 
-        private Texture GetTextureFromField(Field field)
+        private Texture GetTextureFromFieldItem(FieldItem fieldItem)
         {
+            Field field = _model.Fields[fieldItem.X, fieldItem.Y];
             if (!field.HasPlaceable) return Texture.None;
             switch (field.Placeable)
             {
@@ -178,7 +178,7 @@ namespace CCity.ViewModel
                 case PoliceDepartment _: return Texture.PoliceDepartment;
                 case Stadium _: return Texture.StadiumBottomLeft;
                 case PowerPlant _: return Texture.PowerPlantBottomLeft;
-                case Road _: return GetRoadTexture(field);
+                case Road _: return GetAndSetRoadTexture(field);
                 case Filler _: return GetFillerTexture(field);
                 default: return Texture.Unhandled;
             }
@@ -189,10 +189,54 @@ namespace CCity.ViewModel
             throw new NotImplementedException();
         }
 
-        private Texture GetRoadTexture(Field field)
+        private Texture GetAndSetRoadTexture(Field field)
         {
-            if (!field.Has(typeof(Road))) return Texture.Unhandled;
-            (int t, int r, int b, int l) = GetRoadNeighbours(field);
+            int index = CalculateIndexFromField(field);
+            List<int> indexes = new() { index - 1, index + 1, index - _model.Width, index + _model.Width };
+            foreach(int currentIndex in indexes)
+            {
+                if(IsInFields(currentIndex))
+                {
+                    FieldItem currentFieldItem = Fields[currentIndex];
+                    currentFieldItem.Texture = GetRoadTextureFromField(_model.Fields[currentFieldItem.X, currentFieldItem.Y]);
+                }
+            }
+            return GetRoadTextureFromField(field);
+        }
+
+        private int CalculateIndexFromField(Field field) => field.X * _model.Width + field.Y;
+
+        private bool IsInFields(int index) => 0 <= index && index <= Fields.Count;
+
+        private Texture GetRoadTextureFromField(Field field)
+        {
+            //if (!field.Has(typeof(Road))) return Texture.Unhandled;
+            //(int t, int r, int b, int l) = GetRoadNeighbours(field);
+            (int t, int r, int b, int l) neighbours = (0, 0, 0, 0);
+            switch (neighbours)
+            {
+                //
+                case (1, 0, 1, 0): return Texture.RoadVertical;
+                case (0, 1, 0, 1): return Texture.RoadHorizontal;
+                case (1, 1, 1, 1): return Texture.RoadCross;
+                //turns
+                case (1, 0, 0, 1): return Texture.RoadTopLeft;
+                case (1, 1, 0, 0): return Texture.RoadTopRight;
+                case (0, 0, 1, 1): return Texture.RoadBottomLeft;
+                case (0, 1, 1, 0): return Texture.RoadBottomRight;
+                //nots
+                case (0, 1, 1, 1): return Texture.RoadNotTop;
+                case (1, 1, 0, 1): return Texture.RoadNotBottom;
+                case (1, 1, 1, 0): return Texture.RoadNotLeft;
+                case (1, 0, 1, 1): return Texture.RoadNotRight;
+                //closes
+                case (1, 0, 0, 0): return Texture.RoadTopClose;
+                case (0, 0, 1, 0): return Texture.RoadBottomClose;
+                case (0, 0, 0, 1): return Texture.RoadLeftClose;
+                case (0, 1, 0, 0): return Texture.RoadRightClose;
+
+                default: return Texture.Unhandled;
+            }
             throw new NotImplementedException();
         }
 
