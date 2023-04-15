@@ -8,13 +8,13 @@
         private const int ComTaxNorm = 5000;
         private const int IndTaxNorm = 7500;
 
-        private const int MaxResTax = 50;
-        private const int MaxComTax = 25;
-        private const int MaxIndTax = 25;
+        private const double MaxResTax = 0.5;
+        private const double MaxComTax = 0.25;
+        private const double MaxIndTax = 0.25;
         
-        private const int MinResTax = 15;
-        private const int MinComTax = 10;
-        private const int MinIndTax = 5;
+        private const double MinResTax = 0.15;
+        private const double MinComTax = 0.1;
+        private const double MinIndTax = 0.5;
         
         private const int StartingBudget = 10000;
 
@@ -126,22 +126,26 @@
         
         public bool ChangeTax(TaxType taxType, double amount)
         {
+            var changedTax=0.0;
             switch (taxType)
             {
                 case TaxType.Residental:
-                    if(amount < MinResTax || amount > MaxResTax)
+                    changedTax=_taxes.ResidentalTax+= amount;
+                    if(changedTax < MinResTax || changedTax > MaxResTax)
                         return false;
-                    _taxes.ResidentalTax += amount;
+                    _taxes.ResidentalTax = changedTax;
                     break;
                 case TaxType.Commercial:
-                    if (amount < MinComTax || amount > MaxComTax)
+                    changedTax=_taxes.CommercialTax+= amount;
+                    if (changedTax < MinComTax || changedTax > MaxComTax)
                         return false;
-                    _taxes.CommercialTax += amount;
+                    _taxes.CommercialTax = changedTax;
                     break;
                 case TaxType.Industrial:
-                    if (amount < MinIndTax || amount > MaxIndTax)
+                    changedTax=_taxes.IndustrialTax+= amount;
+                    if (changedTax < MinIndTax || changedTax > MaxIndTax)
                         return false;
-                    _taxes.IndustrialTax += amount;
+                    _taxes.IndustrialTax = changedTax;
                     break;
                 default:
                     return false;
