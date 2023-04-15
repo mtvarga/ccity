@@ -8,20 +8,13 @@ namespace CCity.Model
 {
     public class CommercialZone : WorkplaceZone
     {
+
         #region Properties
 
-        public override int PlacementCost => throw new NotImplementedException();
-        public override int MaintenanceCost => throw new NotImplementedException();
+        public override int PlacementCost => 100;
+        public override int MaintenanceCost => 10;
 
         #endregion
 
-        #region Constructors 
-
-        public CommercialZone()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

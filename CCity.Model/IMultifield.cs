@@ -8,6 +8,7 @@ namespace CCity.Model
 {
     public interface IMultifield
     {
+
         #region Properties
 
         public int Width { get; }
@@ -15,5 +16,6 @@ namespace CCity.Model
         public List<Filler> Occupies { get; internal set; }
 
         #endregion
+
     }
 }

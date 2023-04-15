@@ -18,9 +18,9 @@ namespace CCity.Model
 
         #region Properties
 
-        public override int PlacementCost => throw new NotImplementedException();
+        public override int PlacementCost => 100;
 
-        public override int MaintenanceCost => throw new NotImplementedException();
+        public override int MaintenanceCost => 10;
 
         public new bool IsPublic { get { return GetPublicityFrom != null; } }
 

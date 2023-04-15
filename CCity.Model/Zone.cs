@@ -51,11 +51,6 @@ namespace CCity.Model
             --Current;
         }
 
-        public override int CalculateSatisfaction()
-        {
-            return (int)Citizens.Sum(citizen => citizen.Satisfaction);
-        }
-
         #endregion
     }
 }

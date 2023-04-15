@@ -11,18 +11,11 @@ namespace CCity.Model
 
         #region Properties
 
-        public override int PlacementCost => throw new NotImplementedException();
+        public override int PlacementCost => 100;
 
-        public override int MaintenanceCost => throw new NotImplementedException();
-
-        #endregion
-        #region Constructors
-
-        public Pole()
-        {
-            throw new NotImplementedException();
-        }
+        public override int MaintenanceCost => 10;
 
         #endregion
+
     }
 }

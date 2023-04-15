@@ -8,20 +8,12 @@ namespace CCity.Model
 {
     public class PoliceDepartment : Placeable, IFlammable
     {
-        #region Constructors
-
-        public PoliceDepartment()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
 
         #region Properties
 
-        public override int PlacementCost => throw new NotImplementedException();
+        public override int PlacementCost => 100;
 
-        public override int MaintenanceCost => throw new NotImplementedException();
+        public override int MaintenanceCost => 10;
 
         double IFlammable.Pontential => throw new NotImplementedException();
 
@@ -30,5 +22,6 @@ namespace CCity.Model
         bool IFlammable.IsOnFire { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         #endregion
+
     }
 }
