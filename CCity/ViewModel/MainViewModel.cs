@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -132,6 +133,33 @@ namespace CCity.ViewModel
         #endregion
 
         #region Private methods
+
+        private void CreateTable()
+        {
+            Fields = new();
+            for(int i = 0; i < _model.Width; i++) {
+                for(int j = 0; j < _model.Height; j++)
+                {
+                    Fields.Add(new FieldItem
+                    {
+                        Texture = Texture.None,
+                        MinimapColor = Color.Green,
+                        OverLayColor = Color.Transparent,
+                        X = i,
+                        Y = j,
+                        Number = i * _model.Width + j,
+                        ClickCommand = new DelegateCommand(param => FieldClicked(Convert.ToInt32(param)))
+                    });
+
+                }
+            }
+            foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem);
+        }
+
+        private void RefreshFieldItem(FieldItem fieldItem)
+        {
+            Field field = _model.Fields[fieldItem.X, fieldItem.Y];
+        }
 
         private void FieldClicked(int index)
         {

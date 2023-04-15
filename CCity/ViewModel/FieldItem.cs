@@ -13,7 +13,7 @@ namespace CCity.ViewModel
 
         #region Fields
 
-        private int _level;
+        //private int _level;
         private Texture _texture;
         private Color _minimapColor;
         private Color _overlayColor;
@@ -22,7 +22,7 @@ namespace CCity.ViewModel
 
         #region Properties
 
-        public int Level {
+        /*public int Level {
             get { return _level; }
             set
             {
@@ -32,7 +32,7 @@ namespace CCity.ViewModel
                     OnPropertyChanged();
                 }
             }
-        }
+        }*/
 
         public Texture Texture {
             get { return _texture; }
@@ -70,21 +70,12 @@ namespace CCity.ViewModel
             }
         }
 
-        public int X { get; }
-        public int Y { get; }
-        public int Number { get; }
-
-        private 
-
-        #endregion
-
-        #region Public methods
-
-        DelegateCommand ClickCommand()
-        {
-            throw new NotImplementedException();
-        }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Number { get; set; }
+        public DelegateCommand? ClickCommand { get; set; }
 
         #endregion
+
     }
 }
