@@ -6,20 +6,18 @@ using System.Threading.Tasks;
 
 namespace CCity.Model
 {
-    public class FireDepartment
+    public class FireDepartment : Placeable
     {
+
         #region Properties
+
+        public override int PlacementCost => 100;
+
+        public override int MaintenanceCost => 10;
+
         public int AvailableFiretrucks { get; internal set; }
 
         #endregion
 
-        #region Constructors
-
-        public FireDepartment()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

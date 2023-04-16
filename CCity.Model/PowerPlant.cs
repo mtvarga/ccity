@@ -6,18 +6,21 @@ using System.Threading.Tasks;
 
 namespace CCity.Model
 {
-    public class PowerPlant : IFlammable, IMultifield
+    public class PowerPlant : Placeable, IFlammable, IMultifield
     {
-        #region Constuctors
 
-        public PowerPlant()
-        {
-            throw new NotImplementedException();
-        }
+        #region Fields
+
+        List<Filler> _occupies;
 
         #endregion
 
         #region Properties
+
+        public override int PlacementCost => 100;
+
+        public override int MaintenanceCost => 10;
+
 
         double IFlammable.Pontential => throw new NotImplementedException();
 
@@ -25,12 +28,22 @@ namespace CCity.Model
 
         bool IFlammable.IsOnFire { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        int IMultifield.Width => throw new NotImplementedException();
+        int IMultifield.Width => 2;
 
-        int IMultifield.Height => throw new NotImplementedException();
+        int IMultifield.Height => 2;
 
-        List<Filler> IMultifield.Occupies { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        List<Filler> IMultifield.Occupies { get => _occupies; set => _occupies = value; }
 
         #endregion
+
+        #region Constructor
+
+        public PowerPlant()
+        {
+            _occupies = new();
+        }
+
+        #endregion
+
     }
 }
