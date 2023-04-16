@@ -64,7 +64,7 @@ namespace CCity.ViewModel
             {
                 if(value != _minimapMinimized) { 
                     _minimapMinimized = value;
-                    OnPropertyChanged(nameof(_minimapMinimized));
+                    OnPropertyChanged(nameof(MinimapMinimized));
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace CCity.ViewModel
                 if (value != _selectedTool)
                 {
                     _selectedTool = value;
-                    OnPropertyChanged(nameof(_selectedTool));
+                    OnPropertyChanged(nameof(SelectedTool));
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace CCity.ViewModel
                 if (value != _mapPosition)
                 {
                     _mapPosition = value;
-                    OnPropertyChanged(nameof(_mapPosition));
+                    OnPropertyChanged(nameof(MapPosition));
                 }
             }
         }
@@ -123,6 +123,7 @@ namespace CCity.ViewModel
             _model.FieldsUpdated += Model_FieldUpdated;
             _model.TaxChanged += Model_TaxChanged;
             _model.SatisfactionChanged += Model_SatisfactionChanged;
+            _model.BudgetChanged += Model_BudgetChanged;
             CreateTable();
 
             NewGameCommand = new DelegateCommand(param => OnNewGame());
@@ -159,6 +160,7 @@ namespace CCity.ViewModel
                         X = j,
                         Y = i,
                         Number = (i * Width) + j,
+                        Text = "",
                         ClickCommand = new DelegateCommand(param => FieldClicked(Convert.ToInt32(param)))
                     });
 
@@ -171,6 +173,7 @@ namespace CCity.ViewModel
         {
             fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
             fieldItem.MinimapColor = GetMinimapColorFromFieldItem(fieldItem);
+            fieldItem.Text = fieldItem.Texture.ToString();
         }
 
         private Color GetMinimapColorFromFieldItem(FieldItem fieldItem)
@@ -377,7 +380,7 @@ namespace CCity.ViewModel
 
         private void OnSelectTool(Tool tool)
         {
-            _selectedTool = tool;
+            SelectedTool = tool;
         }
 
         private void OnChangeResidentialTax(int n) => _model.ChangeTax(TaxType.Residental, (n > 0 ? 1 : -1) * 0.01);

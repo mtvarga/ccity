@@ -33,7 +33,18 @@
                     <Button Width="40" Height="40" Margin="2">Lkzn</Button>
                     <Button Width="40" Height="40" Margin="2">Kkdzn</Button>
                     <Button Width="40" Height="40" Margin="2">Iprzn</Button>
-                    <Button Width="40" Height="40" Margin="2">Pd</Button>
+                    <Button Width="40" Height="40" Margin="2" Content="Pd" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.PoliceDepartment}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedTool}" Value="{x:Static viewmodel:Tool.PoliceDepartment}">
+                                        <Setter Property="Background" Value="Blue" />
+                                        <Setter Property="Content" Value="Blue" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <Button Width="40" Height="40" Margin="2">Fd</Button>
                     <Button Width="40" Height="40" Margin="2">Stdm</Button>
                     <Button Width="40" Height="40" Margin="2">Pp</Button>
@@ -104,7 +115,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" Content="{Binding Number}">
+                                <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" Content="{Binding Text}">
 
                                 </Button>
                             </DataTemplate>
