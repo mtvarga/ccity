@@ -37,17 +37,37 @@ namespace CCity.Model
             );
 
         
-        public static double SquareDistance(Placeable p1, Placeable p2) => SquareDistance(p1.Field, p2.Field);
+        public static double SquareDistance(Placeable p1, Placeable p2) => SquareDistance(p1.Owner, p2.Owner);
         
-        public static double SquareDistance(Field f1, Field f2) => SquareDistance(f1.X, f1.Y, f2.X, f2.Y);
+        public static double SquareDistance(Field? f1, Field? f2) => (f1, f2) switch
+        {
+            (not null, not null) => SquareDistance(f1.X, f1.Y, f2.X, f2.Y),
+            _ => 0
+        };
 
         public static double SquareDistance(int x1, int y1, int x2, int y2) =>
             Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
 
-        public static int AbsoluteDistance(Placeable p1, Placeable p2) => AbsoluteDistance(p1.Field, p2.Field);
+        public static int AbsoluteDistance(Placeable p1, Placeable p2) => AbsoluteDistance(p1.Owner, p2.Owner);
 
-        public static int AbsoluteDistance(Field f1, Field f2) => AbsoluteDistance(f1.X, f1.X, f2.X, f2.Y);
+        public static int AbsoluteDistance(Field? f1, Field? f2) => (f1, f2) switch
+        {
+            (not null, not null) =>  AbsoluteDistance(f1.X, f1.X, f2.X, f2.Y),
+            _ => 0
+        };
 
         public static int AbsoluteDistance(int x1, int y1, int x2, int y2) => Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
+        
+        public static (TCollection True, TCollection False) Split<TCollection, T>(TCollection collection, Predicate<T> condition) 
+            where TCollection : ICollection<T>, new()
+        {
+            var resultTrue = new TCollection();
+            var resultFalse = new TCollection();
+
+            foreach (var item in collection)
+                (condition(item) ? resultTrue : resultFalse).Add(item);
+
+            return (resultTrue, resultFalse);
+        }
     }
 }
