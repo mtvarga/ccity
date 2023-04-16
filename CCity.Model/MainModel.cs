@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public class MainModel
     {
@@ -44,14 +38,14 @@ namespace CCity.Model
 
         #region Public methods
 
-        public void Place(int x, int y, PlaceableType type)
+        public void Place(int x, int y, Placeable placeable)
         {
-            throw new NotImplementedException();
+            List<Field> effectedFields = _fieldManager.Place(x, y, placeable);
         }
 
         public void Demolish(int x, int y)
         {
-            throw new NotImplementedException();
+            List<Field> effectedFields = _fieldManager.Demolish(x, y);
         }
 
         public void Upgrade(int x, int y)
@@ -64,9 +58,9 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
-        public void ChangeTax(TaxType type, int n)
+        public void ChangeTax(TaxType type, double amount)
         {
-            throw new NotImplementedException();
+            _globalManager.ChangeTax(type, amount);
         }
 
         public void ChangeSpeed(int n)
