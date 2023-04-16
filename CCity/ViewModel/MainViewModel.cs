@@ -176,6 +176,7 @@ namespace CCity.ViewModel
         private Texture GetTextureFromFieldItem(FieldItem fieldItem)
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
+            SetNeighboursRoadTexture(field);
             if (!field.HasPlaceable) return Texture.None;
             switch (field.Placeable)
             {
@@ -183,7 +184,7 @@ namespace CCity.ViewModel
                 case PoliceDepartment _: return Texture.PoliceDepartment;
                 case Stadium _: return Texture.StadiumBottomLeft;
                 case PowerPlant _: return Texture.PowerPlantBottomLeft;
-                case Road _: return GetAndSetRoadTexture(field);
+                case Road _: return GetRoadTextureFromField(field);
                 case Filler _: return GetFillerTexture(field);
                 default: return Texture.Unhandled;
             }
@@ -194,7 +195,7 @@ namespace CCity.ViewModel
             throw new NotImplementedException();
         }
 
-        private Texture GetAndSetRoadTexture(Field field)
+        private void SetNeighboursRoadTexture(Field field)
         {
             int index = CalculateIndexFromField(field);
             List<int> indexes = new() { index - 1, index + 1, index - _model.Width, index + _model.Width };
@@ -206,7 +207,6 @@ namespace CCity.ViewModel
                     currentFieldItem.Texture = GetRoadTextureFromField(_model.Fields[currentFieldItem.X, currentFieldItem.Y]);
                 }
             }
-            return GetRoadTextureFromField(field);
         }
 
         private int CalculateIndexFromField(Field field) => field.X * _model.Width + field.Y;
@@ -253,13 +253,13 @@ namespace CCity.ViewModel
             switch (SelectedTool)
             {
                 case Tool.Cursor: SelectField(index); break;
-                case Tool.ResidentalZone: _model.Place(coord.x, coord.y, PlaceableType.ResidentalZone); break;
-                case Tool.IndustrialZone: _model.Place(coord.x, coord.y, PlaceableType.IndustrialZone); break;
-                case Tool.CommercialZone: _model.Place(coord.x, coord.y, PlaceableType.CommercialZone); break;
-                case Tool.Road: _model.Place(coord.x, coord.y, PlaceableType.Road); break;
-                case Tool.PoliceDepartment: _model.Place(coord.x, coord.y, PlaceableType.PoliceDepartment); break;
-                case Tool.Stadium: _model.Place(coord.x, coord.y, PlaceableType.Stadium); break;
-                case Tool.FireDepartment: _model.Place(coord.x, coord.y, PlaceableType.FireDepartment); break;
+                case Tool.ResidentalZone: _model.Place(coord.x, coord.y, new ResidentialZone()); break;
+                case Tool.CommercialZone: _model.Place(coord.x, coord.y, new CommercialZone()); break;
+                case Tool.IndustrialZone: _model.Place(coord.x, coord.y, new IndustrialZone()); break;
+                case Tool.FireDepartment: _model.Place(coord.x, coord.y, new FireDepartment()); break;
+                case Tool.PoliceDepartment: _model.Place(coord.x, coord.y, new PoliceDepartment()); break;
+                case Tool.Stadium: _model.Place(coord.x, coord.y, new Stadium()); break;
+                case Tool.Road: _model.Place(coord.x, coord.y, new Road()); break;
                 case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
                 default: throw new Exception();
             }
@@ -289,7 +289,7 @@ namespace CCity.ViewModel
 
         private string GetFieldName(Field? selectedField)
         {
-            throw new Exception();
+            return "...";
         }
 
         private void Model_GameTicked(object? o, EventArgs e)
