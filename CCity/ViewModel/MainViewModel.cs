@@ -118,6 +118,7 @@ namespace CCity.ViewModel
         {
             _model = model;
             _model.TaxChanged += new EventHandler<EventArgs>(Model_TaxChanged);
+            _model.FieldsUpdated += Model_FieldUpdated;
 
             NewGameCommand = new DelegateCommand(param => OnNewGame());
             PauseGameCommand = new DelegateCommand(param => OnPauseGame());
@@ -319,12 +320,15 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(CommercialTax));
         }
 
-        private void Mode_FieldUpdated(object? o, FieldEventArgs e)
+        private void Model_FieldUpdated(object? o, FieldEventArgs e)
         {
-            foreach(Field field in e.Fields)
+            if (e.Fields != null)
             {
-                int index = field.Y * _model.Width + field.X;
-                RefreshFieldItem(Fields[index]);
+                foreach (Field field in e.Fields)
+                {
+                    int index = field.Y * _model.Width + field.X;
+                    RefreshFieldItem(Fields[index]);
+                }
             }
         }
 
