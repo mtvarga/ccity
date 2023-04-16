@@ -48,7 +48,7 @@
             {
                 List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
                 _globalManager.Pay(placeable.PlacementCost);
-                _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZones(true).Count, _fieldManager.IndustrialZones(true).Count);
+                _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
                 BudgetChanged?.Invoke(this, EventArgs.Empty);
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -62,7 +62,7 @@
             {
                 List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
                 _globalManager.Pay(-(placeable.PlacementCost/2));
-                _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZones(true).Count, _fieldManager.IndustrialZones(true).Count);
+                _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
                 BudgetChanged?.Invoke(this, EventArgs.Empty);
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
             }

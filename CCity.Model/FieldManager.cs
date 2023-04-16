@@ -21,6 +21,8 @@ namespace CCity.Model
         public Field[,] Fields { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public int CommercialZoneCount { get => _commercialZones.Count; }
+        public int IndustrialZoneCount { get => _industrialZones.Count; }
         private Dictionary<Forest, int> _growingForests;
         private List<Field> _burningBuildings;
         private List<ResidentialZone> _residentialZones;
