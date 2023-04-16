@@ -30,27 +30,16 @@
             <Grid Grid.Column="0" Background="#eee">
                 <WrapPanel Margin="7" VerticalAlignment="Top">
                     <Button Width="40" Height="40" Margin="2">Crsr</Button>
-                    <Button Width="40" Height="40" Margin="2">Lkzn</Button>
-                    <Button Width="40" Height="40" Margin="2">Kkdzn</Button>
-                    <Button Width="40" Height="40" Margin="2">Iprzn</Button>
-                    <Button Width="40" Height="40" Margin="2" Content="Pd" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.PoliceDepartment}">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedTool}" Value="{x:Static viewmodel:Tool.PoliceDepartment}">
-                                        <Setter Property="Background" Value="Blue" />
-                                        <Setter Property="Content" Value="Blue" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Button Width="40" Height="40" Margin="2">Fd</Button>
-                    <Button Width="40" Height="40" Margin="2">Stdm</Button>
-                    <Button Width="40" Height="40" Margin="2">Pp</Button>
-                    <Button Width="40" Height="40" Margin="2">Pl</Button>
-                    <Button Width="40" Height="40" Margin="2">Road</Button>
-                    <Button Width="40" Height="40" Margin="2">Bldzr</Button>
+                    <Button Width="40" Height="40" Margin="2" Content="Lkzn" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.ResidentalZone}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Kkdzn" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.CommercialZone}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Iprzn" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.IndustrialZone}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Pd" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.PoliceDepartment}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Fd" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.FireDepartment}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Stdm" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Stadium}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Pp" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.PowerPlant}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Pole" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Pole}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Road" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Road}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Bldzr" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Bulldozer}"/>
                 </WrapPanel>
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                     <StackPanel Orientation="Vertical" Margin="0 5">
