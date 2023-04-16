@@ -14,7 +14,7 @@
         
         private const double MinResTax = 0.15;
         private const double MinComTax = 0.1;
-        private const double MinIndTax = 0.5;
+        private const double MinIndTax = 0.05;
         
         private const int StartingBudget = 10000;
 
@@ -157,7 +157,7 @@
             switch (taxType)
             {
                 case TaxType.Residental:
-                    changedTax = _taxes.ResidentalTax + amount;
+                    changedTax = Math.Round(_taxes.ResidentalTax + amount, 2);
                     
                     if (changedTax < MinResTax || changedTax > MaxResTax)
                         return false;
@@ -165,7 +165,7 @@
                     _taxes.ResidentalTax = changedTax;
                     break;
                 case TaxType.Commercial:
-                    changedTax = _taxes.CommercialTax + amount;
+                    changedTax = Math.Round(_taxes.CommercialTax + amount, 2);
                     
                     if (changedTax < MinComTax || changedTax > MaxComTax)
                         return false;
@@ -173,7 +173,7 @@
                     _taxes.CommercialTax = changedTax;
                     break;
                 case TaxType.Industrial:
-                    changedTax = _taxes.IndustrialTax + amount;
+                    changedTax = Math.Round(_taxes.IndustrialTax + amount, 2);
                     
                     if (changedTax < MinIndTax || changedTax > MaxIndTax)
                         return false;
