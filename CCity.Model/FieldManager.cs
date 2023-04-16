@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace CCity.Model
 {
@@ -96,7 +97,7 @@ namespace CCity.Model
                 case Road _:
                     List<Field>? effectedFieldsByRoadDemolition = DemolishRoad(field).ToList();
                     if (effectedFieldsByRoadDemolition == null) return (null!, null);
-                    else effectedFields = effectedFields.Concat(effectedFieldsByRoadDemolition).ToList();
+                    else effectedFields = effectedFields.Concat(effectedFieldsByRoadDemolition).ToList()
                     break;
                 default:
                     effectedFields = DemolishFromField(field);
@@ -320,12 +321,11 @@ namespace CCity.Model
             List<Field> effectedFields = new();
             HashSet<Placeable> privatedPlaceables = new();
             List<Road> gavePublicityTo = road.GivesPublicityTo.ToList();
-            DemolishFromField(field);
+            effectedFields = DemolishFromField(field);
             foreach (Road giftedRoad in gavePublicityTo)
             {
                 ModifyRoad(giftedRoad, privatedPlaceables, effectedFields);
             }
-
             if (privatedPlaceables.Count > 0 && !privatedPlaceables.All(e => WouldStayPublic(e)))
             {
                 Place(field.X, field.Y, road);
