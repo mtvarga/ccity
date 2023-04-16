@@ -46,23 +46,23 @@
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
                             <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResidentialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
-                            <Button Height="14">+</Button>
-                            <Button Height="14">-</Button>
+                            <Button Height="14" Command="{Binding ChangeResidentialTaxCommand}" CommandParameter="1">+</Button>
+                            <Button Height="14" Command="{Binding ChangeResidentialTaxCommand}" CommandParameter="-1">-</Button>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
                             <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding CommercialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
-                            <Button Height="14">+</Button>
-                            <Button Height="14">-</Button>
+                                <Button Height="14" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="1">+</Button>
+                                <Button Height="14" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="-1">>-</Button>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
                             <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding IndustrialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
-                            <Button Height="14">+</Button>
-                            <Button Height="14">-</Button>
-                        </StackPanel>
+                                <Button Height="14" Command="{Binding ChangeIndustrialTaxCommand}" CommandParameter="1">+</Button>
+                                <Button Height="14" Command="{Binding ChangeIndustrialTaxCommand}" CommandParameter="-1">-</Button>
+                            </StackPanel>
                     </StackPanel>
                     </StackPanel>
                     <TextBlock Text="{Binding Speed, StringFormat='🕜: {0}'}" Margin="0 0 0 5"/>
