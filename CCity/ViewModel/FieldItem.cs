@@ -17,6 +17,7 @@ namespace CCity.ViewModel
         private Texture _texture;
         private Color _minimapColor;
         private Color _overlayColor;
+        private String _text;
 
         #endregion
 
@@ -44,6 +45,19 @@ namespace CCity.ViewModel
                     OnPropertyChanged();
                 }
             } 
+        }
+
+        public String Text
+        {
+            get { return _text; }
+            set
+            {
+                if (_text != value)
+                {
+                    _text = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         public Color MinimapColor { 
