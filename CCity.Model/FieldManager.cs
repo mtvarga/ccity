@@ -11,8 +11,8 @@ namespace CCity.Model
 
         private const int MAX_EFFECT = 10;
         private const int EFFECT_RADIUS = 10;
-        private const int HEIGHT = 50;
-        private const int WIDTH = 50;
+        private const int HEIGHT = 10;
+        private const int WIDTH = 20;
 
         #endregion
 

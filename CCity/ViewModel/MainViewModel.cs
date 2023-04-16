@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -53,6 +54,8 @@ namespace CCity.ViewModel
         //public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
         public int SelectedFieldSatisfaction { get; }
         //public string SelectedFieldCitizenName { get; }
+        public int Width { get => _model.Width; }
+        public int Height { get => _model.Height; }
 
         public bool MinimapMinimized
         { 
@@ -120,6 +123,7 @@ namespace CCity.ViewModel
             _model.FieldsUpdated += Model_FieldUpdated;
             _model.TaxChanged += Model_TaxChanged;
             _model.SatisfactionChanged += Model_SatisfactionChanged;
+            CreateTable();
 
             NewGameCommand = new DelegateCommand(param => OnNewGame());
             PauseGameCommand = new DelegateCommand(param => OnPauseGame());
@@ -144,17 +148,17 @@ namespace CCity.ViewModel
         private void CreateTable()
         {
             Fields = new();
-            for(int i = 0; i < _model.Width; i++) {
-                for(int j = 0; j < _model.Height; j++)
+            for(int i = 0; i < Height; i++) {
+                for(int j = 0; j < Width; j++)
                 {
                     Fields.Add(new FieldItem
                     {
                         Texture = Texture.None,
                         MinimapColor = Color.Green,
                         OverLayColor = Color.Transparent,
-                        X = i,
-                        Y = j,
-                        Number = i * _model.Width + j,
+                        X = j,
+                        Y = i,
+                        Number = (i * Width) + j,
                         ClickCommand = new DelegateCommand(param => FieldClicked(Convert.ToInt32(param)))
                     });
 
@@ -212,7 +216,7 @@ namespace CCity.ViewModel
 
         private int CalculateIndexFromField(Field field) => field.X * _model.Width + field.Y;
 
-        private bool IsInFields(int index) => 0 <= index && index <= Fields.Count;
+        private bool IsInFields(int index) => 0 <= index && index < Fields.Count;
 
         private Texture GetRoadTextureFromField(Field field)
         {
@@ -269,6 +273,8 @@ namespace CCity.ViewModel
         private void SelectField(int index)
         {
             (int x, int y) coord = GetCordinates(index);
+            Trace.WriteLine(coord.x + " " + coord.y + " " + index + " Hello");
+
             _selectedField = _model.Fields[coord.x, coord.y];
             OnPropertyChanged(nameof(IsFieldSelected));
             OnPropertyChanged(nameof(SelectedFieldName));
@@ -283,8 +289,8 @@ namespace CCity.ViewModel
 
         private (int, int) GetCordinates(int index)
         {
-            int x = index % _model.Width;
-            int y = index / _model.Width;
+            int x = index % Width;
+            int y = (index-x) / Width;
             return (x, y);
         }
 

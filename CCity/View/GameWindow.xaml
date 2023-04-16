@@ -96,12 +96,19 @@
                     </StackPanel>
                 </Grid>
                 <Grid>
-                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Fields}">
+                    <ItemsControl ItemsSource="{Binding Fields}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Widht}" />
+                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" Content="{Binding Number}">
+
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Grid>
             </Grid>
