@@ -76,11 +76,11 @@ namespace CCity.Model
             _industrialEffect += n;
         }
 
-        public bool Has(Type type)
+        /*public bool Has(Type type)
         {
             if (Placeable == null) return false;
             return Placeable.GetType() == type;
-        }
+        }*/
 
         public void RefreshPublicity()
         {

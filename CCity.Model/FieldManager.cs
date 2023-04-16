@@ -261,7 +261,7 @@ namespace CCity.Model
             List<Field> modifiedFields = new() { field };
             if (field.Placeable == null) return modifiedFields;
             Road placedRoad = (Road)field.Placeable;
-            List<Placeable> roadNeigbours = GetTypeNeighbours(placedRoad, typeof(Road));
+            List<Placeable> roadNeigbours = GetRoadNeighbours(placedRoad);
             foreach (Road neigbourRoad in roadNeigbours)
             {
                 if (neigbourRoad.IsPublic)
@@ -283,7 +283,7 @@ namespace CCity.Model
 
         private List<Field>? RefreshPublicity(Placeable placeable)
         {
-            List<Placeable> neighbours = GetTypeNeighbours(placeable, typeof(Road));
+            List<Placeable> neighbours = GetRoadNeighbours(placeable);
             if (placeable is Road || placeable.IsPublic) return null;
             List<Field> effectedFields = new();
             foreach (Road neighbour in neighbours)
@@ -300,8 +300,8 @@ namespace CCity.Model
 
         private void SpreadRoadPublicity(Road road, List<Field> effectedFields)
         {
-            List<Placeable> roadNeighbours = GetTypeNeighbours(road, typeof(Road));
-            List<Placeable> placeableNeighbours = GetTypeNeighbours(road, typeof(Road), false);
+            List<Placeable> roadNeighbours = GetRoadNeighbours(road);
+            List<Placeable> placeableNeighbours = GetRoadNeighbours(road, false);
             foreach (Placeable neigbour in placeableNeighbours)
             {
                 List<Field>? effectedFieldsBySpreading = RefreshPublicity(neigbour);
@@ -321,7 +321,7 @@ namespace CCity.Model
 
         private List<Field>? DemolishRoad(Field field)
         {
-            if (!field.Has(typeof(Road))) return null;
+            if (field.Placeable is not Road) return null;
             Road road = (Road)field.Placeable;
             List<Field> effectedFields = new();
             HashSet<Placeable> privatedPlaceables = new();
@@ -341,8 +341,8 @@ namespace CCity.Model
 
         private void ModifyRoad(Road actualRoad, HashSet<Placeable> privatedPlaceables, List<Field> effectedFields)
         {
-            List<Placeable> roadNeighbours = GetTypeNeighbours(actualRoad, typeof(Road));
-            List<Placeable> notRoadNeighbours = GetTypeNeighbours(actualRoad, typeof(Road), false);
+            List<Placeable> roadNeighbours = GetRoadNeighbours(actualRoad);
+            List<Placeable> notRoadNeighbours = GetRoadNeighbours(actualRoad, false);
 
             actualRoad.GetsPublicityFrom = null;
             foreach (Road roadNeighbour in roadNeighbours)
@@ -382,7 +382,7 @@ namespace CCity.Model
 
         private bool WouldStayPublic(Placeable placeable)
         {
-            List<Placeable> roadNeighbours = GetTypeNeighbours(placeable,typeof(Road));
+            List<Placeable> roadNeighbours = GetRoadNeighbours(placeable);
             foreach (Road roadNeighbour in roadNeighbours)
             {
                 if (roadNeighbour.IsPublic)
@@ -408,10 +408,10 @@ namespace CCity.Model
             else return placeable;
         }
 
-        private List<Placeable> GetTypeNeighbours(Placeable placeable, Type type, bool pessimist = false)
+        private List<Placeable> GetRoadNeighbours(Placeable placeable, bool pessimist = false)
         {
             List<Placeable> placeables = GetNeighbours(placeable);
-            placeables = placeables.FindAll(p => (p.GetType() == type && !pessimist) || (p.GetType() != type && pessimist));
+            placeables = placeables.FindAll(p => (p is Road && !pessimist) || (p is not Road && pessimist));
             return placeables;
         }
 

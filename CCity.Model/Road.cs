@@ -22,7 +22,7 @@ namespace CCity.Model
 
         public override int MaintenanceCost => 10;
 
-        public new bool IsPublic { get { return GetsPublicityFrom != null; } }
+        public override bool IsPublic { get { return GetsPublicityFrom != null; } }
 
         #endregion
 

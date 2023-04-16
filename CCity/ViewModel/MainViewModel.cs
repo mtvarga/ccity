@@ -184,7 +184,7 @@ namespace CCity.ViewModel
 
             //Publicity testing
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
-            if (field.HasPlaceable && field.Placeable.IsPublic || (field.Has(typeof(Road))&& ((Road)field.Placeable).IsPublic)) {
+            if (field.HasPlaceable && field.Placeable.IsPublic) {
                 fieldItem.OverlayColor = Color.FromArgb(100, 180, 0, 255);
             } else
             {

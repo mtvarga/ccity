@@ -16,7 +16,7 @@ namespace CCity.Model
         public abstract int MaintenanceCost { get; }
         public int ElectrifiedNeighbours { get; internal set; }
         public bool HasElectricity { get; }
-        public bool IsPublic { get; set; }
+        public virtual bool IsPublic { get; set; }
 
         #endregion
 
