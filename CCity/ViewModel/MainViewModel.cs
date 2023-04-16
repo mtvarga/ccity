@@ -33,13 +33,13 @@ namespace CCity.ViewModel
         public string MayorName { get => _model.MayorName; }
         public string CityName { get => _model.CityName; }
         public int Budget { get => _model.Budget; }
-        public int Satisfaction { get => _model.Satisfaction; }
+        public int Satisfaction { get => PercentToInt(_model.Satisfaction); }
         public int Population { get => _model.Population; }
         public bool Paused { get; } //TO DO
         public Speed Speed { get => _model.Speed; }
-        public int CommercialTax { get => _model.Taxes.CommercialTax; }
-        public int ResidentialTax { get => _model.Taxes.ResidentalTax; }
-        public int IndustrialTax { get => _model.Taxes.IndustrialTax; }
+        public int CommercialTax { get => PercentToInt(_model.Taxes.CommercialTax); }
+        public int ResidentialTax { get => PercentToInt(_model.Taxes.ResidentalTax); }
+        public int IndustrialTax { get => PercentToInt(_model.Taxes.IndustrialTax); }
         public bool IsFieldSelected { get => _selectedField != null; }
         public string SelectedFieldName { get => IsFieldSelected ? GetFieldName(_selectedField) : ""; }
         //public int SelectedFieldHealth { get; }
