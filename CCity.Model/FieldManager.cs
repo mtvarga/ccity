@@ -360,6 +360,7 @@ namespace CCity.Model
 
             if (!found)
             {
+                actualRoad.GetsPublicityFrom = null;
                 List<Road> gavePublicityTo = actualRoad.GivesPublicityTo.ToList();
                 foreach (Road giftedRoad in gavePublicityTo)
                 {
@@ -373,7 +374,7 @@ namespace CCity.Model
             else
             {
                 effectedFields.Add(actualRoad.Owner);
-                foreach (Placeable notRoadNeighbour in notRoadNeighbours)
+                /*foreach (Placeable notRoadNeighbour in notRoadNeighbours)
                 {
                     if(WouldStayPublic(notRoadNeighbour))
                     {
@@ -383,7 +384,7 @@ namespace CCity.Model
                     {
                         privatedPlaceables.Add(notRoadNeighbour);
                     }
-                }
+                }*/
             }
         }
 
