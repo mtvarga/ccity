@@ -54,12 +54,12 @@ namespace CCity.Model
             CalculateHomeWorkplaceDistanceEffect();
         }
 
-        public void MoveOut()
+        public int CalculateSatisfaction()
         {
             Home.DropCitizen(this);
             Workplace.DropCitizen(this);
         }
-
+        
         #endregion
 
         #region Private methods
