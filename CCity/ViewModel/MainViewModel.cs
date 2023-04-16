@@ -318,7 +318,6 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(ResidentialTax));
             OnPropertyChanged(nameof(IndustrialTax));
             OnPropertyChanged(nameof(CommercialTax));
-            throw new Exception();
         }
 
         private void Model_FieldUpdated(object? o, FieldEventArgs e)

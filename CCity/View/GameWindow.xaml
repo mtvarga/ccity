@@ -54,7 +54,7 @@
                             <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding CommercialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                             <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
                                 <Button Height="14" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="1">+</Button>
-                                <Button Height="14" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="-1">>-</Button>
+                                <Button Height="14" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="-1">-</Button>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
@@ -97,7 +97,11 @@
                 </Grid>
                 <Grid>
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding Fields}">
-                        
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Widht}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                     </ItemsControl>
                 </Grid>
             </Grid>
