@@ -439,12 +439,12 @@ namespace CCity.Model
 
         private void IterateThroughSide(int startX, int startY, bool xIterates, int iterationNumber, List<Placeable> placeables)
         {
-            int currentX;
-            int currentY;
+            int currentX = startX;
+            int currentY = startY;
             for (int i = 0; i < iterationNumber; i++)
             {
-                currentX = xIterates ? startX + i : startX;
-                currentY = xIterates ? startY : startY - i;
+                currentX = xIterates ? currentX + i : currentX;
+                currentY = xIterates ? currentY : currentY - i;
                 if (OnMap(currentX, currentY))
                 {
                     Field neighbour = Fields[currentX, currentY];
