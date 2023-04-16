@@ -230,6 +230,7 @@ namespace CCity.Model
             if (!CanDemolish(field)) return null;
             List<Field> effectedFields = new();
             Placeable placeable = GetRoot(field.Placeable);
+            field = placeable.Owner;
 
             if (placeable is IMultifield multifield)
             {

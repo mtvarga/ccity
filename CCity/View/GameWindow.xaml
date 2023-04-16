@@ -36,8 +36,8 @@
                     <Button Width="40" Height="40" Margin="2" Content="Pd" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.PoliceDepartment}"/>
                     <Button Width="40" Height="40" Margin="2" Content="Fd" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.FireDepartment}"/>
                     <Button Width="40" Height="40" Margin="2" Content="Stdm" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Stadium}"/>
-                    <Button Width="40" Height="40" Margin="2" Content="Pp" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.PowerPlant}"/>
-                    <Button Width="40" Height="40" Margin="2" Content="Pole" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Pole}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Pp" IsEnabled="False" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.PowerPlant}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="Pole" IsEnabled="False" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Pole}"/>
                     <Button Width="40" Height="40" Margin="2" Content="Road" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Road}"/>
                     <Button Width="40" Height="40" Margin="2" Content="Bldzr" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Bulldozer}"/>
                 </WrapPanel>

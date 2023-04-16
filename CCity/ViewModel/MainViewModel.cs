@@ -200,7 +200,8 @@ namespace CCity.ViewModel
 
         private Texture GetFillerTexture(Field field)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return Texture.Unhandled;
         }
 
         private void SetNeighboursRoadTexture(Field field)
