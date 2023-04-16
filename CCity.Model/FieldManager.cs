@@ -97,7 +97,7 @@ namespace CCity.Model
                 case Road _:
                     List<Field>? effectedFieldsByRoadDemolition = DemolishRoad(field).ToList();
                     if (effectedFieldsByRoadDemolition == null) return (null!, null);
-                    else effectedFields = effectedFields.Concat(effectedFieldsByRoadDemolition).ToList()
+                    else effectedFields = effectedFields.Concat(effectedFieldsByRoadDemolition).ToList();
                     break;
                 default:
                     effectedFields = DemolishFromField(field);

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Xml.Serialization;
 using CCity.Model;
@@ -155,8 +155,8 @@ namespace CCity.ViewModel
                     Fields.Add(new FieldItem
                     {
                         Texture = Texture.None,
-                        MinimapColor = Color.Green,
-                        OverLayColor = Color.Transparent,
+                        MinimapColor = Color.FromRgb(0, 255, 0),
+                        OverlayColor = Color.FromArgb(0, 0, 0, 0),
                         X = j,
                         Y = i,
                         Number = (i * Width) + j,
@@ -174,11 +174,17 @@ namespace CCity.ViewModel
             fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
             fieldItem.MinimapColor = GetMinimapColorFromFieldItem(fieldItem);
             fieldItem.Text = fieldItem.Texture.ToString();
+
+            //Publicity testing
+            Field field = _model.Fields[fieldItem.X, fieldItem.Y];
+            if (field.HasPlaceable && !field.Placeable.IsPublic) {
+                fieldItem.OverlayColor = Color.FromArgb(100, 180, 0, 255);
+            }
         }
 
         private Color GetMinimapColorFromFieldItem(FieldItem fieldItem)
         {
-            return Color.Green;
+            return Color.FromRgb(0, 255, 0);
         }
 
         private Texture GetTextureFromFieldItem(FieldItem fieldItem)

@@ -12,6 +12,7 @@
              FontFamily="Arial">
     <UserControl.Resources>
         <viewmodel:TextureEnumToPath x:Key="TextureEnumToPath" />
+        <viewmodel:ColorToSolidColorBrush x:Key="ColorToSolidColorBrush" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -104,8 +105,10 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" Content="{Binding Text}">
-
+                                <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}">
+                                    <Grid Background="{Binding OverlayColor}">
+                                        <Label Content="{Binding Text}"></Label>
+                                    </Grid>
                                 </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

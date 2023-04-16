@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
+using System.Windows.Media;
 
 namespace CCity.ViewModel
 {
@@ -60,7 +60,8 @@ namespace CCity.ViewModel
             }
         }
 
-        public Color MinimapColor { 
+        public Color MinimapColor
+        { 
             get { return _minimapColor; }
             set
             {
@@ -72,7 +73,8 @@ namespace CCity.ViewModel
             }
         }
 
-        public Color OverLayColor {
+        public Color OverlayColor
+        {
             get { return _overlayColor; }
             set
             {
