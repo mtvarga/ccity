@@ -52,6 +52,11 @@ namespace CCity.Model
             _residentialZones = new();
             _commercialZones = new();
             _industrialZones = new();
+
+            //starter public road
+            Road starterRoad = new Road();
+            starterRoad.GetsPublicityFrom = starterRoad;
+            Fields[Width/2, Height-1].Place(starterRoad);
         }
 
         #endregion
@@ -95,7 +100,7 @@ namespace CCity.Model
             switch (placeable)
             {
                 case Road _:
-                    List<Field>? effectedFieldsByRoadDemolition = DemolishRoad(field).ToList();
+                    List<Field>? effectedFieldsByRoadDemolition = DemolishRoad(field);
                     if (effectedFieldsByRoadDemolition == null) return (null!, null);
                     else effectedFields = effectedFields.Concat(effectedFieldsByRoadDemolition).ToList();
                     break;
@@ -261,7 +266,7 @@ namespace CCity.Model
             {
                 if (neigbourRoad.IsPublic)
                 {
-                    placedRoad.GetPublicityFrom = neigbourRoad;
+                    placedRoad.GetsPublicityFrom = neigbourRoad;
                     neigbourRoad.GivesPublicityTo.Add(placedRoad);
                     break;
                 }
@@ -306,7 +311,7 @@ namespace CCity.Model
             {
                 if (!neighbourRoad.IsPublic)
                 {
-                    neighbourRoad.GetPublicityFrom = road;
+                    neighbourRoad.GetsPublicityFrom = road;
                     road.GivesPublicityTo.Add(neighbourRoad);
                     effectedFields.Add(neighbourRoad.Owner);
                     SpreadRoadPublicity(neighbourRoad, effectedFields);
@@ -339,12 +344,12 @@ namespace CCity.Model
             List<Placeable> roadNeighbours = GetTypeNeighbours(actualRoad, typeof(Road));
             List<Placeable> notRoadNeighbours = GetTypeNeighbours(actualRoad, typeof(Road), false);
 
-            actualRoad.GetPublicityFrom = null;
+            actualRoad.GetsPublicityFrom = null;
             foreach (Road roadNeighbour in roadNeighbours)
             {
-                if (roadNeighbour.IsPublic && roadNeighbour.GetPublicityFrom != actualRoad.GetPublicityFrom)
+                if (roadNeighbour.IsPublic && roadNeighbour.GetsPublicityFrom != actualRoad.GetsPublicityFrom)
                 {
-                    actualRoad.GetPublicityFrom = roadNeighbour;
+                    actualRoad.GetsPublicityFrom = roadNeighbour;
                     roadNeighbour.GivesPublicityTo.Add(actualRoad);
                     break;
                 }
@@ -352,7 +357,7 @@ namespace CCity.Model
 
             if (actualRoad.IsPublic)
             {
-                actualRoad.GetPublicityFrom = null;
+                actualRoad.GetsPublicityFrom = null;
                 foreach (Road giftedRoad in actualRoad.GivesPublicityTo)
                 {
                     ModifyRoad(giftedRoad, privatedPlaceables, effectedFields);
