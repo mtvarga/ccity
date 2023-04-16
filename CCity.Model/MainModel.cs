@@ -1,4 +1,6 @@
-﻿namespace CCity.Model
+﻿using System.Reflection.PortableExecutable;
+
+namespace CCity.Model
 {
     public class MainModel
     {
@@ -80,8 +82,9 @@
 
         public void ChangeTax(TaxType type, double amount)
         {
-            _globalManager.ChangeTax(type, amount);
-
+            if (!_globalManager.ChangeTax(type, amount))
+                return;
+            
             TaxChanged?.Invoke(this, EventArgs.Empty);
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
