@@ -157,7 +157,7 @@
             switch (taxType)
             {
                 case TaxType.Residental:
-                    changedTax = _taxes.ResidentalTax + amount;
+                    changedTax = Math.Round(_taxes.ResidentalTax + amount);
                     
                     if (changedTax < MinResTax || changedTax > MaxResTax)
                         return false;
@@ -165,7 +165,7 @@
                     _taxes.ResidentalTax = changedTax;
                     break;
                 case TaxType.Commercial:
-                    changedTax = _taxes.CommercialTax + amount;
+                    changedTax = Math.Round(_taxes.CommercialTax + amount);
                     
                     if (changedTax < MinComTax || changedTax > MaxComTax)
                         return false;
@@ -173,7 +173,7 @@
                     _taxes.CommercialTax = changedTax;
                     break;
                 case TaxType.Industrial:
-                    changedTax = _taxes.IndustrialTax + amount;
+                    changedTax = Math.Round(_taxes.IndustrialTax + amount);
                     
                     if (changedTax < MinIndTax || changedTax > MaxIndTax)
                         return false;
