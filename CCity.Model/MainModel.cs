@@ -43,12 +43,30 @@
 
         public void Place(int x, int y, Placeable placeable)
         {
-            List<Field> effectedFields = _fieldManager.Place(x, y, placeable);
+            List<Field>? effectedFields = _fieldManager.Place(x, y, placeable);
+            if(effectedFields != null)
+            {
+                List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+                _globalManager.Pay(placeable.PlacementCost);
+                _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZones(true).Count, _fieldManager.IndustrialZones(true).Count);
+                BudgetChanged?.Invoke(this, EventArgs.Empty);
+                SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+            }
+            FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
         }
 
         public void Demolish(int x, int y)
         {
-            List<Field> effectedFields = _fieldManager.Demolish(x, y);
+            (Placeable placeable, List<Field>? effectedFields) = _fieldManager.Demolish(x, y);
+            if(effectedFields != null)
+            {
+                List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+                _globalManager.Pay(-(placeable.PlacementCost/2));
+                _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZones(true).Count, _fieldManager.IndustrialZones(true).Count);
+                BudgetChanged?.Invoke(this, EventArgs.Empty);
+                SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+            }
+            FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
         }
 
         public void Upgrade(int x, int y)

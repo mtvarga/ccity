@@ -71,7 +71,7 @@ namespace CCity.Model
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
                     break;
             }
-            ListPlaceable(placeable, true);
+            UpdatePlaceableList(placeable, true);
             return effectedFields;
         }
 
@@ -80,12 +80,12 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
-        public List<Field>? Demolish(int x, int y)
+        public (Placeable, List<Field>?) Demolish(int x, int y)
         {
-            if (!OnMap(x, y)) return null;
+            if (!OnMap(x, y)) return (null!, null);
 
             Field field = Fields[x, y];
-            if (!field.HasPlaceable) return null;
+            if (!field.HasPlaceable) return (null!, null);
             Placeable placeable = field.Placeable;
             List<Field>? effectedFields = new();
 
@@ -93,18 +93,18 @@ namespace CCity.Model
             {
                 case Road _:
                     List<Field>? effectedFieldsByRoadDemolition = DemolishRoad(field).ToList();
-                    if (effectedFieldsByRoadDemolition == null) return null;
+                    if (effectedFieldsByRoadDemolition == null) return (null!, null);
                     else effectedFields = effectedFields.Concat(effectedFieldsByRoadDemolition).ToList();
                     break;
                 default:
                     effectedFields = DemolishFromField(field);
-                    if (effectedFields == null) return null;
+                    if (effectedFields == null) return (null!, null);
                     List<Field>? effectedFieldsBySpreading = SpreadPlaceableEffectConditional(placeable, false);
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
                     break;
             }
-            ListPlaceable(placeable, false);
-            return effectedFields;
+            UpdatePlaceableList(placeable, false);
+            return (placeable, effectedFields);
         }
 
         public List<Field> GrowForests()
@@ -177,7 +177,7 @@ namespace CCity.Model
             }
         }
 
-        private void ListPlaceable(Placeable placeable, bool add)
+        private void UpdatePlaceableList(Placeable placeable, bool add)
         {
             switch (placeable)
             {
