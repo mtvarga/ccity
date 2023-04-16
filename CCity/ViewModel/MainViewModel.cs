@@ -117,6 +117,7 @@ namespace CCity.ViewModel
         public MainViewModel(MainModel model)
         {
             _model = model;
+            _model.FieldsUpdated += Model_FieldUpdated;
             _model.TaxChanged += Model_TaxChanged;
             _model.SatisfactionChanged += Model_SatisfactionChanged;
 
@@ -317,14 +318,18 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(ResidentialTax));
             OnPropertyChanged(nameof(IndustrialTax));
             OnPropertyChanged(nameof(CommercialTax));
+            throw new Exception();
         }
 
-        private void Mode_FieldUpdated(object? o, FieldEventArgs e)
+        private void Model_FieldUpdated(object? o, FieldEventArgs e)
         {
-            foreach(Field field in e.Fields)
+            if (e.Fields != null)
             {
-                int index = field.Y * _model.Width + field.X;
-                RefreshFieldItem(Fields[index]);
+                foreach (Field field in e.Fields)
+                {
+                    int index = field.Y * _model.Width + field.X;
+                    RefreshFieldItem(Fields[index]);
+                }
             }
         }
 
