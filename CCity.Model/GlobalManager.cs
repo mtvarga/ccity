@@ -40,7 +40,7 @@
         private const double WorkplaceStadiumRatio = 1;
         
         private const double TaxRatio = (double)2 / 3;
-        private const double IndustrialCommercialBalanceRatio = 1 - TaxRatio;
+        private const double IndustrialCommercialBalanceRatio = (double)1 / 3;
         
         #endregion
 
@@ -48,53 +48,60 @@
 
         private Taxes _taxes;
 
-        private double _safetyRatio;
-        private double _negativeBudgetRatio;
-
-        private double _averageCitizenFactors;
-        private double _normalFactors;
-
-        private int _commercialZoneCount;
-        private int _industrialZoneCount;
-        private int _population;
-
         #endregion
 
         #region Properties
 
-        public double TotalSatisfaction { get; private set; }
+        public double TotalSatisfaction => Population > 0 ? (1 - NegativeBudgetRatio) * PositiveBudgetFactors : 0;
 
         public int Budget { get; private set; }
 
         public Taxes Taxes => _taxes;
 
+        private double NegativeBudgetRatio => MinNegativeBudgetRatio + 
+                                              NegativeBudgetYears * (MaxNegativeBudgetRatio - MinNegativeBudgetRatio) / 
+                                              NegativeBudgetRatioParts;  
+
+        private int NegativeBudgetYears { get; set; }
+
+        private double PositiveBudgetFactors => (CitizenAverageRatio * AverageCitizenFactors +
+                                                 GlobalRatio * GlobalFactors)
+                                                /
+                                                (CitizenAverageRatio + GlobalRatio);
+
+        private double AverageCitizenFactors { get; set; }
+
+        private double SafetyRatio => SafetyRatioForPopulation(Population);
+
         private double GlobalFactors => (TaxRatio * TaxFactors + 
                                          IndustrialCommercialBalanceRatio * IndustrialCommercialBalance) 
                                         /
                                         (TaxRatio + IndustrialCommercialBalanceRatio);
-        
+
         private double TaxFactors => 1 -
                                      (Taxes.ResidentalTax - MinResTax) / 3 * (MaxResTax - MinResTax) +
                                      (Taxes.CommercialTax - MinComTax) / 3 * (MaxComTax - MinComTax) +
                                      (Taxes.IndustrialTax - MinIndTax) / 3 * (MaxIndTax - MinIndTax);
 
         private double IndustrialCommercialBalance => 1 - 
-                                                      Math.Abs(_commercialZoneCount - _industrialZoneCount) / 
-                                                      _commercialZoneCount + _industrialZoneCount;
+                                                      Math.Abs(CommercialZoneCount - IndustrialZoneCount) / 
+                                                      CommercialZoneCount + IndustrialZoneCount;
+
+        private int CommercialZoneCount { get; set; }
         
+        private int IndustrialZoneCount { get; set; }
+        
+        private int Population { get; set; }
+
         #endregion
 
         #region Constructors
 
         public GlobalManager()
         {
-            TotalSatisfaction = 0;
-
-            _negativeBudgetRatio = MinNegativeBudgetRatio;
-            _safetyRatio = MinSafetyRatio;
-
             Budget = StartingBudget;
-            
+            NegativeBudgetYears = 0;
+
             _taxes = new Taxes
             {
                 ResidentalTax = 0.27,
@@ -102,9 +109,9 @@
                 IndustrialTax = 0.05
             };
 
-            _population = 0;
-            _commercialZoneCount = 0;
-            _industrialZoneCount = 0;
+            Population = 0;
+            CommercialZoneCount = 0;
+            IndustrialZoneCount = 0;
         }
 
         #endregion
@@ -114,16 +121,13 @@
         public void Pay(int price)
         {
             var newBudget = Budget - price;
-            
-            switch (newBudget)
+
+            NegativeBudgetYears = newBudget switch
             {
-                case <= 0 when Budget > 0:
-                    IncreaseNegativeBudgetRatio();
-                    break;
-                case > 0 when Budget <= 0:
-                    ResetNegativeBudgetRatio();
-                    break;
-            }
+                <= 0 when Budget > 0 => 1,
+                > 0 when Budget <= 0 => 0,
+                _ => NegativeBudgetYears
+            };
 
             Budget = newBudget;
         }
@@ -180,16 +184,15 @@
                     return false;
             }
             
-            RecalculateTotalSatisfaction();
             return true;
         }
         
         public void UpdateSatisfaction(IEnumerable<Zone> zones, int commercialZoneCount, int industrialZoneCount)
         {
-            _commercialZoneCount = commercialZoneCount;
-            _industrialZoneCount = industrialZoneCount;
+            CommercialZoneCount = commercialZoneCount;
+            IndustrialZoneCount = industrialZoneCount;
 
-            if (_population <= 0)
+            if (Population <= 0)
                 return;
             
             UpdateSatisfaction(zones.SelectMany(zone => zone.Citizens));
@@ -197,7 +200,7 @@
         
         public void UpdateSatisfaction(IEnumerable<Citizen> citizens)
         {
-            var citizenSatisfactionSum = _averageCitizenFactors * _population;
+            var citizenSatisfactionSum = AverageCitizenFactors * Population;
 
             foreach (var citizen in citizens)
             {
@@ -206,32 +209,24 @@
                 citizenSatisfactionSum += citizen.LastCalculatedSatisfaction;
             }
             
-            _averageCitizenFactors = citizenSatisfactionSum / _population;
-            RecalculateTotalSatisfaction();
+            AverageCitizenFactors = citizenSatisfactionSum / Population;
         }
         
         public void UpdateSatisfaction(bool movedIn, List<Citizen> changes, List<Citizen> citizens)
         {
             if (citizens.Count == 0)
             {
-                _population = 0;
-                TotalSatisfaction = 0;
+                Population = 0;
                 return;
             }
 
-            var citizenSatisfactionSum = 
-                _averageCitizenFactors * _population;
-            var newSafetyRatio = 
-                MinSafetyRatio + 
-                Math.Floor(Math.Min(citizens.Count, MaxSafetyRatioPopulation) / (MaxSafetyRatioPopulation / SafetyRatioParts)) *
-                ((MaxSafetyRatio - MinSafetyRatio) / SafetyRatioParts);
+            var citizenSatisfactionSum = AverageCitizenFactors * Population;
+            var oldSafetyRatio = SafetyRatioForPopulation(Population);
             
-            _population = citizens.Count;
+            Population = citizens.Count;
             
-            if (newSafetyRatio < _safetyRatio || newSafetyRatio > _safetyRatio)
+            if (oldSafetyRatio < SafetyRatio || oldSafetyRatio > SafetyRatio)
             {
-                _safetyRatio = newSafetyRatio;
-                
                 citizenSatisfactionSum = 0;
                 
                 foreach (var citizen in citizens)
@@ -251,42 +246,31 @@
                 }
             }
 
-            _averageCitizenFactors = citizenSatisfactionSum / _population;
-            RecalculateTotalSatisfaction();
+            AverageCitizenFactors = citizenSatisfactionSum / Population;
         }
 
         public void PassYear()
         {
             if (Budget <= 0)
-                IncreaseNegativeBudgetRatio();
+                NegativeBudgetYears++;
         }
         
         #endregion
 
         #region Private methods
 
-        private void RecalculateTotalSatisfaction()
-        {
-            _normalFactors = (CitizenAverageRatio * _averageCitizenFactors + 
-                              GlobalRatio * GlobalFactors)
-                             /
-                             (CitizenAverageRatio + GlobalRatio);
-            
-            TotalSatisfaction = (1 - _negativeBudgetRatio) * _normalFactors;
-        }
-
         private void CalculateSatisfaction(Citizen citizen)
         {
-            var homeFactors = _safetyRatio * citizen.Home.Owner.PoliceDepartmentEffect + 
-                              (1 - _safetyRatio) * (HomePollutionRatio * (1 - citizen.Home.Owner.IndustrialEffect) + 
-                                                    HomeStadiumRatio * citizen.Home.Owner.StadiumEffect)
-                                                   /
-                                                   (HomePollutionRatio + HomeStadiumRatio);
+            var homeFactors = SafetyRatio * citizen.Home.Owner.PoliceDepartmentEffect + 
+                              (1 - SafetyRatio) * ((HomePollutionRatio * (1 - citizen.Home.Owner.IndustrialEffect) + 
+                                                    HomeStadiumRatio * citizen.Home.Owner.StadiumEffect) 
+                                                   / 
+                                                   (HomePollutionRatio + HomeStadiumRatio));
 
-            var workplaceFactors = _safetyRatio * citizen.Workplace.Owner.PoliceDepartmentEffect + 
-                                   (1 - _safetyRatio) * (WorkplaceStadiumRatio * citizen.Workplace.Owner.StadiumEffect)
+            var workplaceFactors = SafetyRatio * citizen.Workplace.Owner.PoliceDepartmentEffect + 
+                                   (1 - SafetyRatio) * ((WorkplaceStadiumRatio * citizen.Workplace.Owner.StadiumEffect)
                                                         /
-                                                        (WorkplaceStadiumRatio);
+                                                        (WorkplaceStadiumRatio));
 
             citizen.LastCalculatedSatisfaction = (HomeRatio * homeFactors + 
                                                   WorkplaceRatio * workplaceFactors + 
@@ -294,20 +278,11 @@
                                                  /
                                                  (HomeRatio + WorkplaceRatio + DistanceRatio);
         }
-        
-        private void IncreaseNegativeBudgetRatio()
-        {
-            _negativeBudgetRatio += MaxNegativeBudgetRatio / NegativeBudgetRatioParts;
-            
-            RecalculateTotalSatisfaction();
-        }
 
-        private void ResetNegativeBudgetRatio()
-        {
-            _negativeBudgetRatio = 0;
-            
-            RecalculateTotalSatisfaction();
-        }
+        private static double SafetyRatioForPopulation(int population) => MinSafetyRatio + 
+                                                                          Math.Floor(Math.Min(population, MaxSafetyRatioPopulation) /
+                                                                              (MaxSafetyRatioPopulation / SafetyRatioParts)) * 
+                                                                          ((MaxSafetyRatio - MinSafetyRatio) / SafetyRatioParts);
 
         #endregion
 
