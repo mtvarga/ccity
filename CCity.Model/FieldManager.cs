@@ -262,6 +262,7 @@ namespace CCity.Model
             if (field.Placeable == null) return modifiedFields;
             Road placedRoad = (Road)field.Placeable;
             List<Placeable> roadNeigbours = GetRoadNeighbours(placedRoad);
+            Trace.WriteLine(roadNeigbours.Count);
             foreach (Road neigbourRoad in roadNeigbours)
             {
                 if (neigbourRoad.IsPublic)
@@ -323,10 +324,11 @@ namespace CCity.Model
         {
             if (field.Placeable is not Road) return null;
             Road road = (Road)field.Placeable;
-            List<Field> effectedFields = new();
+            List<Field>? effectedFields = new();
             HashSet<Placeable> privatedPlaceables = new();
             List<Road> gavePublicityTo = road.GivesPublicityTo.ToList();
             effectedFields = DemolishFromField(field);
+            if (effectedFields == null) return null;
             foreach (Road giftedRoad in gavePublicityTo)
             {
                 ModifyRoad(giftedRoad, privatedPlaceables, effectedFields);
@@ -344,24 +346,29 @@ namespace CCity.Model
             List<Placeable> roadNeighbours = GetRoadNeighbours(actualRoad);
             List<Placeable> notRoadNeighbours = GetRoadNeighbours(actualRoad, false);
 
-            actualRoad.GetsPublicityFrom = null;
+            bool found = false;
             foreach (Road roadNeighbour in roadNeighbours)
             {
-                if (roadNeighbour.IsPublic && roadNeighbour.GetsPublicityFrom != actualRoad.GetsPublicityFrom)
+                if (roadNeighbour.IsPublic && roadNeighbour.GetsPublicityFrom != actualRoad)
                 {
                     actualRoad.GetsPublicityFrom = roadNeighbour;
                     roadNeighbour.GivesPublicityTo.Add(actualRoad);
+                    found = true;
                     break;
                 }
             }
 
-            if (actualRoad.IsPublic)
+            if (!found)
             {
-                actualRoad.GetsPublicityFrom = null;
-                foreach (Road giftedRoad in actualRoad.GivesPublicityTo)
+                List<Road> gavePublicityTo = actualRoad.GivesPublicityTo.ToList();
+                foreach (Road giftedRoad in gavePublicityTo)
                 {
                     ModifyRoad(giftedRoad, privatedPlaceables, effectedFields);
                 }
+            }
+            if (actualRoad.IsPublic)
+            {
+                SpreadRoadPublicity(actualRoad, effectedFields);
             }
             else
             {
@@ -432,8 +439,8 @@ namespace CCity.Model
             }
             IterateThroughSide(x - 1, y, false, height, placeables); //left side
             IterateThroughSide(x, y + 1, true, width, placeables); //bottom
-            IterateThroughSide(x, y - Height, true, width, placeables); //top
-            IterateThroughSide(x + Width, y, false, height, placeables); //right side
+            IterateThroughSide(x, y - height, true, width, placeables); //top
+            IterateThroughSide(x + width, y, false, height, placeables); //right side
             return placeables;
         }
 
