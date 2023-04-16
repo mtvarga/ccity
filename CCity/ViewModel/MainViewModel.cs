@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Navigation;
 using System.Xml.Serialization;
 using CCity.Model;
+using Microsoft.Win32;
 
 namespace CCity.ViewModel
 {
@@ -116,7 +117,7 @@ namespace CCity.ViewModel
         public MainViewModel(MainModel model)
         {
             _model = model;
-
+            _model.TaxChanged += new EventHandler<EventArgs>(Model_TaxChanged);
 
             NewGameCommand = new DelegateCommand(param => OnNewGame());
             PauseGameCommand = new DelegateCommand(param => OnPauseGame());
@@ -288,34 +289,43 @@ namespace CCity.ViewModel
 
         private string GetFieldName(Field? selectedField)
         {
-            throw new NotImplementedException();
+            throw new Exception();
         }
 
-        private void Model_GameTicked(object o, EventArgs e)
+        private void Model_GameTicked(object? o, EventArgs e)
         {
             throw new NotImplementedException();
         }
 
-        private void Model_PopulationChanged(object o, FieldEventArgs e)
+        private void Model_PopulationChanged(object? o, EventArgs e)
         {
             OnPropertyChanged(nameof(Population));
         }
 
-        private void Model_BudgetChanged(object o, FieldEventArgs e)
+        private void Model_BudgetChanged(object? o, EventArgs e)
         {
             OnPropertyChanged(nameof(Budget));
         }
 
-        private void Model_SatisfactionChanged(object o, FieldEventArgs e)
+        private void Model_SatisfactionChanged(object? o, EventArgs e)
         {
             OnPropertyChanged(nameof(Satisfaction));
         }
 
-        private void Model_TaxChanged(object o, FieldEventArgs e)
+        private void Model_TaxChanged(object? o, EventArgs e)
         {
             OnPropertyChanged(nameof(ResidentialTax));
             OnPropertyChanged(nameof(IndustrialTax));
             OnPropertyChanged(nameof(CommercialTax));
+        }
+
+        private void Mode_FieldUpdated(object? o, FieldEventArgs e)
+        {
+            foreach(Field field in e.Fields)
+            {
+                int index = field.Y * _model.Width + field.X;
+                RefreshFieldItem(Fields[index]);
+            }
         }
 
         #endregion
@@ -380,6 +390,7 @@ namespace CCity.ViewModel
             UnselectField();
             OnPropertyChanged(nameof(IsFieldSelected));
         }
+
 
         #endregion
     }
