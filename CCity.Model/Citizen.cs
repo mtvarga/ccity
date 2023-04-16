@@ -54,7 +54,7 @@ namespace CCity.Model
             CalculateHomeWorkplaceDistanceEffect();
         }
 
-        public int CalculateSatisfaction()
+        public void MoveOut()
         {
             Home.DropCitizen(this);
             Workplace.DropCitizen(this);
@@ -67,11 +67,11 @@ namespace CCity.Model
         private void CalculateHomeWorkplaceDistanceEffect()
         {
             var proximityEffectValues = 
-                Utilities.GetCoordinatesInRadiusWeighted(Home.Owner, CloseProximityRadius)
-                    .Where((x, y, weight) => x == Workplace.Owner.X && y == Workplace.Owner.Y)
-                    .Select((_, _, weight) => weight);
+                Utilities.GetPointsInRadiusWeighted(Home.Owner!, CloseProximityRadius)
+                    .Where(tuple => tuple.X == Workplace.Owner!.X && tuple.Y == Workplace.Owner!.Y)
+                    .Select(tuple => tuple.Weight).ToList();
 
-            HomeWorkplaceDistanceEffect = proximityEffectValues.Count > 0 ? proximityEffectValues.First : 0;
+            HomeWorkplaceDistanceEffect = proximityEffectValues.Any() ? proximityEffectValues.First() : 0;
         }
 
         #endregion
