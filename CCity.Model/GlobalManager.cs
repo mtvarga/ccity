@@ -261,13 +261,13 @@
 
         private void CalculateSatisfaction(Citizen citizen)
         {
-            var homeFactors = SafetyRatio * citizen.Home.Owner.PoliceDepartmentEffect + 
+            var homeFactors = SafetyRatio * citizen.Home.Owner!.PoliceDepartmentEffect + 
                               (1 - SafetyRatio) * ((HomePollutionRatio * (1 - citizen.Home.Owner.IndustrialEffect) + 
                                                     HomeStadiumRatio * citizen.Home.Owner.StadiumEffect) 
                                                    / 
                                                    (HomePollutionRatio + HomeStadiumRatio));
 
-            var workplaceFactors = SafetyRatio * citizen.Workplace.Owner.PoliceDepartmentEffect + 
+            var workplaceFactors = SafetyRatio * citizen.Workplace.Owner!.PoliceDepartmentEffect + 
                                    (1 - SafetyRatio) * ((WorkplaceStadiumRatio * citizen.Workplace.Owner.StadiumEffect)
                                                         /
                                                         (WorkplaceStadiumRatio));
