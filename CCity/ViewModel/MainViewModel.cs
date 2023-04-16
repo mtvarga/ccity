@@ -107,6 +107,7 @@ namespace CCity.ViewModel
         public DelegateCommand ChangeResidentialTaxCommand { get; private set; }
         public DelegateCommand ChangeCommercialTaxCommand { get; private set; }
         public DelegateCommand ChangeIndustrialTaxCommand { get; private set; }
+        public DelegateCommand RefreshMapCommand { get; private set; }
         //TO DO
         public DelegateCommand SendFiretruckCommand { get; private set; }
         public DelegateCommand UpgradeCommand { get; private set; }
@@ -135,6 +136,12 @@ namespace CCity.ViewModel
             ChangeCommercialTaxCommand = new DelegateCommand(param => OnChangeCommercialTax(int.Parse(param as string ?? string.Empty)));
             ChangeIndustrialTaxCommand = new DelegateCommand(param => OnChangeIndustrialTax(int.Parse(param as string ?? string.Empty)));
             CloseSelectedFieldWindow = new DelegateCommand(OnCloseSelectedFieldWindow);
+            RefreshMapCommand = new DelegateCommand(param => OnRefreshMap());
+        }
+
+        private void OnRefreshMap()
+        {
+            foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem);
         }
 
         #endregion

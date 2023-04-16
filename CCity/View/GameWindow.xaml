@@ -41,6 +41,7 @@
                     <Button Width="40" Height="40" Margin="2" Content="Pole" IsEnabled="False" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Pole}"/>
                     <Button Width="40" Height="40" Margin="2" Content="Road" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Road}"/>
                     <Button Width="40" Height="40" Margin="2" Content="Bldzr" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Bulldozer}"/>
+                    <Button Width="40" Height="40" Margin="2" Content="REFRESH" Command="{Binding RefreshMapCommand}"/>
                 </WrapPanel>
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                     <StackPanel Orientation="Vertical" Margin="0 5">
