@@ -12,8 +12,8 @@
 
         #region Properties
 
-        public string CityName { get; }
-        public string MayorName { get; }
+        public string CityName { get; private set; }
+        public string MayorName { get; private set; }
         public Field[,] Fields { get => _fieldManager.Fields; }
         public int Budget { get => _globalManager.Budget; }
         public Taxes Taxes { get => _globalManager.Taxes; }
@@ -29,11 +29,8 @@
 
         #region Constructors
 
-        public MainModel(string cityName, string mayorName)
+        public MainModel()
         {
-            CityName = cityName;
-            MayorName = mayorName;
-
             _fieldManager = new FieldManager();
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
@@ -94,6 +91,15 @@
         public void TimerTick()
         {
             throw new NotImplementedException();
+        }
+
+        public void NewGame(string cityName, string mayorName)
+        {
+            _fieldManager = new FieldManager();
+            _citizenManager = new CitizenManager();
+            _globalManager = new GlobalManager();
+            CityName = cityName;
+            MayorName = mayorName;
         }
 
         #endregion

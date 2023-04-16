@@ -44,17 +44,17 @@ namespace CCity
         private void App_Startup(object sender, StartupEventArgs e)
         {
             _model = new();
-            _model.GameOver += new EventHandler<EventArgs>(Model_GameOver);
+            _model.GameOver += Model_GameOver;
 
             _viewModel = new(_model);
-            _viewModel.NewGame += new EventHandler(ViewModel_NewGame);
-            _viewModel.PauseGame += new EventHandler(ViewModel_PauseGame);
-            _viewModel.ExitGame += new EventHandler(ViewModel_ExitGame);
-            _viewModel.CloseApplication += new EventHandler(ViewModel_CloseApplication);
+            _viewModel.NewGame += ViewModel_NewGame;
+            _viewModel.PauseGame += ViewModel_PauseGame;
+            _viewModel.ExitGame += ViewModel_ExitGame;
+            _viewModel.CloseApplication += ViewModel_CloseApplication;
 
             _timer = new DispatcherTimer();
             _timer.Interval = TimeSpan.FromMilliseconds(250);
-            _timer.Tick += new EventHandler(Time_Ticked);
+            _timer.Tick += Time_Ticked;
 
             _mainWindow = new();
             _mainWindow.Closing += new System.ComponentModel.CancelEventHandler(View_Closing);

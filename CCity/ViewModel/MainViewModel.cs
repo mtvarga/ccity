@@ -332,10 +332,10 @@ namespace CCity.ViewModel
 
         #region Events
 
-        public EventHandler? NewGame;
-        public EventHandler? PauseGame;
-        public EventHandler? ExitGame;
-        public EventHandler? CloseApplication;
+        public event EventHandler? NewGame;
+        public event EventHandler? PauseGame;
+        public event EventHandler? ExitGame;
+        public event EventHandler? CloseApplication;
 
         #endregion
 
