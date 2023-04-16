@@ -219,7 +219,7 @@ namespace CCity.Model
             Placeable placeable = field.Placeable;
             switch (placeable)
             {
-                case FireDepartment fireDepartment: return fireDepartment.AvailableFiretrucks == 1; //every firetruck is available
+                //case FireDepartment fireDepartment: return fireDepartment.AvailableFiretrucks == 1; //every firetruck is available
                 case Zone zone: return zone.HasCitizen;
             }
             return true;
