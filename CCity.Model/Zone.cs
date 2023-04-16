@@ -8,14 +8,9 @@ namespace CCity.Model
 {
     public abstract class Zone : Placeable, IFlammable, IUpgradeable
     {
-        #region Fields
-
-        public int Capacity;
-        public int Current;
-
-        #endregion
-
         #region Properties
+        public int Capacity { get; private set; }
+        public int Current { get; private set; }
 
         public List<Citizen> Citizens { get; private set; }
 
@@ -31,18 +26,24 @@ namespace CCity.Model
 
         bool IUpgradeable.CanUpgrade => throw new NotImplementedException();
 
+        public bool IsFull => Capacity <= Current;
+
+        public bool HasCitizen => Current > 0;
+
         #endregion
 
         #region Public methods
 
         public void AddCitizen(Citizen citizen)
         {
-            throw new NotImplementedException();
+            Citizens.Add(citizen);
+            ++Current;
         }
 
         public void DropCitizen(Citizen citizen)
         {
-            throw new NotImplementedException();
+            Citizens.Remove(citizen);
+            --Current;
         }
 
         #endregion
