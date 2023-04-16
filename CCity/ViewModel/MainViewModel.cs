@@ -117,18 +117,18 @@ namespace CCity.ViewModel
         public MainViewModel(MainModel model)
         {
             _model = model;
-            _model.TaxChanged += new EventHandler<EventArgs>(Model_TaxChanged);
+            _model.TaxChanged += Model_TaxChanged;
+            _model.SatisfactionChanged += Model_SatisfactionChanged;
 
             NewGameCommand = new DelegateCommand(param => OnNewGame());
             PauseGameCommand = new DelegateCommand(param => OnPauseGame());
             ExitGameCommand = new DelegateCommand(param => OnExitGame());
             CloseApplicationCommand = new DelegateCommand(param => OnCloseApplication());
             SelectToolCommand = new DelegateCommand(param => OnSelectTool((Tool)param!));
-            ChangeResidentialTaxCommand = new DelegateCommand(param => OnChangeResidentialTax((int)param!));
-            ChangeCommercialTaxCommand = new DelegateCommand(param => OnChangeCommercialTax((int)param!));
-            ChangeIndustrialTaxCommand = new DelegateCommand(param => OnChangeIndustrialTax((int)param!));
+            ChangeResidentialTaxCommand = new DelegateCommand(param => OnChangeResidentialTax(int.Parse(param as string ?? string.Empty)));
+            ChangeCommercialTaxCommand = new DelegateCommand(param => OnChangeCommercialTax(int.Parse(param as string ?? string.Empty)));
+            ChangeIndustrialTaxCommand = new DelegateCommand(param => OnChangeIndustrialTax(int.Parse(param as string ?? string.Empty)));
             CloseSelectedFieldWindow = new DelegateCommand(OnCloseSelectedFieldWindow);
-
         }
 
         #endregion
@@ -370,20 +370,11 @@ namespace CCity.ViewModel
             _selectedTool = tool;
         }
 
-        private  void OnChangeResidentialTax(int n)
-        {
-            //_model.ChangeTax(TaxType.Residental, n);
-        }
+        private void OnChangeResidentialTax(int n) => _model.ChangeTax(TaxType.Residental, (n > 0 ? 1 : -1) * 0.01);
 
-        private void OnChangeCommercialTax(int n)
-        {
-            //_model.ChangeTax(TaxType.Commercial, n);
-        }
+        private void OnChangeCommercialTax(int n) => _model.ChangeTax(TaxType.Commercial, (n > 0 ? 1 : -1) * 0.01);
 
-        private void OnChangeIndustrialTax(int n)
-        {
-            //_model.ChangeTax(TaxType.Industrial, n);
-        }
+        private void OnChangeIndustrialTax(int n) => _model.ChangeTax(TaxType.Industrial, (n > 0 ? 1 : -1) * 0.01);
 
         private void OnCloseSelectedFieldWindow(object? obj)
         {

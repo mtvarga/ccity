@@ -81,6 +81,9 @@
         public void ChangeTax(TaxType type, double amount)
         {
             _globalManager.ChangeTax(type, amount);
+
+            TaxChanged?.Invoke(this, EventArgs.Empty);
+            SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void ChangeSpeed(int n)
