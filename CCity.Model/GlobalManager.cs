@@ -159,7 +159,7 @@
                 case TaxType.Residental:
                     changedTax = _taxes.ResidentalTax + amount;
                     
-                    if (changedTax <= MinResTax || changedTax >= MaxResTax)
+                    if (changedTax < MinResTax || changedTax > MaxResTax)
                         return false;
                     
                     _taxes.ResidentalTax = changedTax;
@@ -167,7 +167,7 @@
                 case TaxType.Commercial:
                     changedTax = _taxes.CommercialTax + amount;
                     
-                    if (changedTax <= MinComTax || changedTax >= MaxComTax)
+                    if (changedTax < MinComTax || changedTax > MaxComTax)
                         return false;
                     
                     _taxes.CommercialTax = changedTax;
@@ -175,7 +175,7 @@
                 case TaxType.Industrial:
                     changedTax = _taxes.IndustrialTax + amount;
                     
-                    if (changedTax <= MinIndTax || changedTax >= MaxIndTax)
+                    if (changedTax < MinIndTax || changedTax > MaxIndTax)
                         return false;
                     
                     _taxes.IndustrialTax = changedTax;
