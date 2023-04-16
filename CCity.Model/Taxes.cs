@@ -8,8 +8,8 @@ namespace CCity.Model
 {
     public struct Taxes
     {
-        public int ResidentalTax;
-        public int CommercialTax;
-        public int IndustrialTax;
+        public double ResidentalTax;
+        public double CommercialTax;
+        public double IndustrialTax;
     }
 }
