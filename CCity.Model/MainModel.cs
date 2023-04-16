@@ -12,29 +12,31 @@
 
         #region Properties
 
-        public string CityName { get; private set; }
-        public string MayorName { get; private set; }
-        public Field[,] Fields { get; private set; }
-        public List<Citizen> Citizens { get; }
-        public int GlobalSatisfactionScore { get; }
-        public int Budget { get; }
-        public Taxes Taxes { get; }
+        public string CityName { get; }
+        public string MayorName { get; }
+        public Field[,] Fields { get => _fieldManager.Fields; }
+        public int Budget { get => _globalManager.Budget; }
+        public Taxes Taxes { get => _globalManager.Taxes; }
         public int Date { get; }
         public Speed Speed { get; }
-        public int Satisfaction { get; }
-        public int Population { get; }
-
-        public int Width { get; }
-        public int Height { get; }
+        public double Satisfaction { get => _globalManager.TotalSatisfaction; }
+        public int Population { get => _citizenManager.Population; }
+        public int Width { get => _fieldManager.Width; }
+        public int Height { get => _fieldManager.Height; }
 
 
         #endregion
 
         #region Constructors
 
-        public MainModel()
+        public MainModel(string cityName, string mayorName)
         {
-            throw new NotImplementedException();
+            CityName = cityName;
+            MayorName = mayorName;
+
+            _fieldManager = new FieldManager();
+            _citizenManager = new CitizenManager();
+            _globalManager = new GlobalManager();
         }
 
         #endregion
@@ -107,13 +109,13 @@
 
         #region Events
 
-        public EventHandler<EventArgs> GameTicked;
-        public EventHandler<FieldEventArgs> FieldsUpdated;
-        public EventHandler<EventArgs> PopulationChanged;
-        public EventHandler<EventArgs> BudgetChanged;
-        public EventHandler<EventArgs> SatisfactionChanged;
-        public EventHandler<EventArgs> TaxChanged;
-        public EventHandler<EventArgs> GameOver;
+        public event EventHandler<EventArgs>? GameTicked;
+        public event EventHandler<FieldEventArgs>? FieldsUpdated;
+        public event EventHandler<EventArgs>? PopulationChanged;
+        public event EventHandler<EventArgs>? BudgetChanged;
+        public event EventHandler<EventArgs>? SatisfactionChanged;
+        public event EventHandler<EventArgs>? TaxChanged;
+        public event EventHandler<EventArgs>? GameOver;
 
         #endregion
     }
