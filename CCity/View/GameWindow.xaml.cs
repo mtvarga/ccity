@@ -24,5 +24,15 @@ namespace CCity.View
         {
             InitializeComponent();
         }
+
+        private void Grid_MouseEnter(object sender, MouseEventArgs e)
+        {
+            ((Grid)sender).Background = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255));
+        }
+
+        private void Grid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            ((Grid)sender).Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+        }
     }
 }
