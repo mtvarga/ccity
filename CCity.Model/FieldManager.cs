@@ -458,7 +458,7 @@ namespace CCity.Model
         private List<Placeable> GetRoadNeighbours(Placeable placeable, bool pessimist = false)
         {
             List<Placeable> placeables = GetNeighbours(placeable);
-            placeables = placeables.FindAll(p => (p is Road && !pessimist) || (p is not Road && pessimist));
+            placeables = placeables.FindAll(p => (p is Road && !pessimist) || (p is not Road && pessimist)).Select(e => GetRoot(e)).ToList();
             return placeables;
         }
 

@@ -251,7 +251,7 @@ namespace CCity.ViewModel
         private Texture GetTextureFromFieldItem(FieldItem fieldItem)
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
-            SetNeighboursRoadTexture(field);
+            //SetNeighboursRoadTexture(field);
             if (!field.HasPlaceable) return Texture.None;
             switch (field.Placeable)
             {
