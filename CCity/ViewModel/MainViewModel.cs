@@ -240,7 +240,7 @@ namespace CCity.ViewModel
                 case ResidentialZone _: return Color.FromArgb(100, 0, 255, 0);
                 case CommercialZone _: return Color.FromArgb(100, 0, 0, 255);
                 case IndustrialZone _: return Color.FromArgb(100, 255, 255, 0);
-                default: return Color.FromArgb(0, 0, 0, 0);
+                default: if (field.Placeable.IsPublic) return Color.FromArgb(100,22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
             }
         }
 
