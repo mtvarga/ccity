@@ -34,8 +34,8 @@
         private const double WorkplaceRatio = 0.25;
         private const double DistanceRatio = 0.25;
 
-        private const double HomePollutionRatio = 0.75;
-        private const double HomeStadiumRatio = 0.25;
+        private const double HomePollutionRatio = 0.5;
+        private const double HomeStadiumRatio = 0.5;
         
         private const double WorkplaceStadiumRatio = 1;
         
@@ -85,7 +85,7 @@
 
         private double IndustrialCommercialBalance => 1 - 
                                                       Math.Abs(CommercialZoneCount - IndustrialZoneCount) / 
-                                                      CommercialZoneCount + IndustrialZoneCount;
+                                                      (CommercialZoneCount + IndustrialZoneCount);
 
         private int CommercialZoneCount { get; set; }
         
@@ -136,18 +136,16 @@
         {
             foreach (var residentialZone in residentialZones)
             {
-                Budget += Convert.ToInt32(Math.Round(ResTaxNorm * _taxes.ResidentalTax * residentialZone.Current));
+                Pay(-Convert.ToInt32(Math.Round(ResTaxNorm * _taxes.ResidentalTax * residentialZone.Current)));
             }
             
             foreach (var workplaceZone in workplaceZones)
-            {
-                Budget += workplaceZone switch
+                Pay(-(workplaceZone switch
                 {
                     IndustrialZone => Convert.ToInt32(Math.Round(IndTaxNorm * _taxes.IndustrialTax * workplaceZone.Current)),
                     CommercialZone => Convert.ToInt32(Math.Round(ComTaxNorm * _taxes.CommercialTax * workplaceZone.Current)),
                     _ => 0,
-                };
-            }
+                }));
         }
         
         public bool ChangeTax(TaxType taxType, double amount)
