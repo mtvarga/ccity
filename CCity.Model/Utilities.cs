@@ -33,7 +33,7 @@ namespace CCity.Model
             select (
                 point.X, 
                 point.Y, 
-                Math.Sin(Math.Round(SquareDistance(f.X, f.Y, point.X, point.Y)) / r)
+                Math.Sin(Math.Round(r - SquareDistance(f.X, f.Y, point.X, point.Y)) / r * Math.PI / 2)
             );
 
         
