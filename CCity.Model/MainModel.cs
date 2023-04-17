@@ -156,11 +156,11 @@
         private void MonthlyTick()
         {
             var vacantHomes = _fieldManager.ResidentialZones(false);
-            var vacantWorkplaces = _fieldManager.CommercialZones(false).Cast<WorkplaceZone>().Concat(_fieldManager.IndustrialZones(false)).ToList();
-
-            if (vacantHomes.Any() && vacantWorkplaces.Any())
+            var vacantCommercialZones = _fieldManager.CommercialZones(false).Cast<WorkplaceZone>().ToList();
+            var vacantIndustrialZones = _fieldManager.IndustrialZones(false).Cast<WorkplaceZone>().ToList();
+            if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
             {
-                var newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantWorkplaces);
+                var newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones,vacantIndustrialZones);
                 
                 _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
                 

@@ -8,6 +8,9 @@ namespace CCity.Model
 {
     public abstract class Zone : Placeable, IFlammable, IUpgradeable
     {
+        #region Constants
+        public const int CapacityConstant = 10;
+        #endregion
         #region Properties
         public int Capacity { get; private set; }
         public int Current { get; private set; }
@@ -37,7 +40,7 @@ namespace CCity.Model
         internal Zone()
         {
             Current = 0;
-            Capacity = 5;
+            Capacity = CapacityConstant;
 
             Citizens = new List<Citizen>();
         }
