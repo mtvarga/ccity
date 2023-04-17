@@ -2,6 +2,10 @@
 {
     public class CitizenManager
     {
+        #region Fields
+        private bool _nextToCommercial;
+        
+        #endregion
         #region Constants
 
         private const double CitizenMoveOutThreshold = 0.25;
@@ -21,13 +25,14 @@
         public CitizenManager()
         {
             Citizens = new List<Citizen>();
+            _nextToCommercial = true;
         }
 
         #endregion
 
         #region Public methods
 
-        public List<Citizen> IncreasePopulation(List<ResidentialZone> vacantHomes, List<WorkplaceZone> vacantWorkplaces)
+        public List<Citizen> IncreasePopulation(List<ResidentialZone> vacantHomes, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         {
             var result = new List<Citizen>();
             
@@ -44,14 +49,15 @@
 
                 for (var i = 0; i < newCitizenCount; i++)
                 {
-                    var workplace = FindNearestWorkplace(home, vacantWorkplaces);
+                    var workplace = FindNearestWorkplace(home, _nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
                     var citizen = new Citizen(home, workplace);
                     
                     Citizens.Add(citizen);
                     result.Add(citizen);
 
                     if (workplace.Capacity - workplace.Current == 0)
-                        vacantWorkplaces.Remove(workplace);
+                       (_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(workplace);
+                    _nextToCommercial = !_nextToCommercial;
                 }
             }
 
