@@ -77,14 +77,13 @@ namespace CCity.Model
 
             switch (placeable)
             {
-                case Road _: effectedFields = effectedFields.Concat(HandleRoadPlacement(field)).ToList(); break;
+                case Road _: List<Field> effectedByRoad = HandleRoadPlacement(field); effectedFields = effectedFields.Concat(effectedByRoad).ToList(); break;
                 default:
                     List<Field>? effectedFieldsBySpreading = RefreshPublicity(placeable);
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
                     break;
             }
             UpdatePlaceableList(placeable, true);
-            Trace.WriteLine(ResidentialZones(false).Count);
             return effectedFields;
         }
 
@@ -265,7 +264,7 @@ namespace CCity.Model
 
         private List<Field> HandleRoadPlacement(Field field)
         {
-            List<Field> modifiedFields = new() { field };
+            List<Field> modifiedFields = new();
             if (field.Placeable == null) return modifiedFields;
             Road placedRoad = (Road)field.Placeable;
             List<Placeable> roadNeigbours = GetRoadNeighbours(placedRoad);
@@ -281,9 +280,7 @@ namespace CCity.Model
 
             if (placedRoad.IsPublic)
             {
-                List<Field> modifiedFieldsByRecursion = new();
-                SpreadRoadPublicity(placedRoad, modifiedFieldsByRecursion);
-                modifiedFields = modifiedFields.Concat(modifiedFieldsByRecursion).ToList();
+                SpreadRoadPublicity(placedRoad, ref modifiedFields);
             }
             return modifiedFields;
         }
@@ -306,7 +303,7 @@ namespace CCity.Model
             return null;
         }
 
-        private void SpreadRoadPublicity(Road road, List<Field> effectedFields)
+        private void SpreadRoadPublicity(Road road,ref List<Field> effectedFields)
         {
             List<Placeable> roadNeighbours = GetRoadNeighbours(road);
             List<Placeable> placeableNeighbours = GetRoadNeighbours(road, true);
@@ -325,7 +322,7 @@ namespace CCity.Model
                     neighbourRoad.GetsPublicityFrom = road;
                     road.GivesPublicityTo.Add(neighbourRoad);
                     effectedFields.Add(neighbourRoad.Owner);
-                    SpreadRoadPublicity(neighbourRoad, effectedFields);
+                    SpreadRoadPublicity(neighbourRoad,ref effectedFields);
                 };
             }
         }
@@ -352,7 +349,7 @@ namespace CCity.Model
                         privatedPlaceables.Add(placeable);
                     }
                 }
-                SpreadRoadPublicity((Road)Fields[ROOTX, ROOTY].Placeable!, effectedFields!);
+                SpreadRoadPublicity((Road)Fields[ROOTX, ROOTY].Placeable!,ref effectedFields!);
                 if (privatedPlaceables.Count > 0 && !privatedPlaceables.All(e => WouldStayPublic(e)))
                 {
                     Place(field.X, field.Y, road);
@@ -360,7 +357,6 @@ namespace CCity.Model
                 }
 
             }
-            Trace.WriteLine(effectedFields.Where(e => e.Placeable is FireDepartment).ToList().Count);
             return effectedFields.Concat(_roads.Select(e => e.Owner)).ToList();
             //#else
             /*if (field.Placeable is not Road) return null;
@@ -412,7 +408,7 @@ namespace CCity.Model
             }
             if (actualRoad.IsPublic)
             {   
-                SpreadRoadPublicity(actualRoad, effectedFields);
+                SpreadRoadPublicity(actualRoad,ref effectedFields);
             }
             else
             {
