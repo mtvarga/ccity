@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Xml.Serialization;
@@ -238,7 +239,7 @@ namespace CCity.ViewModel
                 case ResidentialZone _: return Color.FromArgb(100, 0, 255, 0);
                 case CommercialZone _: return Color.FromArgb(100, 0, 0, 255);
                 case IndustrialZone _: return Color.FromArgb(100, 255, 255, 0);
-                default: if (field.Placeable.IsPublic) return Color.FromArgb(100, 150, 0, 255); else return Color.FromArgb(0, 0, 0, 0);
+                default: if (field.Placeable.IsPublic) return Color.FromArgb(100,22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
             }
         }
 
@@ -415,6 +416,10 @@ namespace CCity.ViewModel
                     int index = field.Y * _model.Width + field.X;
                     RefreshFieldItem(Fields[index]);
                 }
+            }
+            else
+            {
+                MessageBox.Show("A művelet nem végezhető el.", "Hiba", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
