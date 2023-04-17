@@ -13,6 +13,28 @@
     <None Remove="View\Images\banner.png" />
     <None Remove="View\Images\icon.ico" />
     <None Remove="View\Images\profile.png" />
+    <None Remove="View\Images\Textures\fireDepartment.png" />
+    <None Remove="View\Images\Textures\policeDepartment.png" />
+    <None Remove="View\Images\Textures\Roads\roadBottomClose.png" />
+    <None Remove="View\Images\Textures\Roads\roadBottomLeft.png" />
+    <None Remove="View\Images\Textures\Roads\roadBottomRight.png" />
+    <None Remove="View\Images\Textures\Roads\roadCross.png" />
+    <None Remove="View\Images\Textures\Roads\roadHorizontal.png" />
+    <None Remove="View\Images\Textures\Roads\roadLeftClose.png" />
+    <None Remove="View\Images\Textures\Roads\roadNotBottom.png" />
+    <None Remove="View\Images\Textures\Roads\roadNotLeft.png" />
+    <None Remove="View\Images\Textures\Roads\roadNotRight.png" />
+    <None Remove="View\Images\Textures\Roads\roadNotTop.png" />
+    <None Remove="View\Images\Textures\Roads\roadRightClose.png" />
+    <None Remove="View\Images\Textures\Roads\roadTopClose.png" />
+    <None Remove="View\Images\Textures\Roads\roadTopLeft.png" />
+    <None Remove="View\Images\Textures\Roads\roadTopRight.png" />
+    <None Remove="View\Images\Textures\Roads\roadVertical.png" />
+    <None Remove="View\Images\Textures\stadiumBottomLeft.png" />
+    <None Remove="View\Images\Textures\stadiumBottomRight.png" />
+    <None Remove="View\Images\Textures\stadiumTopLeft.png" />
+    <None Remove="View\Images\Textures\stadiumTopRight.png" />
+    <None Remove="View\Images\Textures\transparent.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +53,28 @@
   <ItemGroup>
     <Resource Include="View\Images\banner.png" />
     <Resource Include="View\Images\icon.ico" />
+    <Resource Include="View\Images\Textures\fireDepartment.png" />
+    <Resource Include="View\Images\Textures\policeDepartment.png" />
+    <Resource Include="View\Images\Textures\Roads\roadBottomClose.png" />
+    <Resource Include="View\Images\Textures\Roads\roadBottomLeft.png" />
+    <Resource Include="View\Images\Textures\Roads\roadBottomRight.png" />
+    <Resource Include="View\Images\Textures\Roads\roadCross.png" />
+    <Resource Include="View\Images\Textures\Roads\roadHorizontal.png" />
+    <Resource Include="View\Images\Textures\Roads\roadLeftClose.png" />
+    <Resource Include="View\Images\Textures\Roads\roadNotBottom.png" />
+    <Resource Include="View\Images\Textures\Roads\roadNotLeft.png" />
+    <Resource Include="View\Images\Textures\Roads\roadNotRight.png" />
+    <Resource Include="View\Images\Textures\Roads\roadNotTop.png" />
+    <Resource Include="View\Images\Textures\Roads\roadRightClose.png" />
+    <Resource Include="View\Images\Textures\Roads\roadTopClose.png" />
+    <Resource Include="View\Images\Textures\Roads\roadTopLeft.png" />
+    <Resource Include="View\Images\Textures\Roads\roadTopRight.png" />
+    <Resource Include="View\Images\Textures\Roads\roadVertical.png" />
+    <Resource Include="View\Images\Textures\stadiumBottomLeft.png" />
+    <Resource Include="View\Images\Textures\stadiumBottomRight.png" />
+    <Resource Include="View\Images\Textures\stadiumTopLeft.png" />
+    <Resource Include="View\Images\Textures\stadiumTopRight.png" />
+    <Resource Include="View\Images\Textures\transparent.png" />
   </ItemGroup>
 
   <ItemGroup>

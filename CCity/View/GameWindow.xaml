@@ -101,20 +101,91 @@
                     </StackPanel>
                 </Grid>
                 <Grid>
-                    <ItemsControl ItemsSource="{Binding Fields}">
+                    <ItemsControl ItemsSource="{Binding Fields}" Margin="20">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}" />
+                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}">
                                     <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}">
-                                        <TextBlock>
-                                            <Run Text="{Binding Number}"/>
-                                            <Run Text="{Binding Text}"/>
-                                        </TextBlock>
+                                        <Label Content="{Binding Text}"/>
+                                        <Image Stretch="Fill">
+                                            <Image.Style>
+                                                <Style TargetType="Image">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.PoliceDepartment}">
+                                                            <Setter Property="Source" Value="Images\Textures\policeDepartment.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.FireDepartment}">
+                                                            <Setter Property="Source" Value="Images\Textures\fireDepartment.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.None}">
+                                                            <Setter Property="Source" Value="Images\Textures\transparent.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadHorizontal}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadHorizontal.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadVertical}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadVertical.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadCross}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadCross.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadTopLeft}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadTopLeft.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadTopRight}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadTopRight.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadBottomLeft}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadBottomLeft.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadBottomRight}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadBottomRight.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadNotTop}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadNotTop.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadNotBottom}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadNotBottom.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadNotLeft}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadNotLeft.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadNotRight}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadNotRight.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadTopClose}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadTopClose.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadBottomClose}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadBottomClose.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadLeftClose}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadLeftClose.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.RoadRightClose}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\roadRightClose.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.StadiumTopLeft}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\stadiumTopLeft.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.StadiumTopRight}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\stadiumTopRight.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.StadiumBottomLeft}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\stadiumBottomLeft.png"></Setter>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.StadiumBottomRight}">
+                                                            <Setter Property="Source" Value="Images\Textures\Roads\stadiumBottomRight.png"></Setter>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Image.Style>
+                                        </Image>
                                     </Grid>
                                 </Button>
                             </DataTemplate>
