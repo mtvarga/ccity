@@ -14,6 +14,8 @@ namespace CCity.Model
         private const int EFFECT_RADIUS = 10;
         private const int HEIGHT = 10;
         private const int WIDTH = 20;
+        private const int ROOTX = WIDTH / 2;
+        private const int ROOTY = HEIGHT - 1;
 
         #endregion
 
@@ -29,6 +31,7 @@ namespace CCity.Model
         private List<ResidentialZone> _residentialZones;
         private List<CommercialZone> _commercialZones;
         private List<IndustrialZone> _industrialZones;
+        private List<Road> _roads;
 
         #endregion
 
@@ -52,11 +55,12 @@ namespace CCity.Model
             _residentialZones = new();
             _commercialZones = new();
             _industrialZones = new();
+            _roads = new();
 
             //starter public road
             Road starterRoad = new Road();
             starterRoad.GetsPublicityFrom = starterRoad;
-            Fields[Width/2, Height-1].Place(starterRoad);
+            Fields[ROOTX, ROOTY].Place(starterRoad);
         }
 
         #endregion
@@ -181,7 +185,7 @@ namespace CCity.Model
                 case PoliceDepartment _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangePoliceDepartmentEffect(i));
                 case Stadium _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeStadiumEffect(i));
                 case IndustrialZone _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeIndustrialEffect(i));
-                default: return new List<Field>();
+                default: return new List<Field>() { placeable.Owner! };
             }
         }
 
@@ -192,6 +196,7 @@ namespace CCity.Model
                 case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.RemoveAll(e => e == residentialZone); break;
                 case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.RemoveAll(e => e == commercialZone); break;
                 case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.RemoveAll(e => e == industrialZone); break;
+                case Road road: if (add) _roads.Add(road); else _roads.RemoveAll(e => e == road); break;
                 default: break;
             }
         }
@@ -262,7 +267,6 @@ namespace CCity.Model
             if (field.Placeable == null) return modifiedFields;
             Road placedRoad = (Road)field.Placeable;
             List<Placeable> roadNeigbours = GetRoadNeighbours(placedRoad);
-            Trace.WriteLine(roadNeigbours.Count);
             foreach (Road neigbourRoad in roadNeigbours)
             {
                 if (neigbourRoad.IsPublic)
@@ -293,6 +297,7 @@ namespace CCity.Model
                 {
                     placeable.IsPublic = true;
                     effectedFields = effectedFields.Concat(SpreadPlaceableEffectConditional(placeable, true)).ToList();
+                    effectedFields.Add(placeable.Owner!);
                     return effectedFields;
                 }
             }
@@ -302,11 +307,14 @@ namespace CCity.Model
         private void SpreadRoadPublicity(Road road, List<Field> effectedFields)
         {
             List<Placeable> roadNeighbours = GetRoadNeighbours(road);
-            List<Placeable> placeableNeighbours = GetRoadNeighbours(road, false);
+            List<Placeable> placeableNeighbours = GetRoadNeighbours(road, true);
             foreach (Placeable neigbour in placeableNeighbours)
             {
                 List<Field>? effectedFieldsBySpreading = RefreshPublicity(neigbour);
-                if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
+                if (effectedFieldsBySpreading != null)
+                {
+                    effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
+                }
             }
             foreach (Road neighbourRoad in roadNeighbours)
             {
@@ -322,7 +330,37 @@ namespace CCity.Model
 
         private List<Field>? DemolishRoad(Field field)
         {
+            //#if TEMP_ROAD_DEMOLISH
             if (field.Placeable is not Road) return null;
+            Road road = (Road)field.Placeable;
+            List<Field>? effectedFields = new();
+            if (effectedFields == null) return null;
+            effectedFields = DemolishFromField(field);
+            List<Placeable> privatedPlaceables = new();
+            if (road.IsPublic)
+            {
+                foreach(Road tempRoad in _roads)
+                {
+                    tempRoad.GetsPublicityFrom = null;
+                    tempRoad.GivesPublicityTo = new List<Road>();
+                    List<Placeable> notRoadNeighbours = GetRoadNeighbours(tempRoad, true);
+                    foreach (Placeable placeable in notRoadNeighbours)
+                    {
+                        privatedPlaceables.Add(placeable);
+                    }
+                }
+                SpreadRoadPublicity((Road)Fields[ROOTX, ROOTY].Placeable!, effectedFields!);
+                if (privatedPlaceables.Count > 0 && !privatedPlaceables.All(e => WouldStayPublic(e)))
+                {
+                    Place(field.X, field.Y, road);
+                    return null;
+                }
+
+            }
+            Trace.WriteLine(effectedFields.Where(e => e.Placeable is FireDepartment).ToList().Count);
+            return effectedFields.Concat(_roads.Select(e => e.Owner)).ToList();
+            //#else
+            /*if (field.Placeable is not Road) return null;
             Road road = (Road)field.Placeable;
             List<Field>? effectedFields = new();
             HashSet<Placeable> privatedPlaceables = new();
@@ -338,14 +376,15 @@ namespace CCity.Model
                 Place(field.X, field.Y, road);
                 return null;
             }
-            return effectedFields;
+            return effectedFields;*/
+            //#endif
         }
 
         private void ModifyRoad(Road actualRoad, HashSet<Placeable> privatedPlaceables, List<Field> effectedFields)
         {
             if (!actualRoad.IsPublic) return;
             List<Placeable> roadNeighbours = GetRoadNeighbours(actualRoad);
-            List<Placeable> notRoadNeighbours = GetRoadNeighbours(actualRoad, false);
+            List<Placeable> notRoadNeighbours = GetRoadNeighbours(actualRoad, true);
 
             bool found = false;
             foreach (Road roadNeighbour in roadNeighbours)
@@ -402,9 +441,9 @@ namespace CCity.Model
             return false;
         }
 
-        #endregion
+#endregion
 
-        #region Helpers
+#region Helpers
 
         private bool OnMap(int x, int y)
         {
@@ -484,8 +523,8 @@ namespace CCity.Model
             return coordinates;
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }
