@@ -214,7 +214,6 @@ namespace CCity.ViewModel
                         X = j,
                         Y = i,
                         Number = (i * Width) + j,
-                        Text = "",
                         ClickCommand = new DelegateCommand(param => FieldClicked(Convert.ToInt32(param)))
                     });
 
@@ -227,7 +226,6 @@ namespace CCity.ViewModel
         {
             fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
             fieldItem.MinimapColor = GetMinimapColorFromFieldItem(fieldItem);
-            fieldItem.Text = fieldItem.Texture.ToString();
             fieldItem.OverlayColor = GetOverlayColorFromFieldItem(fieldItem);
         }
 
@@ -262,13 +260,13 @@ namespace CCity.ViewModel
                 case PowerPlant _: return Texture.PowerPlantBottomLeft;
                 case Road _: return GetRoadTextureFromField(field);
                 case Filler _: return GetFillerTexture(field);
-                default: return Texture.Unhandled;
+                default: return Texture.None;
             }
         }
 
         private Texture GetFillerTexture(Field field)
         {
-            //throw new NotImplementedException();
+            Placeable mainPlaceable = (Placeable)((Filler)field.Placeable).Main;
             return Texture.Unhandled;
         }
 
@@ -292,7 +290,7 @@ namespace CCity.ViewModel
 
         private Texture GetRoadTextureFromField(Field field)
         {
-            //if (!field.Has(typeof(Road))) return Texture.Unhandled;
+            if (field.Placeable is not Road) return Texture.Unhandled;
             //(int t, int r, int b, int l) = GetRoadNeighbours(field);
             (int t, int r, int b, int l) neighbours = (0, 0, 0, 0);
             switch (neighbours)

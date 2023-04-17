@@ -112,8 +112,8 @@
                                 <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}">
                                     <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}">
                                         <Label Content="{Binding Text}"/>
-                                        <Image Stretch="Fill">
-                                            <Image.Style>
+                                        <Image Stretch="Fill" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality">
+                                            <!--<Image.Style>
                                                 <Style TargetType="Image">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.PoliceDepartment}">
@@ -171,20 +171,20 @@
                                                             <Setter Property="Source" Value="Images\Textures\Roads\roadRightClose.png"></Setter>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.StadiumTopLeft}">
-                                                            <Setter Property="Source" Value="Images\Textures\Roads\stadiumTopLeft.png"></Setter>
+                                                            <Setter Property="Source" Value="Images\Textures\stadiumTopLeft.png"></Setter>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.StadiumTopRight}">
-                                                            <Setter Property="Source" Value="Images\Textures\Roads\stadiumTopRight.png"></Setter>
+                                                            <Setter Property="Source" Value="Images\Textures\stadiumTopRight.png"></Setter>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.StadiumBottomLeft}">
-                                                            <Setter Property="Source" Value="Images\Textures\Roads\stadiumBottomLeft.png"></Setter>
+                                                            <Setter Property="Source" Value="Images\Textures\stadiumBottomLeft.png"></Setter>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Texture}" Value="{x:Static viewmodel:Texture.StadiumBottomRight}">
-                                                            <Setter Property="Source" Value="Images\Textures\Roads\stadiumBottomRight.png"></Setter>
+                                                            <Setter Property="Source" Value="Images\Textures\stadiumBottomRight.png"></Setter>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
-                                            </Image.Style>
+                                            </Image.Style>-->
                                         </Image>
                                     </Grid>
                                 </Button>

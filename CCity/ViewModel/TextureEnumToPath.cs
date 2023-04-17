@@ -17,13 +17,20 @@ namespace CCity.ViewModel
             {
                 switch (texture)
                 {
-                    case Texture.PoliceDepartment: return "Images/Textures/policeDepartment.png";
-                    case Texture.FireDepartment: return "Images/Textures/fireDepartment.png";
-                    default: return "Images/Textures/transparent.png";
+                    case Texture.None: return "Images/Textures/transparent.png";
+                    default: return GetPath(texture);
                 }
             }
 
             return "Images/Textures/transparent.png";
+        }
+
+        private string GetPath(Texture texture)
+        {
+            string textureString = texture.ToString();
+            string fileString = textureString.Substring(0, 1).ToLower() + textureString.Substring(1);
+            if (fileString.StartsWith("Road")) return "Images/Textures/Roads/" + fileString + ".png";
+            else return "Images/Textures/" + fileString + ".png";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
