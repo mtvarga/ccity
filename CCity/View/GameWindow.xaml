@@ -101,20 +101,23 @@
                     </StackPanel>
                 </Grid>
                 <Grid>
-                    <ItemsControl ItemsSource="{Binding Fields}">
+                    <ItemsControl ItemsSource="{Binding Fields}" Margin="20">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}" />
+                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}">
-                                    <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}">
-                                        <TextBlock>
-                                            <Run Text="{Binding Number}"/>
-                                            <Run Text="{Binding Text}"/>
-                                        </TextBlock>
+                                    <Grid>
+                                        <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}" Panel.ZIndex="2"></Grid>
+                                        <Grid Panel.ZIndex="1">
+                                            <Image Stretch="Fill" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        </Grid>
+                                        <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}" Panel.ZIndex="0">
+                                            <Image Stretch="Fill" Source="Images/Textures/grass.png"/>
+                                        </Grid>
                                     </Grid>
                                 </Button>
                             </DataTemplate>

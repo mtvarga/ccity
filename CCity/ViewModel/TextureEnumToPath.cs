@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ using System.Windows.Data;
 
 namespace CCity.ViewModel
 {
+    [ValueConversion(typeof(Texture), typeof(string))]
     public class TextureEnumToPath : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -16,12 +18,22 @@ namespace CCity.ViewModel
             {
                 switch (texture)
                 {
-                    case Texture.PoliceDepartment:
-                        return "Images/Textures/policeDepartment.png";
+                    case Texture.None: return "Images/Textures/transparent.png";
+                    default:
+                        Trace.WriteLine(GetPath(texture));
+                        return GetPath(texture);
                 }
             }
 
-            return null;
+            return "Images/Textures/transparent.png";
+        }
+
+        private string GetPath(Texture texture)
+        {
+            string textureString = texture.ToString();
+            string fileString = textureString.Substring(0, 1).ToLower() + textureString.Substring(1);
+            if (fileString.StartsWith("road")) return "Images/Textures/Roads/" + fileString + ".png";
+            else return "Images/Textures/" + fileString + ".png";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

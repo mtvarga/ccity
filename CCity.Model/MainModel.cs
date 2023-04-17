@@ -127,7 +127,7 @@
             }
         }
 
-        public async void StartNewGame(string cityName, string mayorName)
+        public void StartNewGame(string cityName, string mayorName)
         {
             _fieldManager = new FieldManager();
             _citizenManager = new CitizenManager();
@@ -136,6 +136,8 @@
             MayorName = mayorName;
             NewGame?.Invoke(this, EventArgs.Empty);
         }
+
+        public (int[], List<Road>) GetFourRoadNeighbours(Road road) => _fieldManager.GetFourRoadNeighbours(road);
 
         #endregion
 
