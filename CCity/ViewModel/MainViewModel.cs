@@ -38,7 +38,7 @@ namespace CCity.ViewModel
         public int Budget { get => _model.Budget; }
         public int Satisfaction { get => PercentToInt(_model.Satisfaction); }
         public int Population { get => _model.Population; }
-        public bool Paused { get; } //TO DO
+        public bool Paused { get; private set; }
         public Speed Speed { get => _model.Speed; }
         public int CommercialTax { get => PercentToInt(_model.Taxes.CommercialTax); }
         public int ResidentialTax { get => PercentToInt(_model.Taxes.ResidentalTax); }
@@ -142,6 +142,9 @@ namespace CCity.ViewModel
         public DelegateCommand ChangeCommercialTaxCommand { get; private set; }
         public DelegateCommand ChangeIndustrialTaxCommand { get; private set; }
         public DelegateCommand RefreshMapCommand { get; private set; }
+        
+        public DelegateCommand ChangeSpeedCommand { get; } 
+        
         //TO DO
         public DelegateCommand SendFiretruckCommand { get; private set; }
         public DelegateCommand UpgradeCommand { get; private set; }
@@ -157,10 +160,12 @@ namespace CCity.ViewModel
         {
             _model = model;
             _model.FieldsUpdated += Model_FieldUpdated;
-            //_model.NewGame += Model_NewGame;
             _model.TaxChanged += Model_TaxChanged;
             _model.SatisfactionChanged += Model_SatisfactionChanged;
             _model.BudgetChanged += Model_BudgetChanged;
+            _model.PopulationChanged += Model_PopulationChanged;
+            _model.SpeedChanged += Model_SpeedChanged;
+                
             CreateTable();
 
             NewGameCommand = new DelegateCommand(param => OnNewGame());
@@ -174,6 +179,8 @@ namespace CCity.ViewModel
             CloseSelectedFieldWindow = new DelegateCommand(OnCloseSelectedFieldWindow);
             RefreshMapCommand = new DelegateCommand(param => OnRefreshMap());
             StartNewGameCommand = new DelegateCommand(param => OnStartNewGame());
+            ChangeSpeedCommand =
+                new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
 
             _inputCityName = "";
             _inputMayorName = "";
@@ -364,7 +371,6 @@ namespace CCity.ViewModel
             return "...";
         }
 
-
         private FieldItem GetFieldItemFromField(Field field)
         {
             return Fields[field.X + field.Y * Width];
@@ -372,7 +378,7 @@ namespace CCity.ViewModel
 
         private void Model_GameTicked(object? o, EventArgs e)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void Model_PopulationChanged(object? o, EventArgs e)
@@ -409,6 +415,8 @@ namespace CCity.ViewModel
             }
         }
 
+        private void Model_SpeedChanged(object? o, EventArgs e) => OnPropertyChanged(nameof(Speed));
+
         #endregion
 
         #region Events
@@ -440,6 +448,9 @@ namespace CCity.ViewModel
 
         private void OnPauseGame()
         {
+            Paused = !Paused;
+            OnPropertyChanged(nameof(Paused));
+            
             PauseGame?.Invoke(this, EventArgs.Empty);
         }
 
@@ -474,7 +485,28 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(IsFieldSelected));
         }
 
-
+        private void OnChangeSpeedCommand(int n)
+        {
+            _model.ChangeSpeed(n switch
+            {
+                < 0 => _model.Speed switch
+                {
+                    Speed.Normal => Speed.Slow,
+                    Model.Speed.Fast => Speed.Normal,
+                    _ => _model.Speed
+                },
+                
+                > 0 => _model.Speed switch
+                {
+                    Speed.Slow => Speed.Normal,
+                    Speed.Normal => Speed.Fast,
+                    _ => _model.Speed
+                },
+                
+                _ => _model.Speed
+            });
+        }
+        
         #endregion
     }
 }

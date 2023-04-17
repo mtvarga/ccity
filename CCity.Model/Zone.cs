@@ -26,12 +26,24 @@ namespace CCity.Model
 
         bool IUpgradeable.CanUpgrade => throw new NotImplementedException();
 
-        public bool IsFull => Capacity <= Current;
+        public bool IsFull => Current >= Capacity;
 
         public bool HasCitizen => Current > 0;
 
         #endregion
 
+        #region Constructors
+
+        internal Zone()
+        {
+            Current = 0;
+            Capacity = 5;
+
+            Citizens = new List<Citizen>();
+        }
+        
+        #endregion
+        
         #region Public methods
 
         public void AddCitizen(Citizen citizen)
