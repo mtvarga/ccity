@@ -23,11 +23,11 @@
         public int X { get; }
         public int Y { get; }
         public bool HasPlaceable { get => Placeable != null; }
-        public double PoliceDepartmentEffect { get => Math.Min(_policeDepartmentEffect, MAX_POLICE_DEPARTMENT_EFFECT) / MAX_POLICE_DEPARTMENT_EFFECT ; }
-        public double StadiumEffect { get => Math.Min(_stadiumEffect, MAX_STADIUM_EFFECT) / MAX_STADIUM_EFFECT; }
-        public double FireDepartmentEffect { get => Math.Min(_fireDepartmentEffect, MAX_FIRE_DEPARTMENT_EFFECT) / MAX_FIRE_DEPARTMENT_EFFECT; }
-        public double ForestEffect { get => Math.Min(_forestEffect, MAX_FOREST_EFFECT) / MAX_FOREST_EFFECT; }
-        public double IndustrialEffect { get => Math.Min(_industrialEffect, MAX_INDUSTRIAL_EFFECT) / MAX_INDUSTRIAL_EFFECT; }
+        public double PoliceDepartmentEffect => Math.Min(_policeDepartmentEffect, MAX_POLICE_DEPARTMENT_EFFECT) / (double)MAX_POLICE_DEPARTMENT_EFFECT;
+        public double StadiumEffect => Math.Min(_stadiumEffect, MAX_STADIUM_EFFECT) / (double)MAX_STADIUM_EFFECT;
+        public double FireDepartmentEffect => Math.Min(_fireDepartmentEffect, MAX_FIRE_DEPARTMENT_EFFECT) / (double)MAX_FIRE_DEPARTMENT_EFFECT;
+        public double ForestEffect => Math.Min(_forestEffect, MAX_FOREST_EFFECT) / (double)MAX_FOREST_EFFECT;
+        public double IndustrialEffect => Math.Min(_industrialEffect, MAX_INDUSTRIAL_EFFECT) / (double)MAX_INDUSTRIAL_EFFECT;
 
         #endregion
 
