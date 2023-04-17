@@ -11,12 +11,14 @@ namespace CCity.Model
 
         #region Fields
 
-        public Road? GetsPublicityFrom; 
-        public List<Road> GivesPublicityTo;
+        public Road? GetsPublicityFrom { get; set; }
+        public List<Road> GivesPublicityTo { get; set; }
 
         #endregion
 
         #region Properties
+
+
 
         public override int PlacementCost => 100;
 
