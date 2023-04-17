@@ -354,7 +354,6 @@ namespace CCity.ViewModel
             if(_selectedField.Placeable is Road)
             {
                 Road road = (Road)_selectedField.Placeable;
-                Trace.WriteLine(GetFieldItemFromField(road.GetsPublicityFrom.Owner).Number);
             }
         }
 
