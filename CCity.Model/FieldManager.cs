@@ -343,6 +343,7 @@ namespace CCity.Model
 
         private void ModifyRoad(Road actualRoad, HashSet<Placeable> privatedPlaceables, List<Field> effectedFields)
         {
+            if (!actualRoad.IsPublic) return;
             List<Placeable> roadNeighbours = GetRoadNeighbours(actualRoad);
             List<Placeable> notRoadNeighbours = GetRoadNeighbours(actualRoad, false);
 
@@ -368,7 +369,7 @@ namespace CCity.Model
                 }
             }
             if (actualRoad.IsPublic)
-            {
+            {   
                 SpreadRoadPublicity(actualRoad, effectedFields);
             }
             else

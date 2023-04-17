@@ -108,7 +108,10 @@
                             <DataTemplate>
                                 <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}">
                                     <Grid Background="{Binding OverlayColor}">
-                                        <Label Content="{Binding Text}"></Label>
+                                        <TextBlock>
+                                            <Run Text="{Binding Number}"/>
+                                            <Run Text="{Binding Text}"/>
+                                        </TextBlock>
                                     </Grid>
                                 </Button>
                             </DataTemplate>

@@ -293,7 +293,6 @@ namespace CCity.ViewModel
         private void SelectField(int index)
         {
             (int x, int y) coord = GetCordinates(index);
-            Trace.WriteLine(coord.x + " " + coord.y + " " + index + " Hello");
 
             _selectedField = _model.Fields[coord.x, coord.y];
             OnPropertyChanged(nameof(IsFieldSelected));
@@ -303,6 +302,12 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(SelectedFieldStadiumEffect));
             OnPropertyChanged(nameof(SelectedFieldIndustrialEffect));
             OnPropertyChanged(nameof(SelectedFieldSatisfaction));
+
+            if(_selectedField.Placeable is Road)
+            {
+                Road road = (Road)_selectedField.Placeable;
+                Trace.WriteLine(GetFieldItemFromField(road.GetsPublicityFrom.Owner).Number);
+            }
         }
 
         private int PercentToInt(double percent) => (int)Math.Floor(percent * 100);
@@ -317,6 +322,11 @@ namespace CCity.ViewModel
         private string GetFieldName(Field? selectedField)
         {
             return "...";
+        }
+
+        private FieldItem GetFieldItemFromField(Field field)
+        {
+            return Fields[field.X + field.Y * Width];
         }
 
         private void Model_GameTicked(object? o, EventArgs e)
