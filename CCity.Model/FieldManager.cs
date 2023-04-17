@@ -226,6 +226,7 @@ namespace CCity.Model
 
         private bool CanDemolish(Field field)
         {
+            if (field == Fields[ROOTX, ROOTY]) return false;
             if (!field.HasPlaceable) return false;
             Placeable placeable = field.Placeable;
             switch (placeable)
@@ -329,6 +330,7 @@ namespace CCity.Model
         private List<Field>? DemolishRoad(Field field)
         {
             //#if TEMP_ROAD_DEMOLISH
+            if (!CanDemolish(field)) return null;
             if (field.Placeable is not Road) return null;
             Road road = (Road)field.Placeable;
             List<Field>? effectedFields = new();

@@ -228,14 +228,19 @@ namespace CCity.ViewModel
             fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
             fieldItem.MinimapColor = GetMinimapColorFromFieldItem(fieldItem);
             fieldItem.Text = fieldItem.Texture.ToString();
+            fieldItem.OverlayColor = GetOverlayColorFromFieldItem(fieldItem);
+        }
 
-            //Publicity testing
+        private Color GetOverlayColorFromFieldItem(FieldItem fieldItem)
+        {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
-            if (field.HasPlaceable && field.Placeable.IsPublic) {
-                fieldItem.OverlayColor = Color.FromArgb(100, 180, 0, 255);
-            } else
+            if (!field.HasPlaceable) return Color.FromArgb(0, 0, 0, 0);
+            switch (field.Placeable)
             {
-                fieldItem.OverlayColor = Color.FromArgb(0, 0, 0, 0);
+                case ResidentialZone _: return Color.FromArgb(100, 0, 255, 0);
+                case CommercialZone _: return Color.FromArgb(100, 0, 0, 255);
+                case IndustrialZone _: return Color.FromArgb(100, 255, 255, 0);
+                default: return Color.FromArgb(0, 0, 0, 0);
             }
         }
 
