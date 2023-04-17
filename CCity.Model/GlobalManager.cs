@@ -136,7 +136,11 @@
         {
             foreach (var residentialZone in residentialZones)
             {
-                Pay(-Convert.ToInt32(Math.Round(ResTaxNorm * _taxes.ResidentalTax * residentialZone.Current)));
+                foreach (var citizen in residentialZone.Citizens)
+                {
+                    if (!citizen.Jobless)
+                        Pay(-Convert.ToInt32(Math.Round(ResTaxNorm * _taxes.ResidentalTax)));
+                }
             }
             
             foreach (var workplaceZone in workplaceZones)
