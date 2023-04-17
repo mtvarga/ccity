@@ -24,6 +24,8 @@ namespace CCity.ViewModel
         private bool _minimapMinimized;
         private Tool _selectedTool;
         private int _mapPosition;
+        private string _inputMayorName;
+        private string _inputCityName;
         private Field? _selectedField;
 
         #endregion
@@ -56,6 +58,9 @@ namespace CCity.ViewModel
         //public string SelectedFieldCitizenName { get; }
         public int Width { get => _model.Width; }
         public int Height { get => _model.Height; }
+        public string OutputCityName { get => _inputCityName == "" ? "Városvezetés a hobbim." : _inputCityName + " büszke polgármestere vagyok."; }
+        public string OutputMayorName { get => _inputMayorName == "" ? "Polgármester." : _inputMayorName; }
+        public bool CanStart { get => _inputMayorName != "" && _inputCityName != ""; }
 
         public bool MinimapMinimized
         { 
@@ -95,6 +100,35 @@ namespace CCity.ViewModel
             }
         }
 
+        public string InputCityName
+        {
+            get { return _inputCityName; }
+            set
+            {
+                if (value != _inputCityName)
+                {
+                    _inputCityName = value;
+                    OnPropertyChanged(nameof(InputCityName));
+                    OnPropertyChanged(nameof(OutputCityName));
+                    OnPropertyChanged(nameof(CanStart));
+                }
+            }
+        }
+
+        public string InputMayorName
+        {
+            get { return _inputMayorName; }
+            set
+            {
+                if (value != _inputMayorName)
+                {
+                    _inputMayorName = value;
+                    OnPropertyChanged(nameof(InputMayorName));
+                    OnPropertyChanged(nameof(OutputMayorName));
+                    OnPropertyChanged(nameof(CanStart));
+                }
+            }
+        }
         #endregion
 
         #region Commands
@@ -137,6 +171,9 @@ namespace CCity.ViewModel
             ChangeIndustrialTaxCommand = new DelegateCommand(param => OnChangeIndustrialTax(int.Parse(param as string ?? string.Empty)));
             CloseSelectedFieldWindow = new DelegateCommand(OnCloseSelectedFieldWindow);
             RefreshMapCommand = new DelegateCommand(param => OnRefreshMap());
+
+            _inputCityName = "";
+            _inputMayorName = "";
         }
 
         private void OnRefreshMap()

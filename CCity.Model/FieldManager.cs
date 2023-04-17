@@ -84,6 +84,7 @@ namespace CCity.Model
                     break;
             }
             UpdatePlaceableList(placeable, true);
+            Trace.WriteLine(ResidentialZones(false).Count);
             return effectedFields;
         }
 

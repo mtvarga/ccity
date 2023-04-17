@@ -43,29 +43,31 @@
                         📷
                     </Button>-->
                 </Grid>
-                
-                <Label
+
+                    <Label
                     HorizontalAlignment="Center"
                     FontSize="20"
                     FontWeight="Bold"
-                    Foreground="#333333">
-                        Polgármester
-                </Label>
-                <Label
+                    Foreground="#333333"
+                    Content="{Binding OutputMayorName, UpdateSourceTrigger=PropertyChanged}">
+                    </Label>
+                    <Label
                     HorizontalAlignment="Center"
                     FontSize="16"
-                    Foreground="#333333">
-                    "Városvezetés a hobbim."
-                </Label>
+                    Foreground="#333333"
+                    Content="{Binding OutputCityName, UpdateSourceTrigger=PropertyChanged}">
+                    </Label>
             </StackPanel>
             <StackPanel Orientation="Vertical" Margin="10">
                 <TextBox
                     Style="{StaticResource StartupTextboxStyle}"
+                    Text="{Binding InputMayorName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Tag="Polgármester neve"
                     Width="250"
                     />
                 <TextBox
                     Style="{StaticResource StartupTextboxStyle}"
+                    Text="{Binding InputCityName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Tag="Város neve"
                     Width="250"
                     />
@@ -74,7 +76,7 @@
                 <Button
                     Style="{StaticResource StartupButtonStyle}"
                     Width="150"
-                    IsEnabled="False">
+                    IsEnabled="{Binding CanStart}">
                     Játék indítása
                 </Button>
                 <Button

@@ -66,8 +66,8 @@ namespace CCity
 
             _mainWindow.DataContext = _viewModel;
 
-            //_mainWindow.NavigateTo(_startupWindow);
-            _mainWindow.NavigateTo(_gameWindow); //for testing purposes
+            _mainWindow.NavigateTo(_startupWindow);
+            //_mainWindow.NavigateTo(_gameWindow); //for testing purposes
             _mainWindow.Show();
         }
 
