@@ -45,9 +45,9 @@ namespace CCity
         {
             _model = new();
             _model.GameOver += Model_GameOver;
+            _model.NewGame += Model_NewGame;
 
             _viewModel = new(_model);
-            _viewModel.NewGame += ViewModel_NewGame;
             _viewModel.PauseGame += ViewModel_PauseGame;
             _viewModel.ExitGame += ViewModel_ExitGame;
             _viewModel.CloseApplication += ViewModel_CloseApplication;
@@ -67,7 +67,6 @@ namespace CCity
             _mainWindow.DataContext = _viewModel;
 
             _mainWindow.NavigateTo(_startupWindow);
-            //_mainWindow.NavigateTo(_gameWindow); //for testing purposes
             _mainWindow.Show();
         }
 
@@ -102,7 +101,7 @@ namespace CCity
 
         #region ViewModel event handlers
 
-        private void ViewModel_NewGame(object? sender, EventArgs e)
+        private void Model_NewGame(object? sender, EventArgs e)
         {
             _mainWindow.NavigateTo(_gameWindow);
             _timer.Start();

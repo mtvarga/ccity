@@ -96,16 +96,17 @@ namespace CCity.Model
 
         public void TimerTick()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
-        public void NewGame(string cityName, string mayorName)
+        public async void StartNewGame(string cityName, string mayorName)
         {
             _fieldManager = new FieldManager();
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
             CityName = cityName;
             MayorName = mayorName;
+            NewGame?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion
@@ -127,6 +128,7 @@ namespace CCity.Model
         public event EventHandler<EventArgs>? BudgetChanged;
         public event EventHandler<EventArgs>? SatisfactionChanged;
         public event EventHandler<EventArgs>? TaxChanged;
+        public event EventHandler<EventArgs>? NewGame;
         public event EventHandler<EventArgs>? GameOver;
 
         #endregion

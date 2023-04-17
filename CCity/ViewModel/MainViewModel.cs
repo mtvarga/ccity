@@ -147,6 +147,7 @@ namespace CCity.ViewModel
         public DelegateCommand UpgradeCommand { get; private set; }
         public DelegateCommand ChangeMinimapSizeCommand { get; private set; }
         public DelegateCommand CloseSelectedFieldWindow { get; private set; }
+        public DelegateCommand StartNewGameCommand { get; private set; }
 
         #endregion
 
@@ -156,6 +157,7 @@ namespace CCity.ViewModel
         {
             _model = model;
             _model.FieldsUpdated += Model_FieldUpdated;
+            //_model.NewGame += Model_NewGame;
             _model.TaxChanged += Model_TaxChanged;
             _model.SatisfactionChanged += Model_SatisfactionChanged;
             _model.BudgetChanged += Model_BudgetChanged;
@@ -171,14 +173,15 @@ namespace CCity.ViewModel
             ChangeIndustrialTaxCommand = new DelegateCommand(param => OnChangeIndustrialTax(int.Parse(param as string ?? string.Empty)));
             CloseSelectedFieldWindow = new DelegateCommand(OnCloseSelectedFieldWindow);
             RefreshMapCommand = new DelegateCommand(param => OnRefreshMap());
+            StartNewGameCommand = new DelegateCommand(param => OnStartNewGame());
 
             _inputCityName = "";
             _inputMayorName = "";
         }
 
-        private void OnRefreshMap()
+        private void Model_NewGame(object? sender, EventArgs e)
         {
-            foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem);
+            NewGame?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion
@@ -361,6 +364,7 @@ namespace CCity.ViewModel
             return "...";
         }
 
+
         private FieldItem GetFieldItemFromField(Field field)
         {
             return Fields[field.X + field.Y * Width];
@@ -417,6 +421,17 @@ namespace CCity.ViewModel
         #endregion
 
         #region Model event methods
+
+        private void OnStartNewGame()
+        {
+            _model.StartNewGame(_inputCityName, _inputMayorName);
+            foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem);
+        }
+
+        private void OnRefreshMap()
+        {
+            foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem);
+        }
 
         private void OnNewGame()
         {

@@ -76,7 +76,8 @@
                 <Button
                     Style="{StaticResource StartupButtonStyle}"
                     Width="150"
-                    IsEnabled="{Binding CanStart}">
+                    IsEnabled="{Binding CanStart}"
+                    Command="{Binding StartNewGameCommand}">
                     Játék indítása
                 </Button>
                 <Button

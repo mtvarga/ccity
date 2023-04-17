@@ -106,8 +106,8 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}">
-                                    <Grid Background="{Binding OverlayColor}">
+                                <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}">
+                                    <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}">
                                         <TextBlock>
                                             <Run Text="{Binding Number}"/>
                                             <Run Text="{Binding Text}"/>
