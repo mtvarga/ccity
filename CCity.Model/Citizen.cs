@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public class Citizen
     {
@@ -21,22 +14,24 @@ namespace CCity.Model
         
         public ResidentialZone Home { get; }
         
-        public WorkplaceZone Workplace { get; private set; }
+        public WorkplaceZone? Workplace { get; private set; }
         
         public double HomeWorkplaceDistanceEffect { get; private set; }
         
         public double LastCalculatedSatisfaction { get; internal set; }
+
+        public bool Jobless => Workplace == null;
         
         #endregion
 
         #region Constructors
 
-        public Citizen(ResidentialZone home, WorkplaceZone workplace)
+        public Citizen(ResidentialZone home, WorkplaceZone? workplace)
         {
             Home = home;
             Home.AddCitizen(this);
             Workplace = workplace;
-            Workplace.AddCitizen(this);
+            Workplace?.AddCitizen(this);
             
             CalculateHomeWorkplaceDistanceEffect();
         }
@@ -47,7 +42,7 @@ namespace CCity.Model
         
         public void SwapWorkplace(WorkplaceZone workplace)
         {
-            Workplace.DropCitizen(this);
+            Workplace?.DropCitizen(this);
             Workplace = workplace;
             Workplace.AddCitizen(this);
 
@@ -57,22 +52,20 @@ namespace CCity.Model
         public void MoveOut()
         {
             Home.DropCitizen(this);
-            Workplace.DropCitizen(this);
+            Workplace?.DropCitizen(this);
         }
         
         #endregion
 
         #region Private methods
 
-        private void CalculateHomeWorkplaceDistanceEffect()
+        private void CalculateHomeWorkplaceDistanceEffect() => HomeWorkplaceDistanceEffect = Workplace switch
         {
-            var proximityEffectValues = 
-                Utilities.GetPointsInRadiusWeighted(Home.Owner!, CloseProximityRadius)
-                    .Where(tuple => tuple.X == Workplace.Owner!.X && tuple.Y == Workplace.Owner!.Y)
-                    .Select(tuple => tuple.Weight).ToList();
-
-            HomeWorkplaceDistanceEffect = proximityEffectValues.Any() ? proximityEffectValues.First() : 0;
-        }
+            null => 0,
+            _ => Utilities.GetPointsInRadiusWeighted(Home.Owner!, CloseProximityRadius)
+                .Where(tuple => tuple.X == Workplace.Owner!.X && tuple.Y == Workplace.Owner!.Y)
+                .Select(tuple => tuple.Weight).FirstOrDefault()
+        };
 
         #endregion
 

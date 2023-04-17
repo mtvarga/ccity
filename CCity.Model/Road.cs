@@ -9,16 +9,11 @@ namespace CCity.Model
     public class Road : Placeable
     {
 
-        #region Fields
-
-        public Road? GetsPublicityFrom { get; set; }
-        public List<Road> GivesPublicityTo { get; set; }
-
-        #endregion
-
         #region Properties
 
+        public Road? GetsPublicityFrom { get; set; }
 
+        public List<Road> GivesPublicityTo { get; set; }
 
         public override int PlacementCost => 100;
 
