@@ -1,6 +1,4 @@
-﻿using System.Reflection.PortableExecutable;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public class MainModel
     {
@@ -9,6 +7,9 @@ namespace CCity.Model
         private FieldManager _fieldManager;
         private CitizenManager _citizenManager;
         private GlobalManager _globalManager;
+
+        private int _counter;
+        private int _monthCounter;
 
         #endregion
 
@@ -20,7 +21,7 @@ namespace CCity.Model
         public int Budget { get => _globalManager.Budget; }
         public Taxes Taxes { get => _globalManager.Taxes; }
         public int Date { get; }
-        public Speed Speed { get; }
+        public Speed Speed { get; private set; }
         public double Satisfaction { get => _globalManager.TotalSatisfaction; }
         public int Population { get => _citizenManager.Population; }
         public int Width { get => _fieldManager.Width; }
@@ -36,6 +37,9 @@ namespace CCity.Model
             _fieldManager = new FieldManager();
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
+
+            _counter = 0;
+            _monthCounter = 0;
         }
 
         #endregion
@@ -89,14 +93,38 @@ namespace CCity.Model
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public void ChangeSpeed(int n)
+        public void ChangeSpeed(Speed speed)
         {
-            throw new NotImplementedException();
+            Speed = speed;
+            SpeedChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void TimerTick()
         {
-            //throw new NotImplementedException();
+            _counter = Speed switch
+            {
+                Speed.Slow => _counter + 1,
+                Speed.Normal => _counter + 16,
+                Speed.Fast => _counter + 256,
+                _ => _counter
+            };
+
+            Tick();
+
+            if (_counter / (double)4096 >= 1)
+            {
+                _monthCounter++;
+                _counter -= 4096;
+                
+                MonthlyTick();
+            }
+            
+            if (_monthCounter == 12)
+            {
+                _monthCounter = 0;
+                
+                YearlyTick();
+            }
         }
 
         public async void StartNewGame(string cityName, string mayorName)
@@ -117,6 +145,47 @@ namespace CCity.Model
         {
             throw new NotImplementedException();
         }
+        
+        private void Tick() 
+        {
+            GameTicked?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void MonthlyTick()
+        {
+            var vacantHomes = _fieldManager.ResidentialZones(false);
+            var vacantWorkplaces = _fieldManager.CommercialZones(false).Cast<WorkplaceZone>().Concat(_fieldManager.IndustrialZones(false)).ToList();
+
+            if (vacantHomes.Any() && vacantWorkplaces.Any())
+            {
+                var newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantWorkplaces);
+                
+                _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
+                
+                PopulationChanged?.Invoke(this, EventArgs.Empty);
+                SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void YearlyTick()
+        {
+            var workplaceZones = _fieldManager.CommercialZones(true).Cast<WorkplaceZone>()
+                .Concat(_fieldManager.IndustrialZones(true)).ToList();
+            
+            _globalManager.CollectTax(_fieldManager.ResidentialZones(true), workplaceZones);
+            
+            for (int i = 0; i < _fieldManager.Width; i++)
+            for (int j = 0; j < _fieldManager.Height; j++)
+            {
+                if (_fieldManager.Fields[i, j].Placeable is { } placeable)
+                {
+                    _globalManager.Pay(placeable.MaintenanceCost);
+                }
+            }
+            
+            BudgetChanged?.Invoke(this, EventArgs.Empty);
+            SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         #endregion
 
@@ -128,6 +197,7 @@ namespace CCity.Model
         public event EventHandler<EventArgs>? BudgetChanged;
         public event EventHandler<EventArgs>? SatisfactionChanged;
         public event EventHandler<EventArgs>? TaxChanged;
+        public event EventHandler<EventArgs>? SpeedChanged;
         public event EventHandler<EventArgs>? NewGame;
         public event EventHandler<EventArgs>? GameOver;
 

@@ -72,19 +72,22 @@
                         <!--<local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="12 0 0 12">-</local:CustomButton>
                         <local:CustomButton Style="{StaticResource SpeedButtonStyle}">||</local:CustomButton>
                         <local:CustomButton Style="{StaticResource SpeedButtonStyle}" CornerRadius="0 12 12 0">+</local:CustomButton>-->
-                        <Button Width="24" Height="24">-</Button>
-                        <Button Width="24" Height="24" Content="||" FontWeight="Bold" >
+                        <Button Width="24" Height="24" Command="{Binding ChangeSpeedCommand}" CommandParameter="-1">-</Button>
+                        <Button Width="24" Height="24" FontWeight="Bold" Command="{Binding PauseGameCommand}">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsPaused}" Value="True">
-                                            <Setter Property="Content" Value="▶"/>
+                                        <DataTrigger Binding="{Binding Paused}" Value="True">
+                                            <Setter Property="Content" Value="▶️"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Paused}" Value="False">
+                                            <Setter Property="Content" Value="⏸️"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
                         </Button>
-                        <Button Width="24" Height="24">+</Button>
+                        <Button Width="24" Height="24" Command="{Binding ChangeSpeedCommand}" CommandParameter="1">+</Button>
                     </StackPanel>
                 </StackPanel>
             </Grid>

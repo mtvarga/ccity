@@ -115,13 +115,9 @@ namespace CCity
         private void ViewModel_PauseGame(object? sender, EventArgs e)
         {
             if (_viewModel.Paused)
-            {
-                _timer.Start();
-            }
-            else
-            {
                 _timer.Stop();
-            }
+            else
+                _timer.Start();
         }
 
         private void ViewModel_CloseApplication(object? sender, EventArgs e)
