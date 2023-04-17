@@ -77,7 +77,8 @@ namespace CCity.Model
 
             switch (placeable)
             {
-                case Road _: List<Field> effectedByRoad = HandleRoadPlacement(field); effectedFields = effectedFields.Concat(effectedByRoad).ToList(); break;
+                case Road _: 
+                    List<Field> effectedByRoad = HandleRoadPlacement(field); effectedFields = effectedFields.Concat(effectedByRoad).ToList(); break;
                 default:
                     List<Field>? effectedFieldsBySpreading = RefreshPublicity(placeable);
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
@@ -377,6 +378,25 @@ namespace CCity.Model
             }
             return effectedFields;*/
             //#endif
+        }
+
+        public (int[], List<Road>) GetFourRoadNeighbours(Road road)
+        {
+            int[] indicators = new int[4];
+            List<Road> neighbours = new();
+            (int fieldX, int fieldY) = (road.Owner!.X, road.Owner!.Y);
+            List<(int, int)> coordinates = new() { (fieldX, fieldY - 1), (fieldX + 1, fieldY), (fieldX, fieldY + 1), (fieldX - 1, fieldY)};
+            for(int i = 0; i < 4; i++)
+            {
+                (int x, int y) = coordinates[i];
+                if (OnMap(x, y) && Fields[x, y].Placeable is Road actualRoad)
+                {
+                    indicators[i] = 1;
+                    neighbours.Add(actualRoad);
+                }
+                else indicators[i] = 0;
+            }
+            return (indicators, neighbours);
         }
 
         private void ModifyRoad(Road actualRoad, HashSet<Placeable> privatedPlaceables, List<Field> effectedFields)

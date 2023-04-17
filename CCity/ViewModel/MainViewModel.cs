@@ -239,7 +239,7 @@ namespace CCity.ViewModel
                 case ResidentialZone _: return Color.FromArgb(100, 0, 255, 0);
                 case CommercialZone _: return Color.FromArgb(100, 0, 0, 255);
                 case IndustrialZone _: return Color.FromArgb(100, 255, 255, 0);
-                default: if (field.Placeable.IsPublic) return Color.FromArgb(100,22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
+                default: if (field.Placeable.IsPublic) return Color.FromArgb(50, 22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
             }
         }
 
@@ -251,7 +251,6 @@ namespace CCity.ViewModel
         private Texture GetTextureFromFieldItem(FieldItem fieldItem)
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
-            //SetNeighboursRoadTexture(field);
             if (!field.HasPlaceable) return Texture.None;
             switch (field.Placeable)
             {
@@ -259,7 +258,9 @@ namespace CCity.ViewModel
                 case PoliceDepartment _: return Texture.PoliceDepartment;
                 case Stadium _: return Texture.StadiumBottomLeft;
                 case PowerPlant _: return Texture.PowerPlantBottomLeft;
-                case Road _: return GetRoadTextureFromField(field);
+                case Road _:
+                    SetNeighboursRoadTexture((Road)(field.Placeable));
+                    return GetRoadTextureFromField(field);
                 case Filler _: return GetFillerTexture(field);
                 default: return Texture.None;
             }
@@ -271,17 +272,13 @@ namespace CCity.ViewModel
             return Texture.Unhandled;
         }
 
-        private void SetNeighboursRoadTexture(Field field)
+        private void SetNeighboursRoadTexture(Road road)
         {
-            int index = CalculateIndexFromField(field);
-            List<int> indexes = new() { index - 1, index + 1, index - _model.Width, index + _model.Width };
-            foreach(int currentIndex in indexes)
+            (int[] indicators, List<Road> neighbours) = _model.GetFourRoadNeighbours(road);
+            foreach(Road neighbour in neighbours)
             {
-                if(IsInFields(currentIndex))
-                {
-                    FieldItem currentFieldItem = Fields[currentIndex];
-                    currentFieldItem.Texture = GetRoadTextureFromField(_model.Fields[currentFieldItem.X, currentFieldItem.Y]);
-                }
+                FieldItem fieldItem = GetFieldItemFromField(neighbour.Owner!);
+                fieldItem.Texture = GetRoadTextureFromField(neighbour.Owner!);
             }
         }
 
@@ -292,14 +289,15 @@ namespace CCity.ViewModel
         private Texture GetRoadTextureFromField(Field field)
         {
             if (field.Placeable is not Road) return Texture.Unhandled;
-            //(int t, int r, int b, int l) = GetRoadNeighbours(field);
-            (int t, int r, int b, int l) neighbours = (0, 0, 0, 0);
+            (int[] id, List<Road> roads) = _model.GetFourRoadNeighbours((Road)field.Placeable);
+            (int, int, int, int) neighbours = (id[0], id[1], id[2], id[3]);
             switch (neighbours)
             {
                 //
                 case (1, 0, 1, 0): return Texture.RoadVertical;
                 case (0, 1, 0, 1): return Texture.RoadHorizontal;
                 case (1, 1, 1, 1): return Texture.RoadCross;
+                case (0, 0, 0, 0): return Texture.RoadCross;
                 //turns
                 case (1, 0, 0, 1): return Texture.RoadTopLeft;
                 case (1, 1, 0, 0): return Texture.RoadTopRight;
@@ -318,7 +316,6 @@ namespace CCity.ViewModel
 
                 default: return Texture.Unhandled;
             }
-            throw new NotImplementedException();
         }
 
         private void UnselectField() => _selectedField = null;

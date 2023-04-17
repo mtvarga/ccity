@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,9 @@ namespace CCity.ViewModel
                 switch (texture)
                 {
                     case Texture.None: return "Images/Textures/transparent.png";
-                    default: return GetPath(texture);
+                    default:
+                        Trace.WriteLine(GetPath(texture));
+                        return GetPath(texture);
                 }
             }
 
@@ -29,7 +32,7 @@ namespace CCity.ViewModel
         {
             string textureString = texture.ToString();
             string fileString = textureString.Substring(0, 1).ToLower() + textureString.Substring(1);
-            if (fileString.StartsWith("Road")) return "Images/Textures/Roads/" + fileString + ".png";
+            if (fileString.StartsWith("road")) return "Images/Textures/Roads/" + fileString + ".png";
             else return "Images/Textures/" + fileString + ".png";
         }
 

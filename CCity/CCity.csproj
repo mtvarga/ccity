@@ -14,6 +14,7 @@
     <None Remove="View\Images\icon.ico" />
     <None Remove="View\Images\profile.png" />
     <None Remove="View\Images\Textures\fireDepartment.png" />
+    <None Remove="View\Images\Textures\grass.png" />
     <None Remove="View\Images\Textures\policeDepartment.png" />
     <None Remove="View\Images\Textures\Roads\roadBottomClose.png" />
     <None Remove="View\Images\Textures\Roads\roadBottomLeft.png" />
@@ -35,6 +36,7 @@
     <None Remove="View\Images\Textures\stadiumTopLeft.png" />
     <None Remove="View\Images\Textures\stadiumTopRight.png" />
     <None Remove="View\Images\Textures\transparent.png" />
+    <None Remove="View\Images\Textures\unhandled.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,6 +56,7 @@
     <Resource Include="View\Images\banner.png" />
     <Resource Include="View\Images\icon.ico" />
     <Resource Include="View\Images\Textures\fireDepartment.png" />
+    <Resource Include="View\Images\Textures\grass.png" />
     <Resource Include="View\Images\Textures\policeDepartment.png" />
     <Resource Include="View\Images\Textures\Roads\roadBottomClose.png" />
     <Resource Include="View\Images\Textures\Roads\roadBottomLeft.png" />
@@ -75,6 +78,7 @@
     <Resource Include="View\Images\Textures\stadiumTopLeft.png" />
     <Resource Include="View\Images\Textures\stadiumTopRight.png" />
     <Resource Include="View\Images\Textures\transparent.png" />
+    <Resource Include="View\Images\Textures\unhandled.png" />
   </ItemGroup>
 
   <ItemGroup>
