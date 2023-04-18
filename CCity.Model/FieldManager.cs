@@ -91,25 +91,23 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
-        public (Placeable, List<Field>?) Demolish(int x, int y)
+        public (Placeable, List<Field>) Demolish(int x, int y)
         {
-            if (!OnMap(x, y)) return (null!, null);
+            if (!OnMap(x, y)) throw new Exception("DEMOLISH-OUTOFFIELDBOUNDS");
 
             Field field = Fields[x, y];
-            if (!field.HasPlaceable) return (null!, null);
+            if (!field.HasPlaceable) throw new Exception("DEMOLISH-NOTEMPTYFIELD");
             Placeable placeable = field.Placeable!;
-            List<Field>? effectedFields = new();
+            List<Field> effectedFields = new();
 
             switch (placeable)
             {
                 case Road _:
-                    List<Field>? effectedFieldsByRoadDemolition = DemolishRoad(field);
-                    if (effectedFieldsByRoadDemolition == null) return (null!, null);
-                    else effectedFields = effectedFields.Concat(effectedFieldsByRoadDemolition).ToList();
+                    List<Field> effectedFieldsByRoadDemolition = DemolishRoad(field);
+                    effectedFields = effectedFields.Concat(effectedFieldsByRoadDemolition).ToList();
                     break;
                 default:
                     effectedFields = DemolishFromField(field);
-                    if (effectedFields == null) return (null!, null);
                     List<Field>? effectedFieldsBySpreading = SpreadPlaceableEffectConditional(placeable, false);
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
                     break;
@@ -142,7 +140,7 @@ namespace CCity.Model
         {
             if (field.HasPlaceable)
             {
-                throw new Exception("PLACE-ALREADYUSEDFIELD");
+                return false;
             }
             if (placeable is IMultifield multifield)
             {
@@ -156,7 +154,7 @@ namespace CCity.Model
         {
             if (!CanPlace(field, placeable))
             {
-                throw new Exception("PLACE-OUTOFFIELDBOUNDRIES");
+                throw new Exception("PLACE-ALREADYUSEDFIELD");
             }
             List<Field> effectedFields = new();
             if (placeable is IMultifield multifield)
@@ -226,8 +224,8 @@ namespace CCity.Model
 
         private bool CanDemolish(Field field)
         {
-            if (field == Fields[ROOTX, ROOTY]) return false;
-            if (!field.HasPlaceable) return false;
+            if (field == Fields[ROOTX, ROOTY]) throw new Exception("DEMOLISH-MAINROAD");
+            if (!field.HasPlaceable) throw new Exception("DEMOLISH-NOTEMPTYFIELD");
             Placeable placeable = field.Placeable!;
             switch (placeable)
             {
@@ -237,9 +235,9 @@ namespace CCity.Model
             return true;
         }
 
-        private List<Field>? DemolishFromField(Field field)
+        private List<Field> DemolishFromField(Field field)
         {
-            if (!CanDemolish(field)) return null;
+            if (!CanDemolish(field)) throw new Exception("DEMOLISH - FIELDHASCIZIZEN");
             List<Field> effectedFields = new();
             Placeable placeable = GetRoot(field.Placeable!);
             field = placeable.Owner!;
@@ -328,14 +326,13 @@ namespace CCity.Model
             }
         }
 
-        private List<Field>? DemolishRoad(Field field)
+        private List<Field> DemolishRoad(Field field)
         {
             //#if TEMP_ROAD_DEMOLISH
-            if (!CanDemolish(field)) return null;
-            if (field.Placeable is not Road) return null;
+            if (!CanDemolish(field)) throw new Exception("DEMOLISH-FIELDHASCIZIZEN");
+            if (field.Placeable is not Road) return new();
             Road road = (Road)field.Placeable;
-            List<Field>? effectedFields = new();
-            if (effectedFields == null) return null;
+            List<Field> effectedFields = new();
             effectedFields = DemolishFromField(field);
             List<Placeable> privatedPlaceables = new();
             if (road.IsPublic)
@@ -354,7 +351,7 @@ namespace CCity.Model
                 if (privatedPlaceables.Count > 0 && !privatedPlaceables.All(e => WouldStayPublic(e)))
                 {
                     Place(field.X, field.Y, road);
-                    return null;
+                    throw new Exception("DEMOLISH-FIELDPUBLICITY");
                 }
 
             }

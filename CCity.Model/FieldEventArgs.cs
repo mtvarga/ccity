@@ -8,9 +8,9 @@ namespace CCity.Model
 {
     public class FieldEventArgs
     {
-        public List<Field>? Fields { get; }
+        public List<Field> Fields { get; }
 
-        public FieldEventArgs(List<Field>? fields)
+        public FieldEventArgs(List<Field> fields)
         {
             Fields = fields;
         }
