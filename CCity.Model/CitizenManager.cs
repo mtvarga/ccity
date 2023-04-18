@@ -41,6 +41,8 @@
         public List<Citizen> IncreasePopulation(List<ResidentialZone> vacantHomes, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         {
             var result = new List<Citizen>();
+            WorkplaceZone? workplace = null;
+            //var isAvaiableWorkplace = true;
             
             // For now, the method will take all the vacant homes and put some citizens in them
             // It might not fill up a home entirely -- there might still be empty slots left in a home or a workplace after this algorithm is done
@@ -55,17 +57,19 @@
 
                 for (var i = 0; i < newCitizenCount; i++)
                 {
-                    var workplace = FindNearestWorkplace(home, _nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
+                    workplace = FindNextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
                     var citizen = new Citizen(home, workplace);
-                    
+                    if (workplace == null)
+                    {
+                        JoblessCitizens.Add(citizen);
+                        //isAvaiableWorkplace = false;
+                        break;
+                    }
                     Citizens.Add(citizen);
                     result.Add(citizen);
-
-                    if (workplace != null && workplace.Capacity - workplace.Current == 0)
-                       (_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(workplace);
-                    
-                    _nextToCommercial = !_nextToCommercial;
                 }
+                if (workplace==null)
+                    break;
             }
 
             return result;
