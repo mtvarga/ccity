@@ -20,6 +20,8 @@
         
         public int Population => Citizens.Count;
 
+        private List<Citizen> JoblessCitizens { get; }
+        
         #endregion
 
         #region Constructors
@@ -27,6 +29,8 @@
         public CitizenManager()
         {
             Citizens = new List<Citizen>();
+            JoblessCitizens = new List<Citizen>();
+            
             _nextToCommercial = true;
         }
 
