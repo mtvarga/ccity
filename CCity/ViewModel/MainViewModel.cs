@@ -291,9 +291,9 @@ namespace CCity.ViewModel
             if (!field.HasPlaceable) return Color.FromArgb(0, 0, 0, 0);
             switch (field.Placeable)
             {
-                case ResidentialZone _: return Color.FromArgb(100, 0, 255, 0);
-                case CommercialZone _: return Color.FromArgb(100, 0, 0, 255);
-                case IndustrialZone _: return Color.FromArgb(100, 255, 255, 0);
+                case ResidentialZone _: return Color.FromArgb(50, 0, 255, 0);
+                case CommercialZone _: return Color.FromArgb(50, 0, 0, 255);
+                case IndustrialZone _: return Color.FromArgb(50, 255, 255, 0);
                 default: if (field.Placeable.IsPublic && IsPublicityToggled) return Color.FromArgb(50, 22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
                 //default: return Color.FromArgb(0, 0, 0, 0);
             }
@@ -318,8 +318,23 @@ namespace CCity.ViewModel
                     SetNeighboursRoadTexture((Road)(field.Placeable));
                     return GetRoadTextureFromField(field);
                 case Filler _: return GetFillerTexture(field);
+                case Zone zone: return GetZoneTexture(zone);
                 default: return Texture.None;
             }
+        }
+
+        private Texture GetZoneTexture(Zone zone)
+        {
+            if (!zone.HasCitizen) return Texture.None;
+            Texture texture = Texture.None;
+            switch (zone)
+            {
+                case ResidentialZone _: texture = Texture.ResidentialZoneLevel1Half; break;
+                case CommercialZone _: texture = Texture.CommercialZoneLevel1Half; break;
+                case IndustrialZone _: texture = Texture.IndustrialZoneLevel1Half; break;
+            }
+            if (!zone.BelowHalfPopulation) ++texture;
+            return texture;
         }
 
         private Texture GetFillerTexture(Field field)

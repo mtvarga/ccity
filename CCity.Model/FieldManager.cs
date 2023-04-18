@@ -83,7 +83,6 @@ namespace CCity.Model
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
                     break;
             }
-            UpdatePlaceableList(placeable, true);
             return effectedFields;
         }
 
@@ -296,6 +295,7 @@ namespace CCity.Model
                 if (neighbour.IsPublic)
                 {
                     placeable.IsPublic = true;
+                    UpdatePlaceableList(placeable, true);
                     effectedFields = effectedFields.Concat(SpreadPlaceableEffectConditional(placeable, true)).ToList();
                     effectedFields.Add(placeable.Owner!);
                     return effectedFields;

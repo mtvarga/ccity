@@ -46,6 +46,12 @@
     <None Remove="View\Images\Textures\Tools\stadium.png" />
     <None Remove="View\Images\Textures\transparent.png" />
     <None Remove="View\Images\Textures\unhandled.png" />
+    <None Remove="View\Images\Textures\Zones\commercialZoneLevel1Full.png" />
+    <None Remove="View\Images\Textures\Zones\commercialZoneLevel1Half.png" />
+    <None Remove="View\Images\Textures\Zones\industrialZoneLevel1Full.png" />
+    <None Remove="View\Images\Textures\Zones\industrialZoneLevel1Half.png" />
+    <None Remove="View\Images\Textures\Zones\residentialZoneLevel1Full.png" />
+    <None Remove="View\Images\Textures\Zones\residentialZoneLevel1Half.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,6 +103,12 @@
     <Resource Include="View\Images\Textures\Tools\stadium.png" />
     <Resource Include="View\Images\Textures\transparent.png" />
     <Resource Include="View\Images\Textures\unhandled.png" />
+    <Resource Include="View\Images\Textures\Zones\commercialZoneLevel1Full.png" />
+    <Resource Include="View\Images\Textures\Zones\commercialZoneLevel1Half.png" />
+    <Resource Include="View\Images\Textures\Zones\industrialZoneLevel1Full.png" />
+    <Resource Include="View\Images\Textures\Zones\industrialZoneLevel1Half.png" />
+    <Resource Include="View\Images\Textures\Zones\residentialZoneLevel1Full.png" />
+    <Resource Include="View\Images\Textures\Zones\residentialZoneLevel1Half.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -33,6 +33,7 @@ namespace CCity.ViewModel
             string textureString = texture.ToString();
             string fileString = textureString.Substring(0, 1).ToLower() + textureString.Substring(1);
             if (fileString.StartsWith("road")) return "Images/Textures/Roads/" + fileString + ".png";
+            else if (fileString.Contains("Zone")) return "Images/Textures/Zones/" + fileString + ".png";
             else return "Images/Textures/" + fileString + ".png";
         }
 

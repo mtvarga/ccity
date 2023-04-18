@@ -176,6 +176,12 @@ namespace CCity.Model
                 PopulationChanged?.Invoke(this, EventArgs.Empty);
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
             }
+
+            List<Field> fields = new();
+            foreach (Zone zone in _fieldManager.ResidentialZones(false)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.CommercialZones(false)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.IndustrialZones(false)) fields.Add(zone.Owner!);
+            //FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
         }
 
         private void YearlyTick()

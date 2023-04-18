@@ -39,6 +39,12 @@ namespace CCity.ViewModel
         PowerPlantTopRight,
         PowerPlantBottomLeft,
         PowerPlantBottomRight,
+        ResidentialZoneLevel1Half,
+        ResidentialZoneLevel1Full,
+        CommercialZoneLevel1Half,
+        CommercialZoneLevel1Full,
+        IndustrialZoneLevel1Half,
+        IndustrialZoneLevel1Full,
         Unhandled
     }
 }

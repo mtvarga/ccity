@@ -34,6 +34,8 @@ namespace CCity.Model
 
         public bool HasCitizen => Current > 0;
 
+        public bool BelowHalfPopulation => Current * 2 < Capacity;
+
         #endregion
 
         #region Constructors
