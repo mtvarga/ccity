@@ -2,14 +2,16 @@
 {
     public class CitizenManager
     {
-        #region Fields
-        private bool _nextToCommercial;
-        
-        #endregion
         #region Constants
 
         private const double CitizenMoveOutThreshold = 0.25;
+
+        #endregion
         
+        #region Fields
+        
+        private bool _nextToCommercial;
+
         #endregion
 
         #region Properties
@@ -55,8 +57,9 @@
                     Citizens.Add(citizen);
                     result.Add(citizen);
 
-                    if (workplace.Capacity - workplace.Current == 0)
+                    if (workplace != null && workplace.Capacity - workplace.Current == 0)
                        (_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(workplace);
+                    
                     _nextToCommercial = !_nextToCommercial;
                 }
             }
@@ -92,9 +95,9 @@
 
         #region Private methods
 
-        private static WorkplaceZone FindNearestWorkplace(Placeable p, List<WorkplaceZone> vacantWorkplaces)
+        private static WorkplaceZone? FindNearestWorkplace(Placeable p, List<WorkplaceZone> vacantWorkplaces)
         {
-            var nearestWorkplace = vacantWorkplaces.First();
+            var nearestWorkplace = vacantWorkplaces.FirstOrDefault();
             var smallestDistance = Utilities.AbsoluteDistance(p, nearestWorkplace);
             
             foreach (var workplace in vacantWorkplaces)
