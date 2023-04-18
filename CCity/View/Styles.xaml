@@ -178,13 +178,13 @@
 
     <Style x:Key="ToolButtonStyle" TargetType="Button">
         <Setter Property="BorderThickness" Value="2"/>
-        <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
         <Setter Property="Background" Value="#FFF"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border BorderThickness="{TemplateBinding BorderThickness}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderBrush="{TemplateBinding Background}"
+                            Background="#FFF"
                             CornerRadius="3">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>

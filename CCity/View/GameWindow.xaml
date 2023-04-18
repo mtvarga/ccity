@@ -39,12 +39,34 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding ClickCommand}" Cursor="Hand" Background="#FFF" Width="36" Height="36" Margin="2" CommandParameter="{Binding Tool}" Style="{StaticResource ToolButtonStyle}">
+                            <Button Command="{Binding ClickCommand}" Cursor="Hand" Width="36" Height="36" Margin="2" CommandParameter="{Binding Number}">
                                 <Grid>
                                     <Grid Panel.ZIndex="1">
                                         <Image Stretch="Fill" Source="{Binding Tool, Converter={StaticResource ToolEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
                                     </Grid>
                                 </Grid>
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="BorderThickness" Value="2"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                                            BorderBrush="{TemplateBinding Background}"
+                                                            Background="#FFF"
+                                                            CornerRadius="3">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
                             </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

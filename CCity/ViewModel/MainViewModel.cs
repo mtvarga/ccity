@@ -24,7 +24,7 @@ namespace CCity.ViewModel
 
         private MainModel _model;
         private bool _minimapMinimized;
-        private Tool _selectedTool;
+        private ToolItem _selectedToolItem;
         private int _mapPosition;
         private string _inputMayorName;
         private string _inputCityName;
@@ -68,6 +68,8 @@ namespace CCity.ViewModel
         public string OutputMayorName { get => _inputMayorName == "" ? "Polgármester" : _inputMayorName; }
         public bool CanStart { get => _inputMayorName != "" && _inputCityName != ""; }
 
+        public Tool SelectedTool => _selectedToolItem.Tool;
+
         public bool MinimapMinimized
         { 
             get { return _minimapMinimized; }
@@ -76,19 +78,6 @@ namespace CCity.ViewModel
                 if(value != _minimapMinimized) { 
                     _minimapMinimized = value;
                     OnPropertyChanged(nameof(MinimapMinimized));
-                }
-            }
-        }
-
-        public Tool SelectedTool
-        {
-            get { return _selectedTool; }
-            set
-            {
-                if (value != _selectedTool)
-                {
-                    _selectedTool = value;
-                    OnPropertyChanged(nameof(SelectedTool));
                 }
             }
         }
@@ -268,14 +257,18 @@ namespace CCity.ViewModel
                 Tool.Bulldozer
             };
             Tools = new();
+            int number = 0;
             foreach (Tool tool in orderedTools)
             {
                 Tools.Add(new ToolItem
                 {
                     Tool = tool,
-                    ClickCommand = new DelegateCommand(param => ToolClicked((Tool)param!))
+                    Number = number++,
+                    ClickCommand = new DelegateCommand(param => ToolClicked((int)param!))
                 });
             }
+            _selectedToolItem = Tools[0];
+            _selectedToolItem.IsSelected = true;
         }
 
         private void RefreshFieldItem(FieldItem fieldItem, bool onlyOverlayColor = false)
@@ -427,9 +420,11 @@ namespace CCity.ViewModel
             }
         }
 
-        private void ToolClicked(Tool tool)
+        private void ToolClicked(int index)
         {
-            SelectedTool = tool;
+            _selectedToolItem.IsSelected = false;
+            _selectedToolItem = Tools[index];
+            _selectedToolItem.IsSelected = true;
             if (SelectedTool != Tool.Cursor) UnselectField();
             OnPropertyChanged(nameof(SelectedTool));
         }
