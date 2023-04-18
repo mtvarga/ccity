@@ -181,9 +181,9 @@ namespace CCity.Model
             }
 
             List<Field> fields = new();
-            foreach (Zone zone in _fieldManager.ResidentialZones(false)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.CommercialZones(false)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.IndustrialZones(false)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
         }
 
