@@ -51,12 +51,13 @@ namespace CCity.ViewModel
         //public string SelectedFieldIsOnFire { get; }
         //public string SelectedFieldIsUpgradeable { get; }
         //public int SelectedFieldUpgradeCost { get; }
-        public int SelectedFieldPoliceDeparmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.PoliceDepartmentEffect) : 0; }
-        public int SelectedFieldFiredepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.FireDepartmentEffect) : 0; }
+        public int SelectedFieldPoliceDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.PoliceDepartmentEffect) : 0; }
+        public int SelectedFieldFireDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.FireDepartmentEffect) : 0; }
         public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField.StadiumEffect) : 0; }
         public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField.IndustrialEffect) : 0; }
         //public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
-        public int SelectedFieldSatisfaction { get; }
+        //public int SelectedFieldSatisfaction { get => IsFieldSelected ? _selectedField!.Placeable is Zone zone ? zone.Satisfaction : 0 : 0; }
+        public int SelectedFieldPopulation { get => IsFieldSelected ? (_selectedField!.Placeable is Zone zone ? zone.Current : 0) : 0; }
         //public string SelectedFieldCitizenName { get; }
         public int Width { get => _model.Width; }
         public int Height { get => _model.Height; }
@@ -151,7 +152,7 @@ namespace CCity.ViewModel
         public DelegateCommand SendFiretruckCommand { get; private set; }
         public DelegateCommand UpgradeCommand { get; private set; }
         public DelegateCommand ChangeMinimapSizeCommand { get; private set; }
-        public DelegateCommand CloseSelectedFieldWindow { get; private set; }
+        public DelegateCommand CloseSelectedFieldWindowCommand { get; private set; }
         public DelegateCommand StartNewGameCommand { get; private set; }
 
         #endregion
@@ -175,11 +176,10 @@ namespace CCity.ViewModel
             PauseGameCommand = new DelegateCommand(param => OnPauseGame());
             ExitGameCommand = new DelegateCommand(param => OnExitGame());
             CloseApplicationCommand = new DelegateCommand(param => OnCloseApplication());
-            SelectToolCommand = new DelegateCommand(param => OnSelectTool((Tool)param!));
             ChangeResidentialTaxCommand = new DelegateCommand(param => OnChangeResidentialTax(int.Parse(param as string ?? string.Empty)));
             ChangeCommercialTaxCommand = new DelegateCommand(param => OnChangeCommercialTax(int.Parse(param as string ?? string.Empty)));
             ChangeIndustrialTaxCommand = new DelegateCommand(param => OnChangeIndustrialTax(int.Parse(param as string ?? string.Empty)));
-            CloseSelectedFieldWindow = new DelegateCommand(OnCloseSelectedFieldWindow);
+            CloseSelectedFieldWindowCommand = new DelegateCommand(OnCloseSelectedFieldWindow);
             RefreshMapCommand = new DelegateCommand(param => OnRefreshMap());
             StartNewGameCommand = new DelegateCommand(param => OnStartNewGame());
             ChangeSpeedCommand =
@@ -267,6 +267,7 @@ namespace CCity.ViewModel
                 case CommercialZone _: return Color.FromArgb(100, 0, 0, 255);
                 case IndustrialZone _: return Color.FromArgb(100, 255, 255, 0);
                 default: if (field.Placeable.IsPublic) return Color.FromArgb(50, 22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
+                //default: return Color.FromArgb(0, 0, 0, 0);
             }
         }
 
@@ -345,7 +346,11 @@ namespace CCity.ViewModel
             }
         }
 
-        private void UnselectField() => _selectedField = null;
+        private void UnselectField()
+        {
+            _selectedField = null;
+            OnPropertyChanged(nameof(IsFieldSelected));
+        }
 
         private void FieldClicked(int index)
         {
@@ -368,6 +373,7 @@ namespace CCity.ViewModel
         private void ToolClicked(Tool tool)
         {
             SelectedTool = tool;
+            if (SelectedTool != Tool.Cursor) UnselectField();
             OnPropertyChanged(nameof(SelectedTool));
         }
 
@@ -378,11 +384,11 @@ namespace CCity.ViewModel
             _selectedField = _model.Fields[coord.x, coord.y];
             OnPropertyChanged(nameof(IsFieldSelected));
             OnPropertyChanged(nameof(SelectedFieldName));
-            OnPropertyChanged(nameof(SelectedFieldPoliceDeparmentEffect));
-            OnPropertyChanged(nameof(SelectedFieldFiredepartmentEffect));
+            OnPropertyChanged(nameof(SelectedFieldPoliceDepartmentEffect));
+            OnPropertyChanged(nameof(SelectedFieldFireDepartmentEffect));
             OnPropertyChanged(nameof(SelectedFieldStadiumEffect));
             OnPropertyChanged(nameof(SelectedFieldIndustrialEffect));
-            OnPropertyChanged(nameof(SelectedFieldSatisfaction));
+            OnPropertyChanged(nameof(SelectedFieldPopulation));
 
             if(_selectedField.Placeable is Road)
             {
@@ -399,9 +405,28 @@ namespace CCity.ViewModel
             return (x, y);
         }
 
+        //TO DO: Utilities or Placeable
+        private Placeable GetRoot(Placeable placeable)
+        {
+            if (placeable is Filler) return (Placeable)(((Filler)placeable).Main);
+            else return placeable;
+        }
+
         private string GetFieldName(Field? selectedField)
         {
-            return "...";
+            if (selectedField is null || selectedField.Placeable is null) return "Üres mező";
+            Placeable placeable = GetRoot(selectedField.Placeable!);
+            switch (placeable)
+            {
+                case ResidentialZone _: return "Lakózóna";
+                case CommercialZone _: return "Kereskedelmi zóna";
+                case IndustrialZone _: return "Ipari zóna";
+                case Road road: if(road.IsPublic) return "Közút"; else return "Út";
+                case PoliceDepartment _: return "Rendőrség";
+                case FireDepartment _: return "Tűzoltóság";
+                case Stadium _: return "Stadion";
+                default: return "Épület";
+            }
         }
 
         private FieldItem GetFieldItemFromField(Field field)
@@ -504,11 +529,6 @@ namespace CCity.ViewModel
         #endregion
 
         #region Delegatecommand methods
-
-        private void OnSelectTool(Tool tool)
-        {
-            SelectedTool = tool;
-        }
 
         private void OnChangeResidentialTax(int n) => _model.ChangeTax(TaxType.Residental, (n > 0 ? 1 : -1) * 0.01);
 

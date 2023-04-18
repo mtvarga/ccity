@@ -116,8 +116,26 @@
             <!--Center-->
             <Grid Grid.Column="1" x:Name="Center">
                 <Grid Panel.ZIndex="2">
-                    <StackPanel Orientation="Vertical" Background="#eee" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
-                        <Button Width="20" Height="20" HorizontalAlignment="Right">×</Button>
+                    <StackPanel Orientation="Vertical" Background="#55FFFFFF" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
+                        <Button Width="20" Height="20" HorizontalAlignment="Right" Command="{Binding CloseSelectedFieldWindowCommand}">×</Button>
+                        <TextBlock Margin="5" Text="{Binding SelectedFieldName}"/>
+                        <StackPanel Orientation="Vertical" Margin="5 10">
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldPoliceDepartmentEffect, StringFormat='Rendőrség effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
+                            <!--<Label Content="{Binding SelectedFieldSatisfaction}"/>-->
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldPopulation, StringFormat='Polgárok: {0} fő'}"/>
+                        </StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsFieldSelected}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
                     </StackPanel>
                 </Grid>
                 <Grid Panel.ZIndex="1" x:Name="FieldsContainerGrid">
