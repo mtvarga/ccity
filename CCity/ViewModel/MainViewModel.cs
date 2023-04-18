@@ -162,6 +162,7 @@ namespace CCity.ViewModel
         {
             _model = model;
             _model.FieldsUpdated += Model_FieldUpdated;
+            _model.ErrorOccured += Model_ErrorOccured;
             _model.TaxChanged += Model_TaxChanged;
             _model.SatisfactionChanged += Model_SatisfactionChanged;
             _model.BudgetChanged += Model_BudgetChanged;
@@ -188,6 +189,7 @@ namespace CCity.ViewModel
             _inputCityName = "";
             _inputMayorName = "";
         }
+
 
         private void Model_NewGame(object? sender, EventArgs e)
         {
@@ -438,18 +440,24 @@ namespace CCity.ViewModel
 
         private void Model_FieldUpdated(object? o, FieldEventArgs e)
         {
-            if (e.Fields != null)
+            foreach (Field field in e.Fields)
             {
-                foreach (Field field in e.Fields)
-                {
-                    int index = field.Y * _model.Width + field.X;
-                    RefreshFieldItem(Fields[index]);
-                }
+                int index = field.Y * _model.Width + field.X;
+                RefreshFieldItem(Fields[index]);
             }
-            else
+        }
+
+        private void Model_ErrorOccured(object? sender, ErrorEventArgs e)
+        {
+            string errorMessage="";
+            switch(e.ErrorCode)
             {
-                MessageBox.Show("A művelet nem végezhető el.", "Hiba", MessageBoxButton.OK, MessageBoxImage.Information);
+                case "PLACE-OUTOFFIELDBOUNDRIES": errorMessage = "Nem építhetsz a pályán kívülre.";  break;
+                case "PLACE-ALREADYUSEDFIELD": errorMessage = "Csak üres mezőre építhetsz."; break;
+
+
             }
+            MessageBox.Show("A művelet nem végezhető el: \n"+errorMessage, "Hiba", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Model_SpeedChanged(object? o, EventArgs e) => OnPropertyChanged(nameof(Speed));

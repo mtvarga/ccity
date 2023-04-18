@@ -67,18 +67,17 @@ namespace CCity.Model
 
         #region Public methods  
 
-        public List<Field>? Place(int x, int y, Placeable placeable)
+        public List<Field> Place(int x, int y, Placeable placeable)
         {
-            if (!OnMap(x, y)) return null;
+            if (!OnMap(x, y)) throw new Exception("PLACE-OUTOFFIELDBOUNDRIES");
 
             Field field = Fields[x, y];
-            List<Field>? effectedFields = PlaceOnField(field, placeable);
-            if (effectedFields == null) return null;
+            List<Field> effectedFields = PlaceOnField(field, placeable);
 
             switch (placeable)
             {
                 case Road _: 
-                    List<Field> effectedByRoad = HandleRoadPlacement(field); effectedFields = effectedFields.Concat(effectedByRoad).ToList(); break;
+                     effectedFields = effectedFields.Concat(HandleRoadPlacement(field)).ToList(); break;
                 default:
                     List<Field>? effectedFieldsBySpreading = RefreshPublicity(placeable);
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
@@ -144,7 +143,7 @@ namespace CCity.Model
         {
             if (field.HasPlaceable)
             {
-                return false;
+                throw new Exception("PLACE-ALREADYUSEDFIELD");
             }
             if (placeable is IMultifield multifield)
             {
@@ -154,11 +153,11 @@ namespace CCity.Model
             return true;
         }
 
-        private List<Field>? PlaceOnField(Field field, Placeable placeable)
+        private List<Field> PlaceOnField(Field field, Placeable placeable)
         {
             if (!CanPlace(field, placeable))
             {
-                return null;
+                throw new Exception("PLACE-OUTOFFIELDBOUNDRIES");
             }
             List<Field> effectedFields = new();
             if (placeable is IMultifield multifield)

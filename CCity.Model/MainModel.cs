@@ -1,4 +1,6 @@
-﻿namespace CCity.Model
+﻿using System.Diagnostics;
+
+namespace CCity.Model
 {
     public class MainModel
     {
@@ -48,15 +50,21 @@
 
         public void Place(int x, int y, Placeable placeable)
         {
-            List<Field>? effectedFields = _fieldManager.Place(x, y, placeable);
-            if(effectedFields != null)
+            List<Field> effectedFields = new();
+            try
             {
-                List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-                _globalManager.Pay(placeable.PlacementCost);
-                _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
-                BudgetChanged?.Invoke(this, EventArgs.Empty);
-                SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+                effectedFields = _fieldManager.Place(x, y, placeable);
             }
+            catch (Exception ex)
+            {
+                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.Message));
+            }
+            List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+            _globalManager.Pay(placeable.PlacementCost);
+            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+            BudgetChanged?.Invoke(this, EventArgs.Empty);
+            SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+            
             FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
         }
 
@@ -195,6 +203,7 @@
 
         public event EventHandler<EventArgs>? GameTicked;
         public event EventHandler<FieldEventArgs>? FieldsUpdated;
+        public event EventHandler<ErrorEventArgs> ErrorOccured;
         public event EventHandler<EventArgs>? PopulationChanged;
         public event EventHandler<EventArgs>? BudgetChanged;
         public event EventHandler<EventArgs>? SatisfactionChanged;
