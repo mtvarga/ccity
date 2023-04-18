@@ -40,11 +40,11 @@
 
         #region Public methods
         
-        public void SwapWorkplace(WorkplaceZone workplace)
+        public void SwapWorkplace(WorkplaceZone? workplace)
         {
             Workplace?.DropCitizen(this);
             Workplace = workplace;
-            Workplace.AddCitizen(this);
+            Workplace?.AddCitizen(this);
 
             CalculateHomeWorkplaceDistanceEffect();
         }

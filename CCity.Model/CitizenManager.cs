@@ -41,9 +41,8 @@
         public List<Citizen> IncreasePopulation(List<ResidentialZone> vacantHomes, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         {
             var result = new List<Citizen>();
-            WorkplaceZone? workplace = null;
-            //var isAvaiableWorkplace = true;
-            
+            WorkplaceZone? nextWorkplace = null;
+
             // For now, the method will take all the vacant homes and put some citizens in them
             // It might not fill up a home entirely -- there might still be empty slots left in a home or a workplace after this algorithm is done
             // TODO: Improve algorithm? - Select some homes randomly and fill those up
@@ -57,18 +56,21 @@
 
                 for (var i = 0; i < newCitizenCount; i++)
                 {
-                    workplace = FindNextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
-                    var citizen = new Citizen(home, workplace);
-                    if (workplace == null)
+                    nextWorkplace = FindNextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
+                    
+                    var citizen = new Citizen(home, nextWorkplace);
+                    
+                    if (nextWorkplace == null)
                     {
                         JoblessCitizens.Add(citizen);
-                        //isAvaiableWorkplace = false;
                         break;
                     }
+                    
                     Citizens.Add(citizen);
                     result.Add(citizen);
                 }
-                if (workplace==null)
+                
+                if (nextWorkplace == null)
                     break;
             }
 
@@ -93,9 +95,16 @@
             return result;
         }
 
-        public Dictionary<WorkplaceZone, Citizen> OptimizeWorkplaces()
+        public Dictionary<WorkplaceZone, Citizen> OptimizeWorkplaces(List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         {
-            // TODO: Implement workplace optimization algorithm
+            foreach (var citizen in JoblessCitizens)
+            {
+                citizen.SwapWorkplace(FindNextWorkplace(citizen.Home, vacantCommercialZones, vacantIndustrialZones));
+
+                if (citizen.Jobless)
+                    break;
+            }
+
             return new Dictionary<WorkplaceZone, Citizen>();
         }
 
@@ -103,6 +112,26 @@
 
         #region Private methods
 
+        private WorkplaceZone? FindNextWorkplace(ResidentialZone home, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
+        { 
+            var result = FindNearestWorkplace(home, _nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
+
+            if (result == null)
+            {
+                result = FindNearestWorkplace(home, !_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
+
+                _nextToCommercial = !_nextToCommercial;
+            }
+
+
+            if (result is { IsFull: true })
+                (_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(result);
+
+            _nextToCommercial = !_nextToCommercial;
+            
+            return result;
+        }
+        
         private static WorkplaceZone? FindNearestWorkplace(Placeable p, List<WorkplaceZone> vacantWorkplaces)
         {
             var nearestWorkplace = vacantWorkplaces.FirstOrDefault();
