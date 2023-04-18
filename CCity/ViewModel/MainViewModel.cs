@@ -28,6 +28,7 @@ namespace CCity.ViewModel
         private string _inputMayorName;
         private string _inputCityName;
         private Field? _selectedField;
+        private bool _isPublicityToggled;
 
         #endregion
 
@@ -103,6 +104,19 @@ namespace CCity.ViewModel
             }
         }
 
+        public bool IsPublicityToggled
+        {
+            get { return _isPublicityToggled; }
+            set
+            {
+                if (value != _isPublicityToggled)
+                {
+                    _isPublicityToggled = value;
+                    OnPropertyChanged(nameof(IsPublicityToggled));
+                }
+            }
+        }
+
         public string InputCityName
         {
             get { return _inputCityName; }
@@ -154,6 +168,7 @@ namespace CCity.ViewModel
         public DelegateCommand ChangeMinimapSizeCommand { get; private set; }
         public DelegateCommand CloseSelectedFieldWindowCommand { get; private set; }
         public DelegateCommand StartNewGameCommand { get; private set; }
+        public DelegateCommand TogglePublicityCommand { get; private set; }
 
         #endregion
 
@@ -182,11 +197,20 @@ namespace CCity.ViewModel
             CloseSelectedFieldWindowCommand = new DelegateCommand(OnCloseSelectedFieldWindow);
             RefreshMapCommand = new DelegateCommand(param => OnRefreshMap());
             StartNewGameCommand = new DelegateCommand(param => OnStartNewGame());
+            TogglePublicityCommand = new DelegateCommand(param => OnTogglePublicity());
             ChangeSpeedCommand =
                 new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
 
             _inputCityName = "";
             _inputMayorName = "";
+            _isPublicityToggled = false;
+        }
+
+        private void OnTogglePublicity()
+        {
+            _isPublicityToggled = !_isPublicityToggled;
+            OnPropertyChanged(nameof(IsPublicityToggled));
+            foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem, true);
         }
 
         private void Model_NewGame(object? sender, EventArgs e)
@@ -250,11 +274,12 @@ namespace CCity.ViewModel
             }
         }
 
-        private void RefreshFieldItem(FieldItem fieldItem)
+        private void RefreshFieldItem(FieldItem fieldItem, bool onlyOverlayColor = false)
         {
+            fieldItem.OverlayColor = GetOverlayColorFromFieldItem(fieldItem);
+            if (onlyOverlayColor) return;
             fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
             fieldItem.MinimapColor = GetMinimapColorFromFieldItem(fieldItem);
-            fieldItem.OverlayColor = GetOverlayColorFromFieldItem(fieldItem);
         }
 
         private Color GetOverlayColorFromFieldItem(FieldItem fieldItem)
@@ -266,7 +291,7 @@ namespace CCity.ViewModel
                 case ResidentialZone _: return Color.FromArgb(100, 0, 255, 0);
                 case CommercialZone _: return Color.FromArgb(100, 0, 0, 255);
                 case IndustrialZone _: return Color.FromArgb(100, 255, 255, 0);
-                default: if (field.Placeable.IsPublic) return Color.FromArgb(50, 22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
+                default: if (field.Placeable.IsPublic && IsPublicityToggled) return Color.FromArgb(50, 22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
                 //default: return Color.FromArgb(0, 0, 0, 0);
             }
         }

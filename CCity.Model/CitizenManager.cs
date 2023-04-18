@@ -41,7 +41,7 @@
         public List<Citizen> IncreasePopulation(List<ResidentialZone> vacantHomes, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         {
             var result = new List<Citizen>();
-            WorkplaceZone? workplace = null;
+            /*WorkplaceZone? workplace = null;
             //var isAvaiableWorkplace = true;
             
             // For now, the method will take all the vacant homes and put some citizens in them
@@ -70,7 +70,7 @@
                 }
                 if (workplace==null)
                     break;
-            }
+            }*/
 
             return result;
         }
