@@ -53,10 +53,10 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding ClickCommand}" Cursor="Hand" Background="#FFF" Width="40" Height="40" Margin="2" CommandParameter="{Binding Tool}" Style="{StaticResource ToolButtonStyle}">
+                            <Button Command="{Binding ClickCommand}" Cursor="Hand" Background="#FFF" Width="36" Height="36" Margin="2" CommandParameter="{Binding Tool}" Style="{StaticResource ToolButtonStyle}">
                                 <Grid>
                                     <Grid Panel.ZIndex="1">
-                                        <Image Stretch="Fill" Source="{Binding Tool, Converter={StaticResource ToolEnumToPath}}" RenderOptions.BitmapScalingMode="LowQuality"/>
+                                        <Image Stretch="Fill" Source="{Binding Tool, Converter={StaticResource ToolEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
                                     </Grid>
                                 </Grid>
                             </Button>
@@ -64,6 +64,9 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Vertical">
+                        <Button Content="Közút" Margin="7" Command="{Binding TogglePublicityCommand}"/>
+                    </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="0 5">
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
                             <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResidentialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
@@ -116,8 +119,26 @@
             <!--Center-->
             <Grid Grid.Column="1" x:Name="Center">
                 <Grid Panel.ZIndex="2">
-                    <StackPanel Orientation="Vertical" Background="#eee" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
-                        <Button Width="20" Height="20" HorizontalAlignment="Right">×</Button>
+                    <StackPanel Orientation="Vertical" Background="#55FFFFFF" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
+                        <Button Width="20" Height="20" HorizontalAlignment="Right" Command="{Binding CloseSelectedFieldWindowCommand}">×</Button>
+                        <TextBlock Margin="5" Text="{Binding SelectedFieldName}"/>
+                        <StackPanel Orientation="Vertical" Margin="5 10">
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldPoliceDepartmentEffect, StringFormat='Rendőrség effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
+                            <!--<Label Content="{Binding SelectedFieldSatisfaction}"/>-->
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldPopulation, StringFormat='Polgárok: {0} fő'}"/>
+                        </StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsFieldSelected}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
                     </StackPanel>
                 </Grid>
                 <Grid Panel.ZIndex="1" x:Name="FieldsContainerGrid">
@@ -134,7 +155,7 @@
                                         <Grid Panel.ZIndex="3" Background="#00000000" MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave"></Grid>
                                         <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}" Panel.ZIndex="2"></Grid>
                                         <Grid Panel.ZIndex="1">
-                                            <Image Stretch="Fill" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="LowQuality"/>
+                                            <Image Stretch="Fill" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
                                         </Grid>
                                         <Grid Panel.ZIndex="0">
                                             <Image Stretch="Fill" Source="Images/Textures/grass.png"/>

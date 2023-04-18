@@ -12,8 +12,8 @@ namespace CCity.Model
 
         private const int MAX_EFFECT = 10;
         private const int EFFECT_RADIUS = 10;
-        private const int HEIGHT = 10;
-        private const int WIDTH = 20;
+        private const int HEIGHT = 13;
+        private const int WIDTH = 25;
         private const int ROOTX = WIDTH / 2;
         private const int ROOTY = HEIGHT - 1;
 
@@ -179,6 +179,7 @@ namespace CCity.Model
 
         private List<Field> SpreadPlaceableEffectConditional(Placeable placeable, bool add)
         {
+            if(!placeable.IsPublic) return new List<Field>() { placeable.Owner! };
             switch (placeable)
             {
                 case FireDepartment _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeFireDepartmentEffect(i));
