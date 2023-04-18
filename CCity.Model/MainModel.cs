@@ -50,36 +50,39 @@ namespace CCity.Model
 
         public void Place(int x, int y, Placeable placeable)
         {
-            List<Field> effectedFields = new();
             try
             {
-                effectedFields = _fieldManager.Place(x, y, placeable);
+                List<Field>  effectedFields = _fieldManager.Place(x, y, placeable);
+                List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+                _globalManager.Pay(placeable.PlacementCost);
+                _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+                BudgetChanged?.Invoke(this, EventArgs.Empty);
+                SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+
+                FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
             }
             catch (Exception ex)
             {
                 ErrorOccured.Invoke(this, new ErrorEventArgs(ex.Message));
             }
-            List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-            _globalManager.Pay(placeable.PlacementCost);
-            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
-            BudgetChanged?.Invoke(this, EventArgs.Empty);
-            SatisfactionChanged?.Invoke(this, EventArgs.Empty);
-            
-            FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
         }
 
         public void Demolish(int x, int y)
         {
-            (Placeable placeable, List<Field>? effectedFields) = _fieldManager.Demolish(x, y);
-            if(effectedFields != null)
+            try
             {
+                (Placeable placeable, List<Field>  effectedFields) = _fieldManager.Demolish(x, y);
                 List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-                _globalManager.Pay(-(placeable.PlacementCost/2));
+                _globalManager.Pay(-(placeable.PlacementCost / 2));
                 _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
                 BudgetChanged?.Invoke(this, EventArgs.Empty);
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+                FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
             }
-            FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
+            catch(Exception ex)
+            {
+                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.Message));
+            }
         }
 
         public void Upgrade(int x, int y)

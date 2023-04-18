@@ -504,8 +504,11 @@ namespace CCity.ViewModel
             {
                 case "PLACE-OUTOFFIELDBOUNDRIES": errorMessage = "Nem építhetsz a pályán kívülre.";  break;
                 case "PLACE-ALREADYUSEDFIELD": errorMessage = "Csak üres mezőre építhetsz."; break;
-
-
+                case "DEMOLISH - OUTOFFIELDBOUNDS": errorMessage = "Nem rombolhatsz a pályán kívülről."; break;
+                case "DEMOLISH-NOTEMPTYFIELD": errorMessage = "Nem lehet üres mezőről rombolni."; break;
+                case "DEMOLISH-MAINROAD": errorMessage = "A főútat nem lehet lerombolni."; break;
+                case "DEMOLISH - FIELDHASCIZIZEN": errorMessage = "Csak az üres zónát lehet visszaminősíteni."; break;
+                case "DEMOLISH-FIELDPUBLICITY": errorMessage = "Az út rombolásával legalább egy épület elérhetetlenné válna.";break;
             }
             MessageBox.Show("A művelet nem végezhető el: \n"+errorMessage, "Hiba", MessageBoxButton.OK, MessageBoxImage.Information);
         }
