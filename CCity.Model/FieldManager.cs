@@ -287,21 +287,40 @@ namespace CCity.Model
 
         private List<Field>? RefreshPublicity(Placeable placeable)
         {
-            List<Placeable> neighbours = GetRoadNeighbours(placeable);
             if (placeable is Road || placeable.IsPublic) return null;
             List<Field> effectedFields = new();
-            foreach (Road neighbour in neighbours)
+            if (CouldBePublic(placeable))
             {
-                if (neighbour.IsPublic)
-                {
-                    placeable.IsPublic = true;
-                    UpdatePlaceableList(placeable, true);
-                    effectedFields = effectedFields.Concat(SpreadPlaceableEffectConditional(placeable, true)).ToList();
-                    effectedFields.Add(placeable.Owner!);
-                    return effectedFields;
-                }
+                placeable.IsPublic = true;
+                UpdatePlaceableList(placeable, true);
+                effectedFields = effectedFields.Concat(SpreadPlaceableEffectConditional(placeable, true)).ToList();
+                effectedFields.Add(placeable.Owner!);
+                return effectedFields;
             }
             return null;
+        }
+
+        private bool CouldBePublic(Placeable placeable)
+        {
+            int width = 1;
+            int height = 1;
+            if (placeable is IMultifield multifield)
+            {
+                width = multifield.Width;
+                height = multifield.Height;
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                List<Placeable> neighbours = GetNeighboursBySide(placeable, i);
+                if (i % 2 == 0 && neighbours.Count == width || i % 2 != 0 && neighbours.Count == height)
+                {
+                    if (neighbours.All(e => e is Road && e.IsPublic))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private void SpreadRoadPublicity(Road road,ref List<Field> effectedFields)
@@ -350,7 +369,7 @@ namespace CCity.Model
                     }
                 }
                 SpreadRoadPublicity((Road)Fields[ROOTX, ROOTY].Placeable!,ref effectedFields!);
-                if (privatedPlaceables.Count > 0 && !privatedPlaceables.All(e => WouldStayPublic(e)))
+                if (privatedPlaceables.Count > 0 && !privatedPlaceables.All(e => CouldBePublic(e)))
                 {
                     Place(field.X, field.Y, road);
                     throw new Exception("DEMOLISH-FIELDPUBLICITY");
@@ -434,7 +453,7 @@ namespace CCity.Model
                 effectedFields.Add(actualRoad.Owner!);
                 /*foreach (Placeable notRoadNeighbour in notRoadNeighbours)
                 {
-                    if(WouldStayPublic(notRoadNeighbour))
+                    if(CouldStayPublic(notRoadNeighbour))
                     {
                         privatedPlaceables.Remove(notRoadNeighbour);
                     }
@@ -444,19 +463,6 @@ namespace CCity.Model
                     }
                 }*/
             }
-        }
-
-        private bool WouldStayPublic(Placeable placeable)
-        {
-            List<Placeable> roadNeighbours = GetRoadNeighbours(placeable);
-            foreach (Road roadNeighbour in roadNeighbours)
-            {
-                if (roadNeighbour.IsPublic)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
 #endregion
@@ -481,7 +487,41 @@ namespace CCity.Model
             return placeables;
         }
 
+        private List<Placeable> GetNeighboursBySide(Placeable placeable, int side)
+        {
+            List<Placeable> placeables = new();
+            Placeable mainPlaceable = GetRoot(placeable);
+            Field field = mainPlaceable.Owner!;
+            if (field == null) return placeables;
+            int x = field.X;
+            int y = field.Y;
+            int width = 1;
+            int height = 1;
+            if (mainPlaceable is IMultifield multifield)
+            {
+                width = multifield.Width;
+                height = multifield.Height;
+            }
+            switch (side)
+            {
+                case 0: IterateThroughSide(x, y - height, true, width, placeables); break; //top
+                case 1: IterateThroughSide(x - 1, y, false, height, placeables); break; //left side
+                case 2: IterateThroughSide(x, y + 1, true, width, placeables); break; //bottom
+                case 3: IterateThroughSide(x + width, y, false, height, placeables); break; //right side
+            }
+            return placeables;
+        }
+
         private List<Placeable> GetNeighbours(Placeable placeable)
+        {
+            List<Placeable> result = GetNeighboursBySide(placeable, 0)
+                .Concat(GetNeighboursBySide(placeable, 1))
+                .Concat(GetNeighboursBySide(placeable, 2))
+                .Concat(GetNeighboursBySide(placeable, 3)).ToList();
+            return result;
+        }
+
+        /*private List<Placeable> GetNeighbours(Placeable placeable)
         {
             List<Placeable> placeables = new();
             Placeable mainPlaceable = GetRoot(placeable);
@@ -501,7 +541,7 @@ namespace CCity.Model
             IterateThroughSide(x, y - height, true, width, placeables); //top
             IterateThroughSide(x + width, y, false, height, placeables); //right side
             return placeables;
-        }
+        }*/
 
         private void IterateThroughSide(int startX, int startY, bool xIterates, int iterationNumber, List<Placeable> placeables)
         {
