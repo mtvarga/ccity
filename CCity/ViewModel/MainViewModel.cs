@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Xml.Serialization;
@@ -64,7 +65,7 @@ namespace CCity.ViewModel
         public int Width { get => _model.Width; }
         public int Height { get => _model.Height; }
         public string OutputCityName { get => _inputCityName == "" ? "Városvezetés a hobbim." : _inputCityName + " büszke polgármestere vagyok."; }
-        public string OutputMayorName { get => _inputMayorName == "" ? "Polgármester." : _inputMayorName; }
+        public string OutputMayorName { get => _inputMayorName == "" ? "Polgármester" : _inputMayorName; }
         public bool CanStart { get => _inputMayorName != "" && _inputCityName != ""; }
 
         public bool MinimapMinimized
@@ -313,18 +314,22 @@ namespace CCity.ViewModel
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
             if (!field.HasPlaceable) return Texture.None;
-            switch (field.Placeable)
+            return GetTextureFromPlaceable(field.Placeable!);
+        }
+
+        private Texture GetTextureFromPlaceable(Placeable placeable)
+        {
+            switch (placeable)
             {
                 case FireDepartment _: return Texture.FireDepartment;
                 case PoliceDepartment _: return Texture.PoliceDepartment;
-                case Stadium _: return Texture.StadiumBottomLeft;
-                case PowerPlant _: return Texture.PowerPlantBottomLeft;
-                case Road _:
-                    SetNeighboursRoadTexture((Road)(field.Placeable));
-                    return GetRoadTextureFromField(field);
-                case Filler _: return GetFillerTexture(field);
+                case Stadium _: return Texture.Stadium;
+                case Road road:
+                    SetNeighboursRoadTexture(road);
+                    return GetRoadTexture(road);
+                case Filler filler: return GetFillerTexture(filler);
                 case Zone zone: return GetZoneTexture(zone);
-                default: return Texture.None;
+                default: return Texture.Unhandled;
             }
         }
 
@@ -342,10 +347,15 @@ namespace CCity.ViewModel
             return texture;
         }
 
-        private Texture GetFillerTexture(Field field)
+        private Texture GetFillerTexture(Filler filler)
         {
-            Placeable mainPlaceable = (Placeable)((Filler)field.Placeable).Main;
-            return Texture.Unhandled;
+            Field mainField = ((Placeable)filler.Main).Owner!;
+            Field fillerField = ((Placeable)filler).Owner!;
+            (int x, int y) = (fillerField.X - mainField.X, mainField.Y - fillerField.Y);
+            string enumString = $"{GetTextureFromPlaceable((Placeable)filler.Main).ToString()}_{x}_{y}";
+            Texture texture;
+            if(Texture.TryParse(enumString, out texture)) return texture;
+            else return Texture.Unhandled;
         }
 
         private void SetNeighboursRoadTexture(Road road)
@@ -354,7 +364,7 @@ namespace CCity.ViewModel
             foreach(Road neighbour in neighbours)
             {
                 FieldItem fieldItem = GetFieldItemFromField(neighbour.Owner!);
-                fieldItem.Texture = GetRoadTextureFromField(neighbour.Owner!);
+                fieldItem.Texture = GetRoadTexture(neighbour);
             }
         }
 
@@ -362,10 +372,9 @@ namespace CCity.ViewModel
 
         private bool IsInFields(int index) => 0 <= index && index < Fields.Count;
 
-        private Texture GetRoadTextureFromField(Field field)
+        private Texture GetRoadTexture(Road road)
         {
-            if (field.Placeable is not Road) return Texture.Unhandled;
-            (int[] id, List<Road> roads) = _model.GetFourRoadNeighbours((Road)field.Placeable);
+            (int[] id, List<Road> roads) = _model.GetFourRoadNeighbours(road);
             (int, int, int, int) neighbours = (id[0], id[1], id[2], id[3]);
             switch (neighbours)
             {

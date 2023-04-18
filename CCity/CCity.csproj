@@ -31,10 +31,10 @@
     <None Remove="View\Images\Textures\Roads\roadTopLeft.png" />
     <None Remove="View\Images\Textures\Roads\roadTopRight.png" />
     <None Remove="View\Images\Textures\Roads\roadVertical.png" />
-    <None Remove="View\Images\Textures\stadiumBottomLeft.png" />
-    <None Remove="View\Images\Textures\stadiumBottomRight.png" />
-    <None Remove="View\Images\Textures\stadiumTopLeft.png" />
-    <None Remove="View\Images\Textures\stadiumTopRight.png" />
+    <None Remove="View\Images\Textures\stadium.png" />
+    <None Remove="View\Images\Textures\stadium_0_1.png" />
+    <None Remove="View\Images\Textures\stadium_1_0.png" />
+    <None Remove="View\Images\Textures\stadium_1_1.png" />
     <None Remove="View\Images\Textures\Tools\bulldozer.png" />
     <None Remove="View\Images\Textures\Tools\commercialZone.png" />
     <None Remove="View\Images\Textures\Tools\cursor.png" />
@@ -88,10 +88,10 @@
     <Resource Include="View\Images\Textures\Roads\roadTopLeft.png" />
     <Resource Include="View\Images\Textures\Roads\roadTopRight.png" />
     <Resource Include="View\Images\Textures\Roads\roadVertical.png" />
-    <Resource Include="View\Images\Textures\stadiumBottomLeft.png" />
-    <Resource Include="View\Images\Textures\stadiumBottomRight.png" />
-    <Resource Include="View\Images\Textures\stadiumTopLeft.png" />
-    <Resource Include="View\Images\Textures\stadiumTopRight.png" />
+    <Resource Include="View\Images\Textures\stadium.png" />
+    <Resource Include="View\Images\Textures\stadium_1_0.png" />
+    <Resource Include="View\Images\Textures\stadium_0_1.png" />
+    <Resource Include="View\Images\Textures\stadium_1_1.png" />
     <Resource Include="View\Images\Textures\Tools\bulldozer.png" />
     <Resource Include="View\Images\Textures\Tools\commercialZone.png" />
     <Resource Include="View\Images\Textures\Tools\cursor.png" />
@@ -109,12 +109,6 @@
     <Resource Include="View\Images\Textures\Zones\industrialZoneLevel1Half.png" />
     <Resource Include="View\Images\Textures\Zones\residentialZoneLevel1Full.png" />
     <Resource Include="View\Images\Textures\Zones\residentialZoneLevel1Half.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="View\Images\background.mp4">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
