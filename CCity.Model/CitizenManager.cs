@@ -72,7 +72,7 @@
                 
                 if (nextWorkplace == null)
                     break;
-            }*/
+            }
 
             return result;
         }
