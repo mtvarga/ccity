@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace CCity.Model
 {
-    public class FieldEventArgs
+    public class ErrorEventArgs
     {
-        public List<Field>? Fields { get; }
+        public string ErrorCode { get; }
 
-        public FieldEventArgs(List<Field>? fields)
+        public ErrorEventArgs(string code)
         {
-            Fields = fields;
+            ErrorCode = code;
         }
     }
 }
