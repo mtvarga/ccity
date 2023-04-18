@@ -11,6 +11,7 @@ namespace CCity.Model
         #region Constants
         public const int CapacityConstant = 10;
         #endregion
+
         #region Properties
         public int Capacity { get; private set; }
         public int Current { get; private set; }
@@ -59,6 +60,13 @@ namespace CCity.Model
         {
             Citizens.Remove(citizen);
             --Current;
+        }
+
+        public double Satisfaction()
+        {
+            if (Current == 0) return 0;
+            double sum = Citizens.Sum(e => e.LastCalculatedSatisfaction);
+            return sum / Current;
         }
 
         #endregion

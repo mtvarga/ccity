@@ -57,8 +57,9 @@ namespace CCity.ViewModel
         public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField.StadiumEffect) : 0; }
         public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField.IndustrialEffect) : 0; }
         //public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
-        //public int SelectedFieldSatisfaction { get => IsFieldSelected ? _selectedField!.Placeable is Zone zone ? zone.Satisfaction : 0 : 0; }
-        public int SelectedFieldPopulation { get => IsFieldSelected ? (_selectedField!.Placeable is Zone zone ? zone.Current : 0) : 0; }
+        public int SelectedFieldSatisfaction { get => SelectedFieldIsZone ? PercentToInt(((Zone)(_selectedField!.Placeable!)).Satisfaction()) : 0; }
+        public int SelectedFieldPopulation { get => SelectedFieldIsZone ? ((Zone)(_selectedField!.Placeable!)).Current : 0; }
+        public bool SelectedFieldIsZone { get => IsFieldSelected && _selectedField!.Placeable is Zone; }
         //public string SelectedFieldCitizenName { get; }
         public int Width { get => _model.Width; }
         public int Height { get => _model.Height; }
@@ -416,8 +417,10 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(SelectedFieldStadiumEffect));
             OnPropertyChanged(nameof(SelectedFieldIndustrialEffect));
             OnPropertyChanged(nameof(SelectedFieldPopulation));
+            OnPropertyChanged(nameof(SelectedFieldSatisfaction));
+            OnPropertyChanged(nameof(SelectedFieldIsZone));
 
-            if(_selectedField.Placeable is Road)
+            if (_selectedField.Placeable is Road)
             {
                 Road road = (Road)_selectedField.Placeable;
             }
