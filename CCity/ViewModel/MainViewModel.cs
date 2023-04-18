@@ -34,6 +34,7 @@ namespace CCity.ViewModel
         #region Properties
 
         public ObservableCollection<FieldItem> Fields { get; private set; }
+        public ObservableCollection<ToolItem> Tools { get; private set; }
         public string MayorName { get => _model.MayorName; }
         public string CityName { get => _model.CityName; }
         public int Budget { get => _model.Budget; }
@@ -168,6 +169,7 @@ namespace CCity.ViewModel
             _model.SpeedChanged += Model_SpeedChanged;
                 
             CreateTable();
+            CreateToolbar();
 
             NewGameCommand = new DelegateCommand(param => OnNewGame());
             PauseGameCommand = new DelegateCommand(param => OnPauseGame());
@@ -221,6 +223,31 @@ namespace CCity.ViewModel
                 }
             }
             foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem);
+        }
+
+        private void CreateToolbar()
+        {
+            List<Tool> orderedTools = new()
+            {
+                Tool.Cursor,
+                Tool.ResidentialZone,
+                Tool.CommercialZone,
+                Tool.IndustrialZone,
+                Tool.PoliceDepartment,
+                Tool.FireDepartment,
+                Tool.Stadium,
+                Tool.Road,
+                Tool.Bulldozer
+            };
+            Tools = new();
+            foreach (Tool tool in orderedTools)
+            {
+                Tools.Add(new ToolItem
+                {
+                    Tool = tool,
+                    ClickCommand = new DelegateCommand(param => ToolClicked((Tool)param!))
+                });
+            }
         }
 
         private void RefreshFieldItem(FieldItem fieldItem)
@@ -326,7 +353,7 @@ namespace CCity.ViewModel
             switch (SelectedTool)
             {
                 case Tool.Cursor: SelectField(index); break;
-                case Tool.ResidentalZone: _model.Place(coord.x, coord.y, new ResidentialZone()); break;
+                case Tool.ResidentialZone: _model.Place(coord.x, coord.y, new ResidentialZone()); break;
                 case Tool.CommercialZone: _model.Place(coord.x, coord.y, new CommercialZone()); break;
                 case Tool.IndustrialZone: _model.Place(coord.x, coord.y, new IndustrialZone()); break;
                 case Tool.FireDepartment: _model.Place(coord.x, coord.y, new FireDepartment()); break;
@@ -336,6 +363,12 @@ namespace CCity.ViewModel
                 case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
                 default: throw new Exception();
             }
+        }
+
+        private void ToolClicked(Tool tool)
+        {
+            SelectedTool = tool;
+            OnPropertyChanged(nameof(SelectedTool));
         }
 
         private void SelectField(int index)

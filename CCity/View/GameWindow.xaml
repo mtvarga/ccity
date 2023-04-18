@@ -9,10 +9,12 @@
              d:DesignHeight="550"
              d:DesignWidth="900"
              Background="White"
-             FontFamily="Arial">
+             FontFamily="Arial"
+             SizeChanged="UserControl_SizeChanged">
     <UserControl.Resources>
         <viewmodel:TextureEnumToPath x:Key="TextureEnumToPath" />
         <viewmodel:ColorToSolidColorBrush x:Key="ColorToSolidColorBrush" />
+        <viewmodel:ToolEnumToPath x:Key="ToolEnumToPath" />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -29,7 +31,7 @@
             
             <!--Sidebar-->
             <Grid Grid.Column="0" Background="#eee">
-                <WrapPanel Margin="7" VerticalAlignment="Top">
+                <!--<WrapPanel Margin="7" VerticalAlignment="Top">
                     <Button Width="40" Height="40" Margin="2">Crsr</Button>
                     <Button Width="40" Height="40" Margin="2" Content="Lkzn" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.ResidentalZone}"/>
                     <Button Width="40" Height="40" Margin="2" Content="Kkdzn" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.CommercialZone}"/>
@@ -42,7 +44,25 @@
                     <Button Width="40" Height="40" Margin="2" Content="Road" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Road}"/>
                     <Button Width="40" Height="40" Margin="2" Content="Bldzr" Command="{Binding SelectToolCommand}" CommandParameter="{x:Static viewmodel:Tool.Bulldozer}"/>
                     <Button Width="40" Height="40" Margin="2" Content="REFRESH" Command="{Binding RefreshMapCommand}"/>
-                </WrapPanel>
+                </WrapPanel>-->
+                <ItemsControl ItemsSource="{Binding Tools}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Margin="7"></WrapPanel>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding ClickCommand}" Cursor="Hand" Background="#FFF" Width="40" Height="40" Margin="2" CommandParameter="{Binding Tool}" Style="{StaticResource ToolButtonStyle}">
+                                <Grid>
+                                    <Grid Panel.ZIndex="1">
+                                        <Image Stretch="Fill" Source="{Binding Tool, Converter={StaticResource ToolEnumToPath}}" RenderOptions.BitmapScalingMode="LowQuality"/>
+                                    </Grid>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                     <StackPanel Orientation="Vertical" Margin="0 5">
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
@@ -94,14 +114,14 @@
             
             
             <!--Center-->
-            <Grid Grid.Column="1">
+            <Grid Grid.Column="1" x:Name="Center">
                 <Grid Panel.ZIndex="2">
                     <StackPanel Orientation="Vertical" Background="#eee" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
                         <Button Width="20" Height="20" HorizontalAlignment="Right">×</Button>
                     </StackPanel>
                 </Grid>
-                <Grid Panel.ZIndex="1">
-                    <ItemsControl ItemsSource="{Binding Fields}" Margin="20">
+                <Grid Panel.ZIndex="1" x:Name="FieldsContainerGrid">
+                    <ItemsControl ItemsSource="{Binding Fields}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}"/>
@@ -116,7 +136,7 @@
                                         <Grid Panel.ZIndex="1">
                                             <Image Stretch="Fill" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="LowQuality"/>
                                         </Grid>
-                                        <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}" Panel.ZIndex="0">
+                                        <Grid Panel.ZIndex="0">
                                             <Image Stretch="Fill" Source="Images/Textures/grass.png"/>
                                         </Grid>
                                     </Grid>

@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace CCity.ViewModel
 {
-    public class FieldItem :ViewModelBase
+    public class FieldItem : ViewModelBase
     {
 
         #region Fields

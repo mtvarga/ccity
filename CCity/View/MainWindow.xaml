@@ -6,11 +6,10 @@
         xmlns:local="clr-namespace:CCity"
         mc:Ignorable="d"
         Title="CCity" 
-        Height="650" 
-        Width="950"
-        MinHeight="650"
-        MinWidth="950"
-        WindowState="Maximized">
+        Height="620" 
+        Width="1150"
+        MinHeight="620"
+        MinWidth="1150">
     <Grid>
 
     </Grid>

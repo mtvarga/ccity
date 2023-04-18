@@ -35,6 +35,15 @@
     <None Remove="View\Images\Textures\stadiumBottomRight.png" />
     <None Remove="View\Images\Textures\stadiumTopLeft.png" />
     <None Remove="View\Images\Textures\stadiumTopRight.png" />
+    <None Remove="View\Images\Textures\Tools\bulldozer.png" />
+    <None Remove="View\Images\Textures\Tools\commercialZone.png" />
+    <None Remove="View\Images\Textures\Tools\cursor.png" />
+    <None Remove="View\Images\Textures\Tools\fireDepartment.png" />
+    <None Remove="View\Images\Textures\Tools\industrialZone.png" />
+    <None Remove="View\Images\Textures\Tools\policeDepartment.png" />
+    <None Remove="View\Images\Textures\Tools\residentialZone.png" />
+    <None Remove="View\Images\Textures\Tools\road.png" />
+    <None Remove="View\Images\Textures\Tools\stadium.png" />
     <None Remove="View\Images\Textures\transparent.png" />
     <None Remove="View\Images\Textures\unhandled.png" />
   </ItemGroup>
@@ -77,6 +86,15 @@
     <Resource Include="View\Images\Textures\stadiumBottomRight.png" />
     <Resource Include="View\Images\Textures\stadiumTopLeft.png" />
     <Resource Include="View\Images\Textures\stadiumTopRight.png" />
+    <Resource Include="View\Images\Textures\Tools\bulldozer.png" />
+    <Resource Include="View\Images\Textures\Tools\commercialZone.png" />
+    <Resource Include="View\Images\Textures\Tools\cursor.png" />
+    <Resource Include="View\Images\Textures\Tools\fireDepartment.png" />
+    <Resource Include="View\Images\Textures\Tools\industrialZone.png" />
+    <Resource Include="View\Images\Textures\Tools\policeDepartment.png" />
+    <Resource Include="View\Images\Textures\Tools\residentialZone.png" />
+    <Resource Include="View\Images\Textures\Tools\road.png" />
+    <Resource Include="View\Images\Textures\Tools\stadium.png" />
     <Resource Include="View\Images\Textures\transparent.png" />
     <Resource Include="View\Images\Textures\unhandled.png" />
   </ItemGroup>

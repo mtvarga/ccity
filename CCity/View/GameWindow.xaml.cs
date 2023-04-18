@@ -34,5 +34,10 @@ namespace CCity.View
         {
             ((Grid)sender).Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
         }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            
+        }
     }
 }
