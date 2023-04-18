@@ -76,8 +76,10 @@ namespace CCity.Model
 
             switch (placeable)
             {
-                case Road _: 
-                     effectedFields = effectedFields.Concat(HandleRoadPlacement(field)).ToList(); break;
+                case Road road: 
+                    effectedFields = effectedFields.Concat(HandleRoadPlacement(field)).ToList();
+                    _roads.Add(road);
+                    break;
                 default:
                     List<Field>? effectedFieldsBySpreading = RefreshPublicity(placeable);
                     if (effectedFieldsBySpreading != null) effectedFields = effectedFields.Concat(effectedFieldsBySpreading).ToList();
@@ -355,7 +357,7 @@ namespace CCity.Model
                 }
 
             }
-            return effectedFields.Concat(_roads.Select(e => e.Owner)).ToList();
+            return effectedFields.Concat(_roads.Select(e => e.Owner!)).ToList();
             //#else
             /*if (field.Placeable is not Road) return null;
             Road road = (Road)field.Placeable;

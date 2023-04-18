@@ -52,6 +52,7 @@
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                     <StackPanel Orientation="Vertical">
                         <Button Content="Közút" Margin="7" Command="{Binding TogglePublicityCommand}"/>
+                        <Button Content="Frissítés" Margin="7" Command="{Binding RefreshMapCommand}"/>
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="0 5">
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">

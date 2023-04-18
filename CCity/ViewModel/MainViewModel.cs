@@ -289,14 +289,19 @@ namespace CCity.ViewModel
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
             if (!field.HasPlaceable) return Color.FromArgb(0, 0, 0, 0);
-            switch (field.Placeable)
+            if(field.Placeable is Zone zone && !zone.HasCitizen)
             {
-                case ResidentialZone _: return Color.FromArgb(50, 0, 255, 0);
-                case CommercialZone _: return Color.FromArgb(50, 0, 0, 255);
-                case IndustrialZone _: return Color.FromArgb(50, 255, 255, 0);
-                default: if (field.Placeable.IsPublic && IsPublicityToggled) return Color.FromArgb(50, 22, 32, 255); else return Color.FromArgb(0, 0, 0, 0);
-                //default: return Color.FromArgb(0, 0, 0, 0);
+                switch (zone)
+                {
+                    case ResidentialZone _: return Color.FromArgb(50, 0, 255, 0);
+                    case CommercialZone _: return Color.FromArgb(50, 0, 0, 255);
+                    case IndustrialZone _: return Color.FromArgb(50, 255, 255, 0);
+                    default: return Color.FromArgb(0, 0, 0, 0);
+                }
             }
+            
+            if (field.Placeable!.IsPublic && IsPublicityToggled) return Color.FromArgb(50, 22, 32, 255); 
+            else return Color.FromArgb(0, 0, 0, 0);
         }
 
         private Color GetMinimapColorFromFieldItem(FieldItem fieldItem)
