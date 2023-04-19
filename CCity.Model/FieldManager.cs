@@ -128,9 +128,9 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
-        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.FindAll(zone => !zone.IsFull || showUnavailable);
-        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.FindAll(zone => !zone.IsFull || showUnavailable);
-        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.FindAll(zone => !zone.IsFull || showUnavailable);
+        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.FindAll(zone => !zone.Full || showUnavailable);
+        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.FindAll(zone => !zone.Full || showUnavailable);
+        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.FindAll(zone => !zone.Full || showUnavailable);
 
         #endregion
 
@@ -233,7 +233,7 @@ namespace CCity.Model
             switch (placeable)
             {
                 //case FireDepartment fireDepartment: return fireDepartment.AvailableFiretrucks == 1; //every firetruck is available
-                case Zone zone: return !zone.HasCitizen;
+                case Zone zone: return zone.Empty;
             }
             return true;
         }

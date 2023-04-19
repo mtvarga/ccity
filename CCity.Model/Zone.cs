@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public abstract class Zone : Placeable, IFlammable, IUpgradeable
     {
         #region Constants
-        public const int CapacityConstant = 10;
+        
+        private const int CapacityConstant = 10;
+        
         #endregion
 
         #region Properties
-        public int Capacity { get; private set; }
-        public int Current { get; private set; }
 
-        public List<Citizen> Citizens { get; private set; }
+        public int Count => Citizens.Count;
+        
+        public int Capacity => CapacityConstant;
+
+        public List<Citizen> Citizens { get; }
 
         double IFlammable.Pontential => throw new NotImplementedException();
 
@@ -30,11 +28,11 @@ namespace CCity.Model
 
         bool IUpgradeable.CanUpgrade => throw new NotImplementedException();
 
-        public bool IsFull => Current >= Capacity;
+        public bool Full => Count == Capacity;
 
-        public bool HasCitizen => Current > 0;
+        public bool Empty => Count == 0;
 
-        public bool BelowHalfPopulation => Current * 2 < Capacity;
+        public bool BelowHalfPopulation => Count * 2 < Capacity;
 
         #endregion
 
@@ -42,9 +40,6 @@ namespace CCity.Model
 
         internal Zone()
         {
-            Current = 0;
-            Capacity = CapacityConstant;
-
             Citizens = new List<Citizen>();
         }
         
@@ -52,23 +47,22 @@ namespace CCity.Model
         
         #region Public methods
 
-        public void AddCitizen(Citizen citizen)
+        public bool AddCitizen(Citizen citizen)
         {
+            if (Count + 1 > Capacity) 
+                return false;
+            
             Citizens.Add(citizen);
-            ++Current;
+            return true;
         }
 
-        public void DropCitizen(Citizen citizen)
-        {
-            Citizens.Remove(citizen);
-            --Current;
-        }
+        public bool DropCitizen(Citizen citizen) => Citizens.Remove(citizen);
 
         public double Satisfaction()
         {
-            if (Current == 0) return 0;
+            if (Count == 0) return 0;
             double sum = Citizens.Sum(e => e.LastCalculatedSatisfaction);
-            return sum / Current;
+            return sum / Count;
         }
 
         #endregion

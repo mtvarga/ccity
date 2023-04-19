@@ -59,7 +59,7 @@ namespace CCity.ViewModel
         public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField.IndustrialEffect) : 0; }
         //public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
         public int SelectedFieldSatisfaction { get => SelectedFieldIsZone ? PercentToInt(((Zone)(_selectedField!.Placeable!)).Satisfaction()) : 0; }
-        public int SelectedFieldPopulation { get => SelectedFieldIsZone ? ((Zone)(_selectedField!.Placeable!)).Current : 0; }
+        public int SelectedFieldPopulation { get => SelectedFieldIsZone ? ((Zone)(_selectedField!.Placeable!)).Count : 0; }
         public bool SelectedFieldIsZone { get => IsFieldSelected && _selectedField!.Placeable is Zone; }
         //public string SelectedFieldCitizenName { get; }
         public int Width { get => _model.Width; }
@@ -286,7 +286,7 @@ namespace CCity.ViewModel
             byte opacity = 50;
             if(field.Placeable is Zone zone)
             {
-                if (zone.HasCitizen) opacity = 37;
+                if (!zone.Empty) opacity = 37;
                 switch (zone)
                 {
                     case ResidentialZone _: return Color.FromArgb(opacity, 0, 255, 0);
@@ -330,7 +330,7 @@ namespace CCity.ViewModel
 
         private Texture GetZoneTexture(Zone zone)
         {
-            if (!zone.HasCitizen) return Texture.None;
+            if (zone.Empty) return Texture.None;
             Texture texture = Texture.None;
             switch (zone)
             {
