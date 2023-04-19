@@ -283,13 +283,15 @@ namespace CCity.ViewModel
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
             if (!field.HasPlaceable) return Color.FromArgb(0, 0, 0, 0);
-            if(field.Placeable is Zone zone && !zone.HasCitizen)
+            byte opacity = 50;
+            if(field.Placeable is Zone zone)
             {
+                if (zone.HasCitizen) opacity = 37;
                 switch (zone)
                 {
-                    case ResidentialZone _: return Color.FromArgb(50, 0, 255, 0);
-                    case CommercialZone _: return Color.FromArgb(50, 0, 0, 255);
-                    case IndustrialZone _: return Color.FromArgb(50, 255, 255, 0);
+                    case ResidentialZone _: return Color.FromArgb(opacity, 0, 255, 0);
+                    case CommercialZone _: return Color.FromArgb(opacity, 0, 0, 255);
+                    case IndustrialZone _: return Color.FromArgb(opacity, 255, 255, 0);
                     default: return Color.FromArgb(0, 0, 0, 0);
                 }
             }
