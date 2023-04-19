@@ -14,6 +14,8 @@ namespace CCity.Model
 
         public override int MaintenanceCost => 0;
 
+        public override bool IsPublic { get => ((Placeable)Main).IsPublic; }
+
         public Filler(IMultifield multifield)
         {
             Main = multifield;
