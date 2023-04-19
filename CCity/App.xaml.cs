@@ -84,7 +84,7 @@ namespace CCity
         {
             bool restartTimer = _timer.IsEnabled;
             _timer.Stop();
-            if (MessageBox.Show("Biztos be akarod zárni a játékot? Az aktuális jákékmenet elfog veszni.", "C City", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+            if (MessageBox.Show("Biztos be akarod zárni a játékot?", "C City", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
             {
                 e.Cancel=true;
                 _timer.Start();
