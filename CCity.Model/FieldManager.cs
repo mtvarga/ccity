@@ -178,6 +178,7 @@ namespace CCity.Model
 
         private List<Field> SpreadPlaceableEffectConditional(Placeable placeable, bool add)
         {
+            placeable = GetRoot(placeable);
             if(!placeable.IsPublic) return new List<Field>() { placeable.Owner! };
             switch (placeable)
             {
