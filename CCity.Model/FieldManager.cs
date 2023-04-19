@@ -176,6 +176,18 @@ namespace CCity.Model
             return effectedFields;
         }
 
+        private void UpdatePlaceableList(Placeable placeable, bool add)
+        {
+            switch (placeable)
+            {
+                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.RemoveAll(e => e == residentialZone); break;
+                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.RemoveAll(e => e == commercialZone); break;
+                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.RemoveAll(e => e == industrialZone); break;
+                case Road road: if (add) _roads.Add(road); else _roads.RemoveAll(e => e == road); break;
+                default: break;
+            }
+        }
+
         private List<Field> SpreadPlaceableEffectConditional(Placeable placeable, bool add)
         {
             if(!placeable.IsPublic) return new List<Field>() { placeable.Owner! };
@@ -186,18 +198,6 @@ namespace CCity.Model
                 case Stadium _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeStadiumEffect(i));
                 case IndustrialZone _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeIndustrialEffect(i));
                 default: return new List<Field>() { placeable.Owner! };
-            }
-        }
-
-        private void UpdatePlaceableList(Placeable placeable, bool add)
-        {
-            switch (placeable)
-            {
-                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.RemoveAll(e => e == residentialZone); break;
-                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.RemoveAll(e => e == commercialZone); break;
-                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.RemoveAll(e => e == industrialZone); break;
-                case Road road: if (add) _roads.Add(road); else _roads.RemoveAll(e => e == road); break;
-                default: break;
             }
         }
 
