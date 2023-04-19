@@ -231,6 +231,8 @@ namespace CCity.Model
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        public double ZoneSatisfaction(Zone zone) => _globalManager.CalculateSatisfaction(zone);
+        
         #endregion
 
         #region Events

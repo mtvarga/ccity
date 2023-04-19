@@ -56,8 +56,12 @@
 
         #region Properties
 
-        public double TotalSatisfaction => Population > 0 ? (1 - NegativeBudgetRatio) * PositiveBudgetFactors : 0;
-
+        public double TotalSatisfaction => Population switch
+        {
+            > 0 => TotalSatisfactionForCitizenAverage(AverageCitizenFactors),
+            _ => 0
+        };
+        
         public int Budget { get; private set; }
 
         public Taxes Taxes => _taxes;
@@ -67,11 +71,6 @@
                                               NegativeBudgetRatioParts;  
 
         private int NegativeBudgetYears { get; set; }
-
-        private double PositiveBudgetFactors => (CitizenAverageRatio * AverageCitizenFactors +
-                                                 GlobalRatio * GlobalFactors)
-                                                /
-                                                (CitizenAverageRatio + GlobalRatio);
 
         private double AverageCitizenFactors { get; set; }
 
@@ -264,6 +263,12 @@
             if (Budget <= 0)
                 NegativeBudgetYears++;
         }
+
+        public double CalculateSatisfaction(Zone zone) => zone.Empty switch
+        {
+            true => 0,
+            _ => TotalSatisfactionForCitizenAverage(zone.Citizens.Sum(citizen => citizen.LastCalculatedSatisfaction) / zone.Count)
+        };
         
         #endregion
 
@@ -297,9 +302,15 @@
                                                  (HomeRatio + WorkplaceRatio + DistanceRatio);
         }
 
+        private double TotalSatisfactionForCitizenAverage(double citizenAverage) =>
+            (1 - NegativeBudgetRatio) * (CitizenAverageRatio * citizenAverage +
+                                         GlobalRatio * GlobalFactors)
+                                        /
+                                        (CitizenAverageRatio + GlobalRatio);
+
         private static double SafetyRatioForPopulation(int population) => MinSafetyRatio + 
                                                                           Math.Floor(Math.Min(population, MaxSafetyRatioPopulation) /
-                                                                              (MaxSafetyRatioPopulation / SafetyRatioParts)) * 
+                                                                                     (MaxSafetyRatioPopulation / SafetyRatioParts)) * 
                                                                           ((MaxSafetyRatio - MinSafetyRatio) / SafetyRatioParts);
 
         #endregion
