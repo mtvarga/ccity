@@ -61,6 +61,7 @@ namespace CCity.Model
             Road starterRoad = new Road();
             starterRoad.GetsPublicityFrom = starterRoad;
             Fields[ROOTX, ROOTY].Place(starterRoad);
+            _roads.Add(starterRoad);
         }
 
         #endregion
@@ -360,13 +361,13 @@ namespace CCity.Model
             {
                 foreach(Road tempRoad in _roads)
                 {
-                    tempRoad.GetsPublicityFrom = null;
-                    tempRoad.GivesPublicityTo = new List<Road>();
                     List<Placeable> notRoadNeighbours = GetRoadNeighbours(tempRoad, true);
                     foreach (Placeable placeable in notRoadNeighbours)
                     {
-                        privatedPlaceables.Add(placeable);
+                        if(placeable.IsPublic) privatedPlaceables.Add(placeable);
                     }
+                    tempRoad.GetsPublicityFrom = null;
+                    tempRoad.GivesPublicityTo = new List<Road>();
                 }
                 SpreadRoadPublicity((Road)Fields[ROOTX, ROOTY].Placeable!,ref effectedFields!);
                 if (privatedPlaceables.Count > 0 && !privatedPlaceables.All(e => CouldBePublic(e)))
@@ -467,7 +468,7 @@ namespace CCity.Model
 
 #endregion
 
-#region Helpers
+        #region Helpers
 
         private bool OnMap(int x, int y)
         {
