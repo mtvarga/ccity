@@ -87,7 +87,6 @@ namespace CCity
             if (MessageBox.Show("Biztos be akarod zárni a játékot?", "C City", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
             {
                 e.Cancel=true;
-                _timer.Start();
 
                 if(restartTimer)
                 {
@@ -101,15 +100,23 @@ namespace CCity
 
         #region ViewModel event handlers
 
-        private void Model_NewGame(object? sender, EventArgs e)
-        {
-            _mainWindow.NavigateTo(_gameWindow);
-            _timer.Start();
-        }
-
         private void ViewModel_ExitGame(object? sender, EventArgs e)
         {
-            _mainWindow.NavigateTo(_startupWindow);
+            bool restartTimer = _timer.IsEnabled;
+            _timer.Stop();
+            if (MessageBox.Show("Biztos új játékot akarsz kezdeni? A jelenlegi játékmentet elfog veszni.", "C City", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                _mainWindow.NavigateTo(_startupWindow);
+                _viewModel.ExitToMainMenu();
+            }
+            else
+            {
+                if (restartTimer)
+                {
+                    _timer.Start();
+                }
+            }
+
         }
 
         private void ViewModel_PauseGame(object? sender, EventArgs e)
@@ -128,6 +135,12 @@ namespace CCity
         #endregion
 
         #region Model event handlers
+
+        private void Model_NewGame(object? sender, EventArgs e)
+        {
+            _mainWindow.NavigateTo(_gameWindow);
+            _timer.Start();
+        }
 
         private void Model_GameOver(object? sender, EventArgs e)
         {

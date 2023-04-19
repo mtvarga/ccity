@@ -193,9 +193,9 @@ namespace CCity.ViewModel
             ChangeSpeedCommand =
                 new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
 
-            _inputCityName = "";
-            _inputMayorName = "";
-            _isPublicityToggled = false;
+            InputCityName = "";
+            InputMayorName = "";
+            IsPublicityToggled = false;
         }
 
         private void OnTogglePublicity()
@@ -539,7 +539,7 @@ namespace CCity.ViewModel
                 case "DEMOLISH - FIELDHASCIZIZEN": errorMessage = "Csak az üres zónát lehet visszaminősíteni."; break;
                 case "DEMOLISH-FIELDPUBLICITY": errorMessage = "Az út rombolásával legalább egy épület elérhetetlenné válna.";break;
             }
-            MessageBox.Show("A művelet nem végezhető el: \n"+errorMessage, "Hiba", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("A művelet nem végezhető el: \n"+errorMessage, "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         private void Model_SpeedChanged(object? o, EventArgs e) => OnPropertyChanged(nameof(Speed));
@@ -628,7 +628,16 @@ namespace CCity.ViewModel
                 _ => _model.Speed
             });
         }
-        
+
+        public void ExitToMainMenu()
+        {
+            CreateTable();
+            CreateToolbar();
+            InputCityName = "";
+            InputMayorName = "";
+            IsPublicityToggled = false;
+        }
+
         #endregion
     }
 }
