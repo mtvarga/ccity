@@ -3,11 +3,11 @@
     public class Field
     {
         #region Constants
-        internal const int MAX_POLICE_DEPARTMENT_EFFECT = 20;
-        internal const int MAX_STADIUM_EFFECT = 20;
-        internal const int MAX_FIRE_DEPARTMENT_EFFECT = 20;
+        internal const int MAX_POLICE_DEPARTMENT_EFFECT = 10;
+        internal const int MAX_STADIUM_EFFECT = 10;
+        internal const int MAX_FIRE_DEPARTMENT_EFFECT = 10;
         internal const int MAX_FOREST_EFFECT = 20;
-        internal const int MAX_INDUSTRIAL_EFFECT = 20;
+        internal const int MAX_INDUSTRIAL_EFFECT = 30;
         #endregion
 
         #region Fields
