@@ -193,10 +193,10 @@ namespace CCity.Model
             return placeable switch
             {
                 { IsPublic: false } => new List<Field>() { placeable.Owner! },
-                FireDepartment _ => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeFireDepartmentEffect(i)),
-                PoliceDepartment _ => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangePoliceDepartmentEffect(i)),
-                Stadium _ => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeStadiumEffect(i)),
-                IndustrialZone _ => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeIndustrialEffect(i)),
+                FireDepartment => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeFireDepartmentEffect(i)),
+                PoliceDepartment => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangePoliceDepartmentEffect(i)),
+                Stadium => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeStadiumEffect(i)),
+                IndustrialZone => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeIndustrialEffect(i)),
                 _ => new List<Field>() { placeable.Owner! },
             };
         }
