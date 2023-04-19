@@ -59,7 +59,7 @@ namespace CCity.ViewModel
         public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField.IndustrialEffect) : 0; }
         //public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
         public int SelectedFieldSatisfaction { get => SelectedFieldIsZone ? PercentToInt(((Zone)(_selectedField!.Placeable!)).Satisfaction()) : 0; }
-        public int SelectedFieldPopulation { get => SelectedFieldIsZone ? ((Zone)(_selectedField!.Placeable!)).Count : 0; }
+        public int SelectedFieldPopulation { get => SelectedFieldIsZone ? PercentToInt(_model.ZoneSatisfaction((Zone)_selectedField!.Placeable!)) : 0; }
         public bool SelectedFieldIsZone { get => IsFieldSelected && _selectedField!.Placeable is Zone; }
         //public string SelectedFieldCitizenName { get; }
         public int Width { get => _model.Width; }
