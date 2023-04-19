@@ -61,7 +61,6 @@ namespace CCity.Model
             Road starterRoad = new Road();
             starterRoad.GetsPublicityFrom = starterRoad;
             Fields[ROOTX, ROOTY].Place(starterRoad);
-            _roads.Add(starterRoad);
         }
 
         #endregion

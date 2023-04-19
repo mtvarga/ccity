@@ -73,8 +73,8 @@
                 </ItemsControl>
                 <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                     <StackPanel Orientation="Vertical">
-                        <Button Content="Közút" Margin="7" Command="{Binding TogglePublicityCommand}"/>
-                        <Button Content="Frissítés" Margin="7" Command="{Binding RefreshMapCommand}"/>
+                        <Button Content="Közút" Height="24" Margin="0 5" Command="{Binding TogglePublicityCommand}"/>
+                        <!--<Button Content="Frissítés" Height="24" Margin="0 5" Command="{Binding RefreshMapCommand}"/>-->
                     </StackPanel>
                     <StackPanel Orientation="Vertical" Margin="0 5">
                     <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
@@ -119,7 +119,7 @@
                         <Button Width="24" Height="24" Command="{Binding ChangeSpeedCommand}" CommandParameter="1">+</Button>
                     </StackPanel>
                     <StackPanel Orientation="Vertical">
-                        <Button Content="Kilépés" Margin="7" Command="{Binding ExitGameCommand}"/>
+                        <Button Content="Kilépés" Height="24" Margin="0 10 0 0" Command="{Binding ExitGameCommand}"/>
                     </StackPanel>
                 </StackPanel>
             </Grid>
