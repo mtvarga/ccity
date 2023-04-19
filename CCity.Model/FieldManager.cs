@@ -99,7 +99,7 @@ namespace CCity.Model
 
             Field field = Fields[x, y];
             if (!field.HasPlaceable) throw new Exception("DEMOLISH-NOTEMPTYFIELD");
-            Placeable placeable = field.Placeable!;
+            Placeable placeable = GetRoot(field.Placeable!);
             List<Field> effectedFields = new();
 
             switch (placeable)
@@ -178,7 +178,6 @@ namespace CCity.Model
 
         private List<Field> SpreadPlaceableEffectConditional(Placeable placeable, bool add)
         {
-            placeable = GetRoot(placeable);
             if(!placeable.IsPublic) return new List<Field>() { placeable.Owner! };
             switch (placeable)
             {

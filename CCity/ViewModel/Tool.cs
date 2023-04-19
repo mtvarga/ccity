@@ -21,6 +21,5 @@ namespace CCity.ViewModel
         Pole,
         Forest,
         Bulldozer
-
     }
 }
