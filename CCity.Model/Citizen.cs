@@ -45,11 +45,11 @@
                 throw new Exception("Illegal operation: Attempted to set Citizen's workplace to null while they already have a workplace.");
             
             Workplace?.DropCitizen(this);
-
+            Workplace = workplace;
+            
             if (!(Workplace?.AddCitizen(this) ?? true))
                 throw new Exception("Couldn't change Citizen's workplace.");
-            
-            Workplace = workplace;
+
             CalculateHomeWorkplaceDistanceEffect();
         }
 
