@@ -25,7 +25,7 @@
         public CitizenManager()
         {
             Citizens = new List<Citizen>();
-            JoblessCitizens = new List<Citizen>();
+            // JoblessCitizens = new List<Citizen>();
             
             NextWorkplaceIsCommercial = true;
         }
