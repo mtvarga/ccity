@@ -170,27 +170,45 @@ namespace CCity.Model
             var vacantCommercialZones = _fieldManager.CommercialZones(false).Cast<WorkplaceZone>().ToList();
             var vacantIndustrialZones = _fieldManager.IndustrialZones(false).Cast<WorkplaceZone>().ToList();
 
-            if (vacantCommercialZones.Any() || vacantIndustrialZones.Any())
+            var newCitizens = new List<Citizen>();
+            
+            /*if (vacantCommercialZones.Any() || vacantIndustrialZones.Any())
             {
-                var effectedCitizens = _citizenManager.OptimizeWorkplaces(vacantCommercialZones, vacantIndustrialZones);
-                _globalManager.UpdateSatisfaction(effectedCitizens);
-                
+                workplaceOptimizedCitizens = _citizenManager.OptimizeWorkplaces(vacantCommercialZones, vacantIndustrialZones);
+
+                if (workplaceOptimizedCitizens.Any())
+                    _globalManager.UpdateSatisfaction(workplaceOptimizedCitizens);
+
                 if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
                 {
-                    var newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
-                
-                    _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
-                
-                    PopulationChanged?.Invoke(this, EventArgs.Empty);
-                    SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+                    newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
+                    
+                    if (newCitizens.Any())
+                        _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
                 }
+            }*/
+            
+            if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
+            {
+                newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
+                    
+                if (newCitizens.Any())
+                    _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
             }
             
+            // TODO: Optimize this!
             List<Field> fields = new();
             foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
+            
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
+
+            if (!newCitizens.Any()) 
+                return;
+            
+            PopulationChanged?.Invoke(this, EventArgs.Empty);
+            SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void YearlyTick()
