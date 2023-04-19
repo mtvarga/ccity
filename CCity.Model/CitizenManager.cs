@@ -14,7 +14,7 @@
         
         public int Population => Citizens.Count;
 
-        private List<Citizen> JoblessCitizens { get; }
+        //private List<Citizen> JoblessCitizens { get; }
         
         private bool NextWorkplaceIsCommercial { get; set; }
         
@@ -54,13 +54,10 @@
                 {
                     nextWorkplace = NextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
                     
-                    var citizen = new Citizen(home, nextWorkplace);
-
                     if (nextWorkplace == null)
-                    {
-                        JoblessCitizens.Add(citizen);
                         break;
-                    }
+
+                    var citizen = new Citizen(home, nextWorkplace);
                     
                     Citizens.Add(citizen);
                     result.Add(citizen);
@@ -100,7 +97,7 @@
         {
             var result = new List<Citizen>();
             
-            foreach (var citizen in JoblessCitizens)
+            /*foreach (var citizen in JoblessCitizens)
             {
                 var nextWorkplace = NextWorkplace(citizen.Home, vacantCommercialZones, vacantIndustrialZones);
                 
@@ -114,7 +111,7 @@
                     (NextWorkplaceIsCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(nextWorkplace);
 
                 NextWorkplaceIsCommercial = !NextWorkplaceIsCommercial;
-            }
+            }*/
 
             return result;
         }
@@ -130,7 +127,6 @@
             if (result == null)
             {
                 result = NearestWorkplace(p, !NextWorkplaceIsCommercial ? vacantCommercialZones : vacantIndustrialZones);
-
                 NextWorkplaceIsCommercial = !NextWorkplaceIsCommercial;
             }
 
