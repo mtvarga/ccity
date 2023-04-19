@@ -26,33 +26,37 @@
 
         #region Constructors
 
-        public Citizen(ResidentialZone home, WorkplaceZone? workplace)
+        public Citizen(ResidentialZone home, WorkplaceZone? workplace = null)
         {
+            if (!home.AddCitizen(this))
+                throw new Exception("Couldn't add Citizen to ResidentialZone.");
+
             Home = home;
-            Home.AddCitizen(this);
-            Workplace = workplace;
-            Workplace?.AddCitizen(this);
-            
-            CalculateHomeWorkplaceDistanceEffect();
+            ChangeWorkplace(workplace);
         }
 
         #endregion
 
         #region Public methods
         
-        public void SwapWorkplace(WorkplaceZone? workplace)
+        public void ChangeWorkplace(WorkplaceZone? workplace)
         {
+            if (Workplace != null && workplace == null)
+                throw new Exception("Illegal operation: Attempted to set Citizen's workplace to null while they already have a workplace.");
+            
             Workplace?.DropCitizen(this);
-            Workplace = workplace;
-            Workplace?.AddCitizen(this);
 
+            if (!(Workplace?.AddCitizen(this) ?? true))
+                throw new Exception("Couldn't change Citizen's workplace.");
+            
+            Workplace = workplace;
             CalculateHomeWorkplaceDistanceEffect();
         }
 
         public void MoveOut()
         {
-            Home.DropCitizen(this);
-            Workplace?.DropCitizen(this);
+            if (!Home.DropCitizen(this) || !(Workplace?.DropCitizen(this) ?? true))
+                throw new Exception("Couldn't move out Citizen.");
         }
         
         #endregion

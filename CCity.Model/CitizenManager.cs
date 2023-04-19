@@ -49,17 +49,17 @@
             // TODO: Implement some sort of updating of these vacant homes in FieldManager
             foreach (var home in vacantHomes)
             {
-                var freeSlots = home.Capacity - home.Current;
+                var freeSlots = home.Capacity - home.Count;
                 var newCitizenCount = freeSlots > 2 
                     ? new Random(DateTime.Now.Millisecond).Next(3, Math.Min(6, freeSlots)) 
                     : freeSlots;
 
                 for (var i = 0; i < newCitizenCount; i++)
                 {
-                    nextWorkplace = FindNextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
+                    nextWorkplace = NextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
                     
                     var citizen = new Citizen(home, nextWorkplace);
-                    
+
                     if (nextWorkplace == null)
                     {
                         JoblessCitizens.Add(citizen);
@@ -68,6 +68,11 @@
                     
                     Citizens.Add(citizen);
                     result.Add(citizen);
+                    
+                    if (nextWorkplace.Full)
+                        (_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(nextWorkplace);
+                    
+                    _nextToCommercial = !_nextToCommercial;
                 }
                 
                 if (nextWorkplace == null)
@@ -95,44 +100,42 @@
             return result;
         }
 
-        public Dictionary<WorkplaceZone, Citizen> OptimizeWorkplaces(List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
+        public List<Citizen> OptimizeWorkplaces(List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         {
+            var result = new List<Citizen>();
+            
             foreach (var citizen in JoblessCitizens)
             {
-                citizen.SwapWorkplace(FindNextWorkplace(citizen.Home, vacantCommercialZones, vacantIndustrialZones));
+                citizen.ChangeWorkplace(NextWorkplace(citizen.Home, vacantCommercialZones, vacantIndustrialZones));
 
                 if (citizen.Jobless)
                     break;
+                
+                result.Add(citizen);
             }
 
-            return new Dictionary<WorkplaceZone, Citizen>();
+            return result;
         }
 
         #endregion
 
         #region Private methods
 
-        private WorkplaceZone? FindNextWorkplace(ResidentialZone home, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
+        private WorkplaceZone? NextWorkplace(Placeable p, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         { 
-            var result = FindNearestWorkplace(home, _nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
+            var result = NearestWorkplace(p, _nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
 
             if (result == null)
             {
-                result = FindNearestWorkplace(home, !_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
+                result = NearestWorkplace(p, !_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
 
                 _nextToCommercial = !_nextToCommercial;
             }
 
-
-            if (result is { IsFull: true })
-                (_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(result);
-
-            _nextToCommercial = !_nextToCommercial;
-            
             return result;
         }
         
-        private static WorkplaceZone? FindNearestWorkplace(Placeable p, List<WorkplaceZone> vacantWorkplaces)
+        private static WorkplaceZone? NearestWorkplace(Placeable p, List<WorkplaceZone> vacantWorkplaces)
         {
             var nearestWorkplace = vacantWorkplaces.FirstOrDefault();
             var smallestDistance = Utilities.AbsoluteDistance(p, nearestWorkplace);
