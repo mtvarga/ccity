@@ -82,6 +82,7 @@
                 </Button>
                 <Button
                     Style="{StaticResource StartupButtonStyle}"
+                    Command="{Binding CloseApplicationCommand}"
                     Width="150">
                     Kilépés
                 </Button>

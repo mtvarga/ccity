@@ -351,7 +351,6 @@ namespace CCity.Model
         private List<Field> DemolishRoad(Field field)
         {
             //#if TEMP_ROAD_DEMOLISH
-            if (!CanDemolish(field)) throw new Exception("DEMOLISH-FIELDHASCIZIZEN");
             if (field.Placeable is not Road) return new();
             Road road = (Road)field.Placeable;
             List<Field> effectedFields = new();
