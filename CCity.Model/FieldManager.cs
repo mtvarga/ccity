@@ -190,15 +190,15 @@ namespace CCity.Model
 
         private List<Field> SpreadPlaceableEffectConditional(Placeable placeable, bool add)
         {
-            if(!placeable.IsPublic) return new List<Field>() { placeable.Owner! };
-            switch (placeable)
+            return placeable switch
             {
-                case FireDepartment _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeFireDepartmentEffect(i));
-                case PoliceDepartment _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangePoliceDepartmentEffect(i));
-                case Stadium _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeStadiumEffect(i));
-                case IndustrialZone _: return SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeIndustrialEffect(i));
-                default: return new List<Field>() { placeable.Owner! };
-            }
+                { IsPublic: false } => new List<Field>() { placeable.Owner! },
+                FireDepartment _ => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeFireDepartmentEffect(i)),
+                PoliceDepartment _ => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangePoliceDepartmentEffect(i)),
+                Stadium _ => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeStadiumEffect(i)),
+                IndustrialZone _ => SpreadPlaceableEffect(placeable, add, (f, i) => f.ChangeIndustrialEffect(i)),
+                _ => new List<Field>() { placeable.Owner! },
+            };
         }
 
         private List<Field> SpreadPlaceableEffect(Placeable placeable, bool add, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS, int maxEffect = MAX_EFFECT)
