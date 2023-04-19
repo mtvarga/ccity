@@ -11,7 +11,7 @@ namespace CCity.Model
         #region Constants
 
         private const int MAX_EFFECT = 10;
-        private const int EFFECT_RADIUS = 7;
+        private const int EFFECT_RADIUS = 10;
         private const int HEIGHT = 13;
         private const int WIDTH = 25;
         private const int ROOTX = WIDTH / 2;
