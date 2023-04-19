@@ -18,8 +18,8 @@
         
         private const int StartingBudget = 10000;
 
-        private const double CitizenAverageRatio = (double)2 / 3;
-        private const double GlobalRatio = (double)1 / 3;
+        private const double CitizenAverageRatio = 0.5;
+        private const double GlobalRatio = 0.5;
         
         private const double MinSafetyRatio = 0.25;
         private const double MaxSafetyRatio = 0.5;
@@ -39,8 +39,8 @@
         
         private const double WorkplaceStadiumRatio = 1;
         
-        private const double TaxRatio = (double)2 / 3;
-        private const double IndustrialCommercialBalanceRatio = (double)1 / 3;
+        private const double TaxRatio = 0.8;
+        private const double IndustrialCommercialBalanceRatio = 0.2;
         
         #endregion
 
