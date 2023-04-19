@@ -83,7 +83,7 @@
                                      (Taxes.CommercialTax - MinComTax) / 3 * (MaxComTax - MinComTax) +
                                      (Taxes.IndustrialTax - MinIndTax) / 3 * (MaxIndTax - MinIndTax);
 
-        private double IndustrialCommercialBalance => CommercialZoneCount + IndustrialZoneCount switch
+        private double IndustrialCommercialBalance => (CommercialZoneCount + IndustrialZoneCount) switch
         {
             0 => 0,
             _ => 1 -
@@ -198,14 +198,14 @@
             CommercialZoneCount = commercialZoneCount;
             IndustrialZoneCount = industrialZoneCount;
 
-            if (Population <= 0)
-                return;
-            
             UpdateSatisfaction(zones.SelectMany(zone => zone.Citizens));
         }
         
         public void UpdateSatisfaction(IEnumerable<Citizen> citizens)
         {
+            if (Population <= 0)
+                return;
+
             var citizenSatisfactionSum = AverageCitizenFactors * Population;
 
             foreach (var citizen in citizens)
