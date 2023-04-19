@@ -42,6 +42,7 @@ namespace CCity.Model
 
             _counter = 0;
             _monthCounter = 0;
+            Speed = Speed.Normal;
         }
 
         #endregion
@@ -145,6 +146,11 @@ namespace CCity.Model
             _globalManager = new GlobalManager();
             CityName = cityName;
             MayorName = mayorName;
+
+            _counter = 0;
+            _monthCounter = 0;
+            Speed = Speed.Normal;
+
             NewGame?.Invoke(this, EventArgs.Empty);
         }
 
