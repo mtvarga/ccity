@@ -8,7 +8,7 @@
         private const int ComTaxNorm = 500;
         private const int IndTaxNorm = 750;
 
-        private const double MaxResTax = 0.75;
+        private const double MaxResTax = 0.50;
         private const double MaxComTax = 0.25;
         private const double MaxIndTax = 0.25;
         
