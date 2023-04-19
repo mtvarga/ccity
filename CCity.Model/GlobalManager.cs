@@ -83,9 +83,13 @@
                                      (Taxes.CommercialTax - MinComTax) / 3 * (MaxComTax - MinComTax) +
                                      (Taxes.IndustrialTax - MinIndTax) / 3 * (MaxIndTax - MinIndTax);
 
-        private double IndustrialCommercialBalance => 1 - 
-                                                      Math.Abs(CommercialZoneCount - IndustrialZoneCount) / 
-                                                      (CommercialZoneCount + IndustrialZoneCount);
+        private double IndustrialCommercialBalance => CommercialZoneCount + IndustrialZoneCount switch
+        {
+            0 => 0,
+            _ => 1 -
+                 Math.Abs(CommercialZoneCount - IndustrialZoneCount) /
+                 ((double)CommercialZoneCount + IndustrialZoneCount)
+        };
 
         private int CommercialZoneCount { get; set; }
         
@@ -263,16 +267,24 @@
 
         private void CalculateSatisfaction(Citizen citizen)
         {
-            var homeFactors = SafetyRatio * citizen.Home.Owner!.PoliceDepartmentEffect + 
-                              (1 - SafetyRatio) * ((HomePollutionRatio * (1 - citizen.Home.Owner.IndustrialEffect) + 
-                                                    HomeStadiumRatio * citizen.Home.Owner.StadiumEffect) 
-                                                   / 
-                                                   (HomePollutionRatio + HomeStadiumRatio));
+            var homeFactors = citizen.Home switch
+            {
+                { Owner: { } homeField } =>       SafetyRatio * homeField.PoliceDepartmentEffect +
+                                            (1 - SafetyRatio) * ((HomePollutionRatio * (1 - homeField.IndustrialEffect) +
+                                                                    HomeStadiumRatio * homeField.StadiumEffect)
+                                                                   /
+                                                                   (HomePollutionRatio + HomeStadiumRatio)),
+                _ => 0
+            };
 
-            var workplaceFactors = SafetyRatio * citizen.Workplace.Owner!.PoliceDepartmentEffect + 
-                                   (1 - SafetyRatio) * ((WorkplaceStadiumRatio * citizen.Workplace.Owner.StadiumEffect)
-                                                        /
-                                                        (WorkplaceStadiumRatio));
+            var workplaceFactors = citizen.Workplace switch
+            {
+                { Owner: { } workplaceField } =>       SafetyRatio * workplaceField.PoliceDepartmentEffect + 
+                                                 (1 - SafetyRatio) * ((WorkplaceStadiumRatio * workplaceField.StadiumEffect)
+                                                                      /
+                                                                      (WorkplaceStadiumRatio)),
+                _ => 0
+            };
 
             citizen.LastCalculatedSatisfaction = (HomeRatio * homeFactors + 
                                                   WorkplaceRatio * workplaceFactors + 

@@ -7,12 +7,6 @@
         private const double CitizenMoveOutThreshold = 0.25;
 
         #endregion
-        
-        #region Fields
-        
-        private bool _nextToCommercial;
-
-        #endregion
 
         #region Properties
 
@@ -21,6 +15,8 @@
         public int Population => Citizens.Count;
 
         private List<Citizen> JoblessCitizens { get; }
+        
+        private bool NextWorkplaceIsCommercial { get; set; }
         
         #endregion
 
@@ -31,7 +27,7 @@
             Citizens = new List<Citizen>();
             JoblessCitizens = new List<Citizen>();
             
-            _nextToCommercial = true;
+            NextWorkplaceIsCommercial = true;
         }
 
         #endregion
@@ -70,9 +66,9 @@
                     result.Add(citizen);
                     
                     if (nextWorkplace.Full)
-                        (_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(nextWorkplace);
+                        (NextWorkplaceIsCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(nextWorkplace);
                     
-                    _nextToCommercial = !_nextToCommercial;
+                    NextWorkplaceIsCommercial = !NextWorkplaceIsCommercial;
                 }
                 
                 if (nextWorkplace == null)
@@ -106,12 +102,18 @@
             
             foreach (var citizen in JoblessCitizens)
             {
-                citizen.ChangeWorkplace(NextWorkplace(citizen.Home, vacantCommercialZones, vacantIndustrialZones));
-
-                if (citizen.Jobless)
+                var nextWorkplace = NextWorkplace(citizen.Home, vacantCommercialZones, vacantIndustrialZones);
+                
+                if (nextWorkplace == null)
                     break;
                 
+                citizen.ChangeWorkplace(nextWorkplace);
                 result.Add(citizen);
+                
+                if (nextWorkplace.Full)
+                    (NextWorkplaceIsCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(nextWorkplace);
+
+                NextWorkplaceIsCommercial = !NextWorkplaceIsCommercial;
             }
 
             return result;
@@ -123,13 +125,13 @@
 
         private WorkplaceZone? NextWorkplace(Placeable p, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         { 
-            var result = NearestWorkplace(p, _nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
+            var result = NearestWorkplace(p, NextWorkplaceIsCommercial ? vacantCommercialZones : vacantIndustrialZones);
 
             if (result == null)
             {
-                result = NearestWorkplace(p, !_nextToCommercial ? vacantCommercialZones : vacantIndustrialZones);
+                result = NearestWorkplace(p, !NextWorkplaceIsCommercial ? vacantCommercialZones : vacantIndustrialZones);
 
-                _nextToCommercial = !_nextToCommercial;
+                NextWorkplaceIsCommercial = !NextWorkplaceIsCommercial;
             }
 
             return result;

@@ -169,17 +169,23 @@ namespace CCity.Model
             var vacantHomes = _fieldManager.ResidentialZones(false);
             var vacantCommercialZones = _fieldManager.CommercialZones(false).Cast<WorkplaceZone>().ToList();
             var vacantIndustrialZones = _fieldManager.IndustrialZones(false).Cast<WorkplaceZone>().ToList();
-            
-            if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
-            {
-                var newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
-                
-                _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
-                
-                PopulationChanged?.Invoke(this, EventArgs.Empty);
-                SatisfactionChanged?.Invoke(this, EventArgs.Empty);
-            }
 
+            if (vacantCommercialZones.Any() || vacantIndustrialZones.Any())
+            {
+                var effectedCitizens = _citizenManager.OptimizeWorkplaces(vacantCommercialZones, vacantIndustrialZones);
+                _globalManager.UpdateSatisfaction(effectedCitizens);
+                
+                if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
+                {
+                    var newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
+                
+                    _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
+                
+                    PopulationChanged?.Invoke(this, EventArgs.Empty);
+                    SatisfactionChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            
             List<Field> fields = new();
             foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
