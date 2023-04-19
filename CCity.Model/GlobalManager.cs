@@ -4,22 +4,26 @@
     {
         #region Constants 
         
-        private const int ResTaxNorm = 1500;
-        private const int ComTaxNorm = 5000;
-        private const int IndTaxNorm = 7500;
+        private const int ResTaxNorm = 150;
+        private const int ComTaxNorm = 500;
+        private const int IndTaxNorm = 750;
 
-        private const double MaxResTax = 0.5;
+        private const double MaxResTax = 0.75;
         private const double MaxComTax = 0.25;
         private const double MaxIndTax = 0.25;
         
-        private const double MinResTax = 0.15;
-        private const double MinComTax = 0.1;
-        private const double MinIndTax = 0.05;
+        private const double MinResTax = 0.01;
+        private const double MinComTax = 0.01;
+        private const double MinIndTax = 0.01;
+
+        private const double ResTaxRatio = 0.8;
+        private const double IndTaxRatio = 0.1;
+        private const double ComTaxRatio = 0.1;
         
         private const int StartingBudget = 10000;
 
-        private const double CitizenAverageRatio = 0.5;
-        private const double GlobalRatio = 0.5;
+        private const double CitizenAverageRatio = 0.25;
+        private const double GlobalRatio = 0.75;
         
         private const double MinSafetyRatio = 0.25;
         private const double MaxSafetyRatio = 0.5;
@@ -78,10 +82,10 @@
                                         /
                                         (TaxRatio + IndustrialCommercialBalanceRatio);
 
-        private double TaxFactors => 1 -
-                                     (Taxes.ResidentalTax - MinResTax) / 3 * (MaxResTax - MinResTax) +
-                                     (Taxes.CommercialTax - MinComTax) / 3 * (MaxComTax - MinComTax) +
-                                     (Taxes.IndustrialTax - MinIndTax) / 3 * (MaxIndTax - MinIndTax);
+        private double TaxFactors => 1 - (ResTaxRatio * (Taxes.ResidentalTax - MinResTax) / (MaxResTax - MinResTax) +
+                                          ComTaxRatio * (Taxes.CommercialTax - MinComTax) / (MaxComTax - MinComTax) +
+                                          IndTaxRatio * (Taxes.IndustrialTax - MinIndTax) / (MaxIndTax - MinIndTax)) /
+                                         (ResTaxRatio + ComTaxRatio + IndTaxRatio);
 
         private double IndustrialCommercialBalance => (CommercialZoneCount + IndustrialZoneCount) switch
         {
