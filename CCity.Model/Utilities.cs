@@ -33,7 +33,7 @@ namespace CCity.Model
             select (
                 point.X, 
                 point.Y, 
-                Math.Sin(Math.Round(SquareDistance(f.X, f.Y, point.X, point.Y)) / r)
+                Math.Sin(Math.Round(r - SquareDistance(f.X, f.Y, point.X, point.Y)) / r * Math.PI / 2)
             );
 
         
@@ -48,7 +48,7 @@ namespace CCity.Model
         public static double SquareDistance(int x1, int y1, int x2, int y2) =>
             Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
 
-        public static int AbsoluteDistance(Placeable p1, Placeable p2) => AbsoluteDistance(p1.Owner, p2.Owner);
+        public static int AbsoluteDistance(Placeable? p1, Placeable? p2) => AbsoluteDistance(p1?.Owner, p2?.Owner);
 
         public static int AbsoluteDistance(Field? f1, Field? f2) => (f1, f2) switch
         {

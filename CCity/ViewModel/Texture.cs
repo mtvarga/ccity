@@ -16,15 +16,31 @@ namespace CCity.ViewModel
         RoadVertical,
         RoadHorizontal,
         RoadTopLeft,
-        //...
+        RoadTopRight,
+        RoadBottomLeft,
+        RoadBottomRight,
+        RoadNotTop,
+        RoadNotBottom,
+        RoadNotLeft,
+        RoadNotRight,
+        RoadTopClose,
+        RoadBottomClose,
+        RoadLeftClose,
+        RoadRightClose,
+        RoadCross,
         FireDepartment,
         PoliceDepartment,
         Forest,
-        StadionTopLeft,
-        StadionTopRight,
-        //...
-        PowerplantTopLeft,
-        PowerplantTopRight
-
+        Stadium,
+        Stadium_0_1,
+        Stadium_1_1,
+        Stadium_1_0,
+        ResidentialZoneLevel1Half,
+        ResidentialZoneLevel1Full,
+        CommercialZoneLevel1Half,
+        CommercialZoneLevel1Full,
+        IndustrialZoneLevel1Half,
+        IndustrialZoneLevel1Full,
+        Unhandled
     }
 }

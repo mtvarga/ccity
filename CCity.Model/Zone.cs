@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public abstract class Zone : Placeable, IFlammable, IUpgradeable
     {
-        #region Properties
-        public int Capacity { get; private set; }
-        public int Current { get; private set; }
+        #region Constants
+        
+        private const int CapacityConstant = 10;
+        
+        #endregion
 
-        public List<Citizen> Citizens { get; private set; }
+        #region Properties
+
+        public int Count => Citizens.Count;
+        
+        public int Capacity => CapacityConstant;
+
+        public List<Citizen> Citizens { get; }
 
         double IFlammable.Pontential => throw new NotImplementedException();
 
@@ -26,24 +28,41 @@ namespace CCity.Model
 
         bool IUpgradeable.CanUpgrade => throw new NotImplementedException();
 
-        public bool IsFull => Capacity <= Current;
+        public bool Full => Count == Capacity;
 
-        public bool HasCitizen => Current > 0;
+        public bool Empty => Count == 0;
+
+        public bool BelowHalfPopulation => Count * 2 < Capacity;
 
         #endregion
 
+        #region Constructors
+
+        internal Zone()
+        {
+            Citizens = new List<Citizen>();
+        }
+        
+        #endregion
+        
         #region Public methods
 
-        public void AddCitizen(Citizen citizen)
+        public bool AddCitizen(Citizen citizen)
         {
+            if (Count + 1 > Capacity) 
+                return false;
+            
             Citizens.Add(citizen);
-            ++Current;
+            return true;
         }
 
-        public void DropCitizen(Citizen citizen)
+        public bool DropCitizen(Citizen citizen) => Citizens.Remove(citizen);
+
+        public double Satisfaction()
         {
-            Citizens.Remove(citizen);
-            --Current;
+            if (Count == 0) return 0;
+            double sum = Citizens.Sum(e => e.LastCalculatedSatisfaction);
+            return sum / Count;
         }
 
         #endregion

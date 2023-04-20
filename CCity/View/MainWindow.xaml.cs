@@ -24,5 +24,10 @@ namespace CCity
         {
             InitializeComponent();
         }
+
+        public void NavigateTo(UserControl userControl)
+        {
+            this.Content = userControl;
+        }
     }
 }

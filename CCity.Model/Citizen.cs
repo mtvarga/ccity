@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public class Citizen
     {
@@ -21,58 +14,62 @@ namespace CCity.Model
         
         public ResidentialZone Home { get; }
         
-        public WorkplaceZone Workplace { get; private set; }
+        public WorkplaceZone? Workplace { get; private set; }
         
         public double HomeWorkplaceDistanceEffect { get; private set; }
         
         public double LastCalculatedSatisfaction { get; internal set; }
+
+        public bool Jobless => Workplace == null;
         
         #endregion
 
         #region Constructors
 
-        public Citizen(ResidentialZone home, WorkplaceZone workplace)
+        public Citizen(ResidentialZone home, WorkplaceZone? workplace = null)
         {
+            if (!home.AddCitizen(this))
+                throw new Exception("Couldn't add Citizen to ResidentialZone.");
+
             Home = home;
-            Home.AddCitizen(this);
-            Workplace = workplace;
-            Workplace.AddCitizen(this);
-            
-            CalculateHomeWorkplaceDistanceEffect();
+            ChangeWorkplace(workplace);
         }
 
         #endregion
 
         #region Public methods
         
-        public void SwapWorkplace(WorkplaceZone workplace)
+        public void ChangeWorkplace(WorkplaceZone? workplace)
         {
-            Workplace.DropCitizen(this);
+            if (Workplace != null && workplace == null)
+                throw new Exception("Illegal operation: Attempted to set Citizen's workplace to null while they already have a workplace.");
+            
+            Workplace?.DropCitizen(this);
             Workplace = workplace;
-            Workplace.AddCitizen(this);
+            
+            if (!(Workplace?.AddCitizen(this) ?? true))
+                throw new Exception("Couldn't change Citizen's workplace.");
 
             CalculateHomeWorkplaceDistanceEffect();
         }
 
         public void MoveOut()
         {
-            Home.DropCitizen(this);
-            Workplace.DropCitizen(this);
+            if (!Home.DropCitizen(this) || !(Workplace?.DropCitizen(this) ?? true))
+                throw new Exception("Couldn't move out Citizen.");
         }
         
         #endregion
 
         #region Private methods
 
-        private void CalculateHomeWorkplaceDistanceEffect()
+        private void CalculateHomeWorkplaceDistanceEffect() => HomeWorkplaceDistanceEffect = Workplace switch
         {
-            var proximityEffectValues = 
-                Utilities.GetPointsInRadiusWeighted(Home.Owner!, CloseProximityRadius)
-                    .Where(tuple => tuple.X == Workplace.Owner!.X && tuple.Y == Workplace.Owner!.Y)
-                    .Select(tuple => tuple.Weight).ToList();
-
-            HomeWorkplaceDistanceEffect = proximityEffectValues.Any() ? proximityEffectValues.First() : 0;
-        }
+            null => 0,
+            _ => Utilities.GetPointsInRadiusWeighted(Home.Owner!, CloseProximityRadius)
+                .Where(tuple => tuple.X == Workplace.Owner!.X && tuple.Y == Workplace.Owner!.Y)
+                .Select(tuple => tuple.Weight).FirstOrDefault()
+        };
 
         #endregion
 
