@@ -8,13 +8,11 @@ namespace CCity.Model
 {
     public class FieldEventArgs
     {
-        private List<Field> _fields;
-
-        public List<Field> Fields { get { return _fields; } }
+        public List<Field> Fields { get; }
 
         public FieldEventArgs(List<Field> fields)
         {
-            _fields = fields;
+            Fields = fields;
         }
     }
 }

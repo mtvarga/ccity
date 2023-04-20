@@ -5,10 +5,110 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>View\Images\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="View\Images\background.jpg" />
+    <None Remove="View\Images\banner.png" />
+    <None Remove="View\Images\icon.ico" />
+    <None Remove="View\Images\profile.png" />
+    <None Remove="View\Images\Textures\fireDepartment.png" />
+    <None Remove="View\Images\Textures\grass.png" />
+    <None Remove="View\Images\Textures\policeDepartment.png" />
+    <None Remove="View\Images\Textures\Roads\roadBottomClose.png" />
+    <None Remove="View\Images\Textures\Roads\roadBottomLeft.png" />
+    <None Remove="View\Images\Textures\Roads\roadBottomRight.png" />
+    <None Remove="View\Images\Textures\Roads\roadCross.png" />
+    <None Remove="View\Images\Textures\Roads\roadHorizontal.png" />
+    <None Remove="View\Images\Textures\Roads\roadLeftClose.png" />
+    <None Remove="View\Images\Textures\Roads\roadNotBottom.png" />
+    <None Remove="View\Images\Textures\Roads\roadNotLeft.png" />
+    <None Remove="View\Images\Textures\Roads\roadNotRight.png" />
+    <None Remove="View\Images\Textures\Roads\roadNotTop.png" />
+    <None Remove="View\Images\Textures\Roads\roadRightClose.png" />
+    <None Remove="View\Images\Textures\Roads\roadTopClose.png" />
+    <None Remove="View\Images\Textures\Roads\roadTopLeft.png" />
+    <None Remove="View\Images\Textures\Roads\roadTopRight.png" />
+    <None Remove="View\Images\Textures\Roads\roadVertical.png" />
+    <None Remove="View\Images\Textures\stadium.png" />
+    <None Remove="View\Images\Textures\stadium_0_1.png" />
+    <None Remove="View\Images\Textures\stadium_1_0.png" />
+    <None Remove="View\Images\Textures\stadium_1_1.png" />
+    <None Remove="View\Images\Textures\Tools\bulldozer.png" />
+    <None Remove="View\Images\Textures\Tools\commercialZone.png" />
+    <None Remove="View\Images\Textures\Tools\cursor.png" />
+    <None Remove="View\Images\Textures\Tools\fireDepartment.png" />
+    <None Remove="View\Images\Textures\Tools\industrialZone.png" />
+    <None Remove="View\Images\Textures\Tools\policeDepartment.png" />
+    <None Remove="View\Images\Textures\Tools\residentialZone.png" />
+    <None Remove="View\Images\Textures\Tools\road.png" />
+    <None Remove="View\Images\Textures\Tools\stadium.png" />
+    <None Remove="View\Images\Textures\transparent.png" />
+    <None Remove="View\Images\Textures\unhandled.png" />
+    <None Remove="View\Images\Textures\Zones\commercialZoneLevel1Full.png" />
+    <None Remove="View\Images\Textures\Zones\commercialZoneLevel1Half.png" />
+    <None Remove="View\Images\Textures\Zones\industrialZoneLevel1Full.png" />
+    <None Remove="View\Images\Textures\Zones\industrialZoneLevel1Half.png" />
+    <None Remove="View\Images\Textures\Zones\residentialZoneLevel1Full.png" />
+    <None Remove="View\Images\Textures\Zones\residentialZoneLevel1Half.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="View\Images\icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="View\Images\background.jpg" />
+    <Resource Include="View\Images\profile.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CCity.Model\CCity.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="View\Images\banner.png" />
+    <Resource Include="View\Images\icon.ico" />
+    <Resource Include="View\Images\Textures\fireDepartment.png" />
+    <Resource Include="View\Images\Textures\grass.png" />
+    <Resource Include="View\Images\Textures\policeDepartment.png" />
+    <Resource Include="View\Images\Textures\Roads\roadBottomClose.png" />
+    <Resource Include="View\Images\Textures\Roads\roadBottomLeft.png" />
+    <Resource Include="View\Images\Textures\Roads\roadBottomRight.png" />
+    <Resource Include="View\Images\Textures\Roads\roadCross.png" />
+    <Resource Include="View\Images\Textures\Roads\roadHorizontal.png" />
+    <Resource Include="View\Images\Textures\Roads\roadLeftClose.png" />
+    <Resource Include="View\Images\Textures\Roads\roadNotBottom.png" />
+    <Resource Include="View\Images\Textures\Roads\roadNotLeft.png" />
+    <Resource Include="View\Images\Textures\Roads\roadNotRight.png" />
+    <Resource Include="View\Images\Textures\Roads\roadNotTop.png" />
+    <Resource Include="View\Images\Textures\Roads\roadRightClose.png" />
+    <Resource Include="View\Images\Textures\Roads\roadTopClose.png" />
+    <Resource Include="View\Images\Textures\Roads\roadTopLeft.png" />
+    <Resource Include="View\Images\Textures\Roads\roadTopRight.png" />
+    <Resource Include="View\Images\Textures\Roads\roadVertical.png" />
+    <Resource Include="View\Images\Textures\stadium.png" />
+    <Resource Include="View\Images\Textures\stadium_1_0.png" />
+    <Resource Include="View\Images\Textures\stadium_0_1.png" />
+    <Resource Include="View\Images\Textures\stadium_1_1.png" />
+    <Resource Include="View\Images\Textures\Tools\bulldozer.png" />
+    <Resource Include="View\Images\Textures\Tools\commercialZone.png" />
+    <Resource Include="View\Images\Textures\Tools\cursor.png" />
+    <Resource Include="View\Images\Textures\Tools\fireDepartment.png" />
+    <Resource Include="View\Images\Textures\Tools\industrialZone.png" />
+    <Resource Include="View\Images\Textures\Tools\policeDepartment.png" />
+    <Resource Include="View\Images\Textures\Tools\residentialZone.png" />
+    <Resource Include="View\Images\Textures\Tools\road.png" />
+    <Resource Include="View\Images\Textures\Tools\stadium.png" />
+    <Resource Include="View\Images\Textures\transparent.png" />
+    <Resource Include="View\Images\Textures\unhandled.png" />
+    <Resource Include="View\Images\Textures\Zones\commercialZoneLevel1Full.png" />
+    <Resource Include="View\Images\Textures\Zones\commercialZoneLevel1Half.png" />
+    <Resource Include="View\Images\Textures\Zones\industrialZoneLevel1Full.png" />
+    <Resource Include="View\Images\Textures\Zones\industrialZoneLevel1Half.png" />
+    <Resource Include="View\Images\Textures\Zones\residentialZoneLevel1Full.png" />
+    <Resource Include="View\Images\Textures\Zones\residentialZoneLevel1Half.png" />
   </ItemGroup>
 
 </Project>

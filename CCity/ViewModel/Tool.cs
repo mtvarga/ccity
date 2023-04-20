@@ -10,7 +10,7 @@ namespace CCity.ViewModel
     {
 
         Cursor,
-        ResidentalZone,
+        ResidentialZone,
         CommercialZone,
         IndustrialZone,
         Road,
@@ -21,6 +21,5 @@ namespace CCity.ViewModel
         Pole,
         Forest,
         Bulldozer
-
     }
 }
