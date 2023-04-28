@@ -11,24 +11,29 @@ namespace CCity.Model
 
         #region Properties
 
-        public Road? GetsPublicityFrom { get; set; }
-
-        public List<Road> GivesPublicityTo { get; set; }
-
         public override int PlacementCost => 100;
 
         public override int MaintenanceCost => 10;
 
-        public override bool IsPublic { get { return GetsPublicityFrom != null; } }
+        public override int NeededElectricity => 1;
+
+        public override bool CouldGivePublicityTo(Placeable _) => true;
 
         #endregion
 
-        #region Constructors
+        #region Public methods
 
-        public Road()
+        public override bool CouldGiveElectricityTo(Placeable placeable)
         {
-            GetsPublicityFrom = null;
-            GivesPublicityTo = new List<Road>();
+            return placeable switch
+            {
+                Zone => true,
+                FireDepartment => true,
+                PoliceDepartment => true,
+                Stadium => true,
+                Pole => true,
+                _ => false
+            };
         }
 
         #endregion

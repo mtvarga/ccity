@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CCity.View.GameWindow"
+<UserControl x:Class="CCity.View.GameWindow"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -71,6 +71,7 @@
                 <StackPanel Margin="0 5 0 0" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                         <StackPanel Orientation="Vertical">
                             <Button Content="Közút" Height="24" Margin="0 5" Command="{Binding TogglePublicityCommand}"/>
+                            <Button Content="Áram" Height="24" Margin="0 5" Command="{Binding ToggleElectricityCommand}"/>
                             <Button Content="Frissítés" Height="24" Margin="0 5" Command="{Binding RefreshMapCommand}"/>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0 5">
@@ -403,6 +404,12 @@
                             <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
                             <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
                             <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2">
+                                <Run Text="Áramellátás: "/>
+                                <Run Text="{Binding SelectedFieldCurrentElectricity, Mode=OneWay}"/>
+                                <Run Text="/"/>
+                                <Run Text="{Binding SelectedFieldNeededElectricity, Mode=OneWay}"/>
+                            </TextBlock>
 
                         </StackPanel>
                         <StackPanel.Style>
