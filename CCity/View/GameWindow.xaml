@@ -17,32 +17,26 @@
         <viewmodel:ToolEnumToPath x:Key="ToolEnumToPath" />
     </UserControl.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="102"/>
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            
-            
-            <!--Sidebar-->
-            <Grid Grid.Column="0" Background="#eee">
+        <!--Sidebar-->
+        <Grid Panel.ZIndex="10">
+            <Border Background="#C8D2BB" Width="80" Height="Auto" Margin="7" CornerRadius="12" Padding="0 4" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <StackPanel Orientation="Vertical">
                 <ItemsControl ItemsSource="{Binding Tools}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel Margin="7" HorizontalAlignment="Center"></WrapPanel>
+                            <WrapPanel Margin="0 5" HorizontalAlignment="Center"></WrapPanel>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding ClickCommand}" Cursor="Hand" Width="36" Height="36" Margin="2" CommandParameter="{Binding Number}">
+                            <Button Command="{Binding ClickCommand}" Cursor="Hand" Width="36" Height="36" Margin="0" CommandParameter="{Binding Number}">
                                 <Grid>
                                     <Grid Panel.ZIndex="1">
-                                        <Image Stretch="Fill" Source="{Binding Tool, Converter={StaticResource ToolEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        <Image Stretch="Fill" Source="{Binding Tool, Converter={StaticResource ToolEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality">
+                                            <Image.Clip>
+                                                <RectangleGeometry RadiusX="3" RadiusY="3" Rect="0,0,32,32" />
+                                            </Image.Clip>
+                                        </Image>
                                     </Grid>
                                 </Grid>
                                 <Button.Style>
@@ -51,7 +45,10 @@
                                             <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                                 <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
                                             </DataTrigger>
-                                        </Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
                                         <Setter Property="BorderThickness" Value="2"/>
                                         <Setter Property="Template">
                                             <Setter.Value>
@@ -59,7 +56,7 @@
                                                     <Border BorderThickness="{TemplateBinding BorderThickness}"
                                                             BorderBrush="{TemplateBinding Background}"
                                                             Background="#FFF"
-                                                            CornerRadius="3">
+                                                            CornerRadius="4">
                                                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                     </Border>
                                                 </ControlTemplate>
@@ -71,125 +68,372 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <StackPanel Margin="5" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-                    <StackPanel Orientation="Vertical">
-                        <Button Content="Közút" Height="24" Margin="0 5" Command="{Binding TogglePublicityCommand}"/>
-                        <!--<Button Content="Frissítés" Height="24" Margin="0 5" Command="{Binding RefreshMapCommand}"/>-->
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical" Margin="0 5">
-                    <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
-                            <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResidentialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
-                            <Button Height="14" Command="{Binding ChangeResidentialTaxCommand}" CommandParameter="1">+</Button>
-                            <Button Height="14" Command="{Binding ChangeResidentialTaxCommand}" CommandParameter="-1">-</Button>
+                <StackPanel Margin="0 5 0 0" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Vertical">
+                            <Button Content="Közút" Height="24" Margin="0 5" Command="{Binding TogglePublicityCommand}"/>
+                            <Button Content="Frissítés" Height="24" Margin="0 5" Command="{Binding RefreshMapCommand}"/>
                         </StackPanel>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
-                            <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding CommercialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
-                                <Button Height="14" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="1">+</Button>
-                                <Button Height="14" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="-1">-</Button>
-                        </StackPanel>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Background="White" Margin="0 5">
-                            <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding IndustrialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
-                            <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
-                                <Button Height="14" Command="{Binding ChangeIndustrialTaxCommand}" CommandParameter="1">+</Button>
-                                <Button Height="14" Command="{Binding ChangeIndustrialTaxCommand}" CommandParameter="-1">-</Button>
+                        <StackPanel Orientation="Vertical" Margin="0 5">
+                            <!-- ADÓ ÁLLÍTÓ GOMBOK -->
+                            <StackPanel Orientation="Horizontal" Margin="0 2" Height="28">
+                                <Border Background="#EEE" CornerRadius="7 0 0 7">
+                                    <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResidentialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
+                                </Border>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                                    <Button Height="14" Cursor="Hand" Command="{Binding ChangeResidentialTaxCommand}" CommandParameter="1" Content="+">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="border"
+                                                                Background="{StaticResource PrimaryColor}"
+                                                                BorderThickness="0"
+                                                                CornerRadius="0 7 0 0">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Height="14" Cursor="Hand" Command="{Binding ChangeResidentialTaxCommand}" CommandParameter="-1" Content="-">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="border"
+                                                                Background="{StaticResource PrimaryColor}"
+                                                                BorderThickness="0"
+                                                                CornerRadius="0 0 7 0">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
                             </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0 2" Height="28">
+                                <Border Background="#EEE" CornerRadius="7 0 0 7">
+                                    <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding CommercialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
+                                </Border>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                                    <Button Height="14" Cursor="Hand" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="1" Content="+">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="border"
+                                                                Background="{StaticResource PrimaryColor}"
+                                                                BorderThickness="0"
+                                                                CornerRadius="0 7 0 0">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Height="14" Cursor="Hand" Command="{Binding ChangeCommercialTaxCommand}" CommandParameter="-1" Content="-">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="border"
+                                                                Background="{StaticResource PrimaryColor}"
+                                                                BorderThickness="0"
+                                                                CornerRadius="0 0 7 0">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0 2" Height="28">
+                                <Border Background="#EEE" CornerRadius="7 0 0 7">
+                                    <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding IndustrialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
+                                </Border>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+                                    <Button Height="14" Cursor="Hand" Command="{Binding ChangeIndustrialTaxCommand}" CommandParameter="1" Content="+">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="border"
+                                                                Background="{StaticResource PrimaryColor}"
+                                                                BorderThickness="0"
+                                                                CornerRadius="0 7 0 0">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button Height="14" Cursor="Hand" Command="{Binding ChangeIndustrialTaxCommand}" CommandParameter="-1" Content="-">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Button}">
+                                                            <Border x:Name="border"
+                                                                Background="{StaticResource PrimaryColor}"
+                                                                BorderThickness="0"
+                                                                CornerRadius="0 0 7 0">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical">
+                        <!--<Button Content="Kilépés" Height="24" Margin="0 10 0 0" Command="{Binding ExitGameCommand}"/>-->
                     </StackPanel>
-                    </StackPanel>
-                    <TextBlock Text="{Binding Speed, StringFormat='🕜: {0}'}" Margin="0 0 0 5"/>
-                    <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
-                        <Button Width="24" Height="24" Command="{Binding ChangeSpeedCommand}" CommandParameter="-1">-</Button>
-                        <Button Width="24" Height="24" FontWeight="Bold" Command="{Binding PauseGameCommand}">
+                </StackPanel>
+                </StackPanel>
+            </Border>
+            <!-- Status bar -->
+            <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Left" >
+                <Border x:Name="Minimap" Width="Auto" Height="Auto" BorderThickness="2" BorderBrush="#C8D2BB" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="21 0">
+                    <Grid>
+                        <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="20" ClipToBounds="True">
+                            <Rectangle x:Name="MinimapBorder" Stroke="#D02" StrokeThickness="1" Fill="Transparent"/>
+                        </Canvas>
+                        <ItemsControl ItemsSource="{Binding Fields}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}" Width="Auto" Height="Auto"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <!--<Grid Background="{Binding MinimapColor, Converter={StaticResource ColorToSolidColorBrush}}" Width="5" Height="5" RenderOptions.EdgeMode="Aliased"/>-->
+                                    <Grid RenderOptions.EdgeMode="Aliased" Width="5" Height="5">
+                                        <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}" Panel.ZIndex="2"></Grid>
+                                        <Grid Panel.ZIndex="1">
+                                            <Image Stretch="Fill" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                        </Grid>
+                                        <Grid Panel.ZIndex="0">
+                                            <Image Stretch="Fill" Source="Images/Textures/grass.png"/>
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding MinimapMinimized}" Value="True">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+                <Border Background="#C8D2BB" Margin="7" CornerRadius="14" Height="28">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Width="28" Height="28" Cursor="Hand" FontSize="20" Command="{Binding ChangeMinimapSizeCommand}">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Paused}" Value="True">
-                                            <Setter Property="Content" Value="▶️"/>
+                                        <DataTrigger Binding="{Binding MinimapMinimized}" Value="True">
+                                            <Setter Property="Content" Value="+" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Paused}" Value="False">
-                                            <Setter Property="Content" Value="⏸️"/>
+                                        <DataTrigger Binding="{Binding MinimapMinimized}" Value="False">
+                                            <Setter Property="Content" Value="-" />
                                         </DataTrigger>
                                     </Style.Triggers>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}">
+                                                <Border x:Name="border"
+                                                    Background="{StaticResource PrimaryColor}"
+                                                    BorderThickness="0"
+                                                    CornerRadius="14">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
                                 </Style>
                             </Button.Style>
                         </Button>
-                        <Button Width="24" Height="24" Command="{Binding ChangeSpeedCommand}" CommandParameter="1">+</Button>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical">
-                        <Button Content="Kilépés" Height="24" Margin="0 10 0 0" Command="{Binding ExitGameCommand}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
-            
-            
-            <!--Center-->
-            <Grid Grid.Column="1" x:Name="Center">
-                <Grid Panel.ZIndex="2">
-                    <Border Background="#BBFFFFFF" CornerRadius="5" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
-                        <StackPanel Orientation="Vertical">
-                            <Button Width="20" Height="20" Cursor="Hand" HorizontalAlignment="Right" Margin="5" Command="{Binding CloseSelectedFieldWindowCommand}" Content="×">
-                                <!--<Button.Style>
+                        <TextBlock Text="{Binding CityName}" Margin="15 7 0 7"/>
+                        <TextBlock Text="{Binding MayorName}" Margin="15 7"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Width="28" Height="28" Command="{Binding ChangeSpeedCommand}" CommandParameter="-1" Content="-">
+                                <Button.Style>
                                     <Style TargetType="Button">
                                         <Setter Property="Template">
                                             <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border 
-                                                        Background="#eee"
-                                                        CornerRadius="8">
+                                                <ControlTemplate TargetType="{x:Type Button}">
+                                                    <Border x:Name="border"
+                                                    Background="{StaticResource PrimaryColor}"
+                                                    BorderThickness="0"
+                                                    CornerRadius="14 0 0 14">
                                                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                     </Border>
                                                 </ControlTemplate>
                                             </Setter.Value>
                                         </Setter>
                                     </Style>
-                                </Button.Style>-->
+                                </Button.Style>
                             </Button>
-                            <TextBlock Margin="5" FontWeight="Bold" FontSize="14" Text="{Binding SelectedFieldName}"/>
-                            <StackPanel Orientation="Vertical" Margin="5 10 5 0">
-                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldPopulation, StringFormat='Polgárok: {0} fő'}"/>
-                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldSatisfaction, StringFormat='Elégedettség: {0}%'}"/>
-                                <StackPanel.Style>
-                                    <Style TargetType="StackPanel">
+                            <Button Width="28" Height="28" FontWeight="Bold" Command="{Binding PauseGameCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedFieldIsZone}" Value="False">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            <DataTrigger Binding="{Binding Paused}" Value="True">
+                                                <Setter Property="Content" Value="▶️"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Paused}" Value="False">
+                                                <Setter Property="Content" Value="⏸️"/>
                                             </DataTrigger>
                                         </Style.Triggers>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type Button}">
+                                                    <Border x:Name="border"
+                                                    Background="{StaticResource PrimaryColor}"
+                                                    BorderThickness="0"
+                                                    CornerRadius="0">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
-                                </StackPanel.Style>
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="5 5 5 10">
-                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldPoliceDepartmentEffect, StringFormat='Rendőrség effekt: {0}%'}"/>
-                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
-                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
-                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
-                            
-                            </StackPanel>
+                                </Button.Style>
+                            </Button>
+                            <Button Width="28" Height="28" Command="{Binding ChangeSpeedCommand}" CommandParameter="1" Content="+">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type Button}">
+                                                    <Border x:Name="border"
+                                                    Background="{StaticResource PrimaryColor}"
+                                                    BorderThickness="0"
+                                                    CornerRadius="0 14 14 0">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Speed, StringFormat='🕜: {0}'}" Margin="15 7"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+            <Border Background="#C8D2BB" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="7" CornerRadius="14" Height="28">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Population, StringFormat='🤵 {0:N0}'}" Margin="7"/>
+                    <TextBlock Text="{Binding Satisfaction, StringFormat='👍 {0}%'}" Margin="7"/>
+                    <TextBlock Text="{Binding Budget, StringFormat='💎 {0:N0}'}" Margin="7"/>
+                    <!-- <TextBlock Text="{Binding Date, StringFormat='📆 {0}'}" Margin="7"/> -->
+                </StackPanel>
+            </Border>
+        </Grid>
+            
+            
+        <!--Center-->
+        <Grid x:Name="Center">
+            <Grid Panel.ZIndex="2">
+                <Border Background="#C8D2BB" CornerRadius="5" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
+                    <StackPanel Orientation="Vertical">
+                        <Button Width="24" Height="24" Cursor="Hand" FontSize="14"  HorizontalAlignment="Right" Margin="5" Command="{Binding CloseSelectedFieldWindowCommand}" Content="×">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border 
+                                                    Background="{StaticResource PrimaryColor}"
+                                                    CornerRadius="12">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <TextBlock Margin="5" FontWeight="Bold" FontSize="14" Text="{Binding SelectedFieldName}"/>
+                        <StackPanel Orientation="Vertical" Margin="5 10 5 0">
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldPopulation, StringFormat='Polgárok: {0} fő'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldSatisfaction, StringFormat='Elégedettség: {0}%'}"/>
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsFieldSelected}" Value="False">
+                                        <DataTrigger Binding="{Binding SelectedFieldIsZone}" Value="False">
                                             <Setter Property="Visibility" Value="Collapsed"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
                         </StackPanel>
-                    </Border>
-                </Grid>
-                <Grid Panel.ZIndex="1" x:Name="FieldsContainerGrid">
+                        <StackPanel Orientation="Vertical" Margin="5 5 5 10">
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldPoliceDepartmentEffect, StringFormat='Rendőrség effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
+
+                        </StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsFieldSelected}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Grid Panel.ZIndex="1" x:Name="FieldsContainerGrid">
+                <ScrollViewer x:Name="MapScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" CanContentScroll="False" PanningMode="Both"
+                    PreviewMouseLeftButtonDown="MapScrollViewer_PreviewMouseLeftButtonDown"
+                    PreviewMouseMove="MapScrollViewer_PreviewMouseMove"
+                    PreviewMouseLeftButtonUp="MapScrollViewer_PreviewMouseLeftButtonUp"
+                    Loaded="MapScrollViewer_Loaded"
+                    ScrollChanged="MapScrollViewer_ScrollChanged"
+                    SizeChanged="MapScrollViewer_SizeChanged">
                     <ItemsControl ItemsSource="{Binding Fields}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}"/>
+                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}" Width="Auto" Height="Auto"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding ClickCommand}" CommandParameter="{Binding Number}" Style="{StaticResource FieldButton}" RenderOptions.EdgeMode="Aliased">
+                                <Button Command="{Binding ClickCommand}" Width="50" Height="50" CommandParameter="{Binding Number}" Style="{StaticResource FieldButton}" RenderOptions.EdgeMode="Aliased">
                                     <Grid>
                                         <Grid Panel.ZIndex="3" Background="#00000000" MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave"></Grid>
                                         <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}" Panel.ZIndex="2"></Grid>
@@ -204,23 +448,8 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </Grid>
+                </ScrollViewer>
             </Grid>
-        </Grid>
-
-
-        <!--Statusbar-->
-        <Grid Grid.Row="1" Background="#EEE">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <TextBlock Text="{Binding CityName}" Margin="7"/>
-                <TextBlock Text="{Binding MayorName}" Margin="7"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="{Binding Population, StringFormat='🤵 {0:N0}'}" Margin="7"/>
-                <TextBlock Text="{Binding Satisfaction, StringFormat='👍 {0}%'}" Margin="7"/>
-                <TextBlock Text="{Binding Budget, StringFormat='💎 {0:N0}'}" Margin="7"/>
-                <!-- <TextBlock Text="{Binding Date, StringFormat='📆 {0}'}" Margin="7"/> -->
-            </StackPanel>
         </Grid>
     </Grid>
 </UserControl>

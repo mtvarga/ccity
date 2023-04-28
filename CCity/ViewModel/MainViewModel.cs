@@ -190,6 +190,7 @@ namespace CCity.ViewModel
             RefreshMapCommand = new DelegateCommand(param => OnRefreshMap());
             StartNewGameCommand = new DelegateCommand(param => OnStartNewGame());
             TogglePublicityCommand = new DelegateCommand(param => OnTogglePublicity());
+            ChangeMinimapSizeCommand = new DelegateCommand(param => OnChangeMinimapSize());
             ChangeSpeedCommand =
                 new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
 
@@ -302,7 +303,13 @@ namespace CCity.ViewModel
 
         private Color GetMinimapColorFromFieldItem(FieldItem fieldItem)
         {
-            return Color.FromRgb(0, 255, 0);
+            Field field = _model.Fields[fieldItem.X, fieldItem.Y];
+            if (!field.HasPlaceable) return Color.FromRgb(0, 255, 0);
+            return field.Placeable! switch
+            {
+                Road => Color.FromRgb(0, 0, 0),
+                _ => Color.FromRgb(0, 255, 0)
+            };
         }
 
         private Texture GetTextureFromFieldItem(FieldItem fieldItem)
@@ -627,6 +634,11 @@ namespace CCity.ViewModel
                 
                 _ => _model.Speed
             });
+        }
+
+        private void OnChangeMinimapSize()
+        {
+            MinimapMinimized = !MinimapMinimized;
         }
 
         public void ExitToMainMenu()

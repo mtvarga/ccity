@@ -12,8 +12,8 @@ namespace CCity.Model
 
         private const int MAX_EFFECT = 10;
         private const int EFFECT_RADIUS = 10;
-        private const int HEIGHT = 13;
-        private const int WIDTH = 25;
+        private const int HEIGHT = 30;
+        private const int WIDTH = 45;
         private const int ROOTX = WIDTH / 2;
         private const int ROOTY = HEIGHT - 1;
 

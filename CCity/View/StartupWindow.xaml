@@ -12,7 +12,7 @@
             <ImageBrush ImageSource="Images/background.jpg"/>
         </UserControl.Background>
         <Grid>
-            <MediaElement x:Name="videoPlayer" Source="https://people.inf.elte.hu/beszn1/background.mp4" Stretch="UniformToFill" LoadedBehavior="Play" UnloadedBehavior="Manual" IsMuted="True" MediaEnded="VideoPlayer_MediaEnded"/>
+            <MediaElement x:Name="videoPlayer" Source="View/Images/background.mp4" Stretch="UniformToFill" LoadedBehavior="Play" UnloadedBehavior="Manual" IsMuted="True" MediaEnded="VideoPlayer_MediaEnded"/>
         <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

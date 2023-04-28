@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="View\Images\background.jpg" />
+    <None Remove="View\Images\background.mp4" />
     <None Remove="View\Images\banner.png" />
     <None Remove="View\Images\icon.ico" />
     <None Remove="View\Images\profile.png" />
@@ -60,6 +61,9 @@
 
   <ItemGroup>
     <Resource Include="View\Images\background.jpg" />
+    <Content Include="View\Images\background.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="View\Images\profile.png" />
   </ItemGroup>
 
