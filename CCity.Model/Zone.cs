@@ -2,16 +2,24 @@
 {
     public abstract class Zone : Placeable, IFlammable, IUpgradeable
     {
+        #region Fields
+
+        private Level _level;
+        private const int upgradeCost = 100;
+
+        #endregion
         #region Constants
-        
+
         private const int CapacityConstant = 10;
-        
+
         #endregion
 
         #region Properties
 
+        public override int NeededElectricity => Count;
+
         public int Count => Citizens.Count;
-        
+
         public int Capacity => CapacityConstant;
 
         public List<Citizen> Citizens { get; }
@@ -22,11 +30,11 @@
 
         bool IFlammable.IsOnFire { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        Level IUpgradeable.Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        Level IUpgradeable.Level { get => _level; set => _level = value; }
 
-        int IUpgradeable.NextUpgradeCost => throw new NotImplementedException();
+        int IUpgradeable.NextUpgradeCost => ((int)_level + 1) * upgradeCost;
 
-        bool IUpgradeable.CanUpgrade => throw new NotImplementedException();
+        bool IUpgradeable.CanUpgrade => _level != Level.Advanced;
 
         public bool Full => Count == Capacity;
 
