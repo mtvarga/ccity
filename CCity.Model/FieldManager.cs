@@ -211,6 +211,9 @@ namespace CCity.Model
             {
                 if(f.Placeable != null)
                 {
+                    //TODO - electricity required for moving in
+                    UpdatePlaceableList(f.Placeable, f.Placeable.IsPublic);
+
                     //SWITCHING ON/OFF FIREDEPARTMENT COMES HERE (based on electricity and publicity)
                     //Suggestion: use f.Placeable.IsPublic && placeable.IsElectrified bool
                     //and try switching on when true, switching off otherwise
