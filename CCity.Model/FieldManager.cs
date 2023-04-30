@@ -191,7 +191,7 @@ namespace CCity.Model
             _electricitySpreader.Refresh(placeable);
             modifiedFields = modifiedFields.Concat(_electricitySpreader.GetAndClearModifiedFields()).ToList();
      
-            foreach (Field f in modifiedFields)
+            foreach (Field f in modifiedFields.ToList())
             {
                 if (f.Placeable != null && f.Placeable.IsPublic && f.Placeable is PowerPlant powerPlant)
                 {
@@ -206,7 +206,7 @@ namespace CCity.Model
             //Now we can check modified placeables, and switch them on/off based on the two props mentioned
             //
             //(we cant do it in the previous loop,
-            // because modifiedFields could have expanded due to switching on PowerPlant(s))
+            //because modifiedFields could have expanded due to switching on PowerPlant(s))
             foreach (Field f in modifiedFields)
             {
                 if(f.Placeable != null)
