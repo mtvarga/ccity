@@ -230,7 +230,7 @@ namespace CCity.Model
                     //("try", because if it is already spreaded/revoked (stored in Placeable), skips)
                     //
                     //so it's true if the Placeable is public and electrified
-                    modifiedFields = modifiedFields.Concat(f.Placeable.Effect(SpreadPlaceableEffect, f.Placeable.IsPublic && placeable.IsElectrified)).ToList();
+                    modifiedFields = modifiedFields.Concat(f.Placeable.Effect(SpreadPlaceableEffect, f.Placeable.IsPublic && f.Placeable.IsElectrified)).ToList();
                 }
             }
             return modifiedFields;

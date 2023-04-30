@@ -15,7 +15,7 @@ namespace CCity.Model
         public abstract int PlacementCost { get; }
         public abstract int MaintenanceCost { get; }
         public virtual int NeededElectricity => 0;
-        public bool EffectSpreaded { get; set; }
+        public bool EffectSpreaded { get; internal set; }
         public bool IsDemolished { get => Owner != null && Owner.Placeable == null; }
         public Placeable Root => this is Filler filler ? (Placeable)filler.Main : this;
 
