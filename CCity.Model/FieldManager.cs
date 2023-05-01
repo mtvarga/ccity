@@ -19,6 +19,8 @@ namespace CCity.Model
         private const int ROOTX = WIDTH / 2;
         private const int ROOTY = HEIGHT - 1;
 
+        private const ushort FireSpreadThreshold = IFlammable.FlammableMaxHealth / 2;
+        
         #endregion
 
         #region Fields
@@ -29,10 +31,14 @@ namespace CCity.Model
         public int CommercialZoneCount { get => _commercialZones.Count; }
         public int IndustrialZoneCount { get => _industrialZones.Count; }
         private Dictionary<Forest, int> _growingForests;
-        private List<Field> _burningBuildings;
+        
         private List<ResidentialZone> _residentialZones;
         private List<CommercialZone> _commercialZones;
         private List<IndustrialZone> _industrialZones;
+        
+        private HashSet<Placeable> Flammables { get; }
+        
+        private HashSet<Placeable> BurningBuildings { get; }
 
         private Spreader _publicitySpreader;
         private Spreader _electricitySpreader;
@@ -55,7 +61,6 @@ namespace CCity.Model
 
             //lists
             _growingForests = new();
-            _burningBuildings = new();
             _residentialZones = new();
             _commercialZones = new();
             _industrialZones = new();
@@ -76,6 +81,9 @@ namespace CCity.Model
                 (s, t) => s.CouldGiveElectricityTo(t),
                 (p) => GetNeighbours(p)
                 );
+            
+            Flammables = new HashSet<Placeable>();
+            BurningBuildings = new HashSet<Placeable>();
         }
 
         #endregion
@@ -115,9 +123,52 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
-        public Field RandomIncinerate()
+        public Field? IgniteRandomBuilding()
         {
-            throw new NotImplementedException();
+            var random = new Random(DateTime.Now.Millisecond);
+            
+            foreach (var placeable in Flammables)
+            {
+                if (placeable is not IFlammable flammable) 
+                    throw new Exception("Internal inconsistency: FieldManager is tracking a non-flammable Placeable as flammable");
+
+                if (random.Next(0, 100) > flammable.Potential) 
+                    continue;
+                
+                // For now, only 1 building will be ignited at once
+                Ignite(placeable);
+                return placeable.Owner;
+            }
+
+            return null;
+        }
+
+        public List<Field> DamageBurningBuildings()
+        {
+            var result = new List<Field>();
+            
+            foreach (var placeable in BurningBuildings)
+            {
+                if (placeable is not IFlammable { Burning: true } flammable)
+                    throw new Exception("Internal inconsistency: FieldManager is tracking a non-flammable Placeable or a flammable that is not burning as a burning building");
+
+                var oldHealth = flammable.Health;
+                
+                Damage(placeable);
+
+                if (oldHealth > FireSpreadThreshold && flammable.Health < FireSpreadThreshold)
+                    result.AddRange(SpreadFire(placeable));
+
+                if (flammable.Health > 0)
+                    result.Add(placeable.Owner!);
+                else
+                {
+                    // TODO: Destroy the placeable that is burning
+                    // For this, we must adjust how the Demolish() method works
+                }
+            }
+
+            return result;
         }
 
         public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.FindAll(zone => !zone.Full || showUnavailable);
@@ -177,8 +228,17 @@ namespace CCity.Model
                 case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.RemoveAll(e => e == industrialZone); break;
                 default: break;
             }
-        }
 
+            if (placeable is IFlammable flammable)
+            {
+                if (add)
+                    Flammables.Add(placeable);
+                else if (flammable.Burning)
+                    throw new Exception("Internal inconsistency: Attempted to remove remove tracking of flammable that is currently burning");
+                else
+                    Flammables.Remove(placeable);
+            }
+        }
 
         //you can rename it, i was not creative sorry
         //Method called in Place and Demolish (see references)
@@ -329,6 +389,59 @@ namespace CCity.Model
 
         #endregion
 
+        #region Fire Related
+
+        private void Ignite(Placeable placeable)
+        {
+            if (placeable is not IFlammable flammable)
+                throw new Exception("Internal inconsistency: Attempted to ignite a non-flammable Placeable");
+            
+            flammable.Burning = true;
+            flammable.Health = 1; // Reset the building's health upon ignition
+            
+            BurningBuildings.Add(placeable);
+        }
+
+        private void PutOut(Placeable placeable)
+        {
+            if (placeable is not IFlammable flammable)
+                throw new Exception("Internal inconsistency: Attempted to put out fire on a non-flammable Placeable");
+            
+            flammable.Burning = false;
+
+            BurningBuildings.Remove(placeable);
+        }
+
+        private void Damage(Placeable placeable)
+        {
+            if (placeable is not IFlammable { Burning: true } flammable)
+                throw new Exception("Internal inconsistency: Attempted to take fire damage on a non-flammable Placeable or on a flammable that is not burning");
+
+            // In one tick, the building takes 0.25% damage
+            // This way:
+            //  - the building takes 1% damage in 1 second
+            //  - the building is completely destroyed in 100 seconds
+            flammable.Health -= 1;
+
+            if (flammable.Health <= 0)
+                BurningBuildings.Remove(placeable);
+        }
+
+        private List<Field> SpreadFire(Placeable placeable)
+        {
+            if (placeable is not IFlammable { Burning: true, Health: < FireSpreadThreshold })
+                throw new Exception("Internal inconsistency: Attempted to spread fire from a non-flammable Placeable or on a flammable that isn't burning or its health is not low enough in order for the fire to spread");
+
+            var flammableNeighbors = GetNeighbours(placeable).Where(p => p is IFlammable).ToList();
+
+            foreach (var neighbor in flammableNeighbors)
+                Ignite(neighbor);
+
+            return flammableNeighbors.Select(p => p.Owner!).ToList();
+        }
+        
+        #endregion
+        
         #region Helpers
 
         private bool OnMap(int x, int y)
