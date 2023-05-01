@@ -1,4 +1,6 @@
-﻿namespace CCity.Model
+﻿using Priority_Queue;
+
+namespace CCity.Model
 {
     public class Field
     {

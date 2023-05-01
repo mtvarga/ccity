@@ -1,3 +1,5 @@
+using Priority_Queue;
+
 namespace CCity.Model
 {
     public static class Utilities
@@ -68,6 +70,90 @@ namespace CCity.Model
                 (condition(item) ? resultTrue : resultFalse).Add(item);
 
             return (resultTrue, resultFalse);
+        }
+
+        // NOTE: The first item in this queue is the road next to the field and the last item in this queue is the field which we must get to
+        // If the queue is empty, it means there is no road connecting the two fields
+        public static Stack<Field> ShortestRoad(Field[,] fields, int width, int height, Field f1, Field f2)
+        {
+            var result = new Stack<Field>();
+            
+            // Dijkstra's algorithm to find the shortest road
+            var nodes = new FieldNode[width, height];
+            var q = new FastPriorityQueue<FieldNode>(width * height);
+            
+            var d = new float[width, height];
+            var pi = new Field?[width, height];
+
+            for (var i = 0; i < width; i++)
+            for (var j = 0; j < height; j++)
+            {
+                d[i, j] = float.PositiveInfinity;
+                pi[i, j] = null;
+
+                if (i == f1.X || j == f2.Y) 
+                    continue;
+                
+                nodes[i, j] = new FieldNode(fields[i, j]);
+                q.Enqueue(nodes[i, j], d[i, j]);
+            }
+
+            var u = f1;
+
+            while (d[u.X, u.Y] < float.PositiveInfinity && q.Any())
+            {
+                if (u == f2)
+                    break;
+                
+                var neighbors = new List<FieldNode>();
+
+                if (u.X - 1 > 0 && fields[u.X - 1, u.Y].Placeable is Road)
+                    neighbors.Add(nodes[u.X - 1, u.Y]);
+
+                if (u.Y - 1 > 0 && fields[u.X, u.Y - 1].Placeable is Road)
+                    neighbors.Add(nodes[u.X, u.Y - 1]);
+
+                if (u.X + 1 < width && fields[u.X + 1, u.Y].Placeable is Road)
+                    neighbors.Add(nodes[u.X + 1, u.Y]);
+
+                if (u.Y + 1 < height && fields[u.X, u.Y + 1].Placeable is Road)
+                    neighbors.Add(nodes[u.X, u.Y + 1]);
+
+                foreach (var neighbor in neighbors)
+                {
+                    var v = neighbor.Field;
+
+                    if (d[v.X, v.Y] <= d[u.X, u.Y] + 1)
+                        continue;
+                    
+                    pi[v.X, v.Y] = u;
+                    d[v.X, v.Y] = d[u.X, u.Y] + 1;
+                    q.UpdatePriority(neighbor, d[u.X, u.Y] + 1);
+                }
+
+                u = q.Dequeue().Field;
+            }
+
+            if (u != f2) 
+                return result;
+            
+            while (u != f1)
+            {
+                result.Push(u);
+                u = pi[u.X, u.Y];
+            }
+
+            return result;
+        }
+
+        private class FieldNode : FastPriorityQueueNode
+        {
+            public Field Field { get; }
+
+            public FieldNode(Field field)
+            {
+                Field = field;
+            }
         }
     }
 }
