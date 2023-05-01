@@ -8,7 +8,12 @@ using System.Threading.Tasks;
 namespace CCity.Model
 {
     public class PowerPlant : Placeable, IFlammable, IMultifield
-    {
+    {  
+        #region Constants
+
+        private const byte PowerPlantPotential = 1;
+        
+        #endregion
 
         #region Fields
 
@@ -22,11 +27,11 @@ namespace CCity.Model
 
         public override int MaintenanceCost => 10;
 
-        double IFlammable.Pontential => throw new NotImplementedException();
+        byte IFlammable.Potential => PowerPlantPotential;
+        
+        bool IFlammable.Burning { get; set; }
 
-        double IFlammable.Health => throw new NotImplementedException();
-
-        bool IFlammable.IsOnFire { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        ushort IFlammable.Health { get; set; } = IFlammable.FlammableMaxHealth;
 
         int IMultifield.Width => 2;
 

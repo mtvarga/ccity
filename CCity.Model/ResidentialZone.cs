@@ -8,13 +8,19 @@ namespace CCity.Model
 {
     public class ResidentialZone : Zone
     {
+        #region Constants
+
+        private const byte ResidentialZonePotential = 1;
+        
+        #endregion
 
         #region Properties
 
         public override int PlacementCost => 100;
         public override int MaintenanceCost => 10;
 
-        #endregion
+        public override byte Potential => ResidentialZonePotential;
 
+        #endregion
     }
 }
