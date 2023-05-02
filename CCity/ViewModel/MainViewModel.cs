@@ -342,6 +342,7 @@ namespace CCity.ViewModel
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
             if (!field.HasPlaceable) return Texture.None;
+            if (field.Placeable is IFlammable && ((IFlammable)field.Placeable).Burning) return Texture.Fire;
             return GetTextureFromPlaceable(field.ActualPlaceable!);
         }
 

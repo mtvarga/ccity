@@ -95,7 +95,7 @@ namespace CCity.Model
                 (s, t) => s.CouldGiveElectricityTo(t),
                 (p) => GetNeighbours(p)
                 );
-            
+
             Flammables = new HashSet<Placeable>();
             BurningBuildings = new HashSet<Placeable>();
             BuildingsBeingSaved = new Dictionary<Field, Placeable>();

@@ -14,6 +14,7 @@
     <None Remove="View\Images\banner.png" />
     <None Remove="View\Images\icon.ico" />
     <None Remove="View\Images\profile.png" />
+    <None Remove="View\Images\Textures\fire.png" />
     <None Remove="View\Images\Textures\fireDepartment.png" />
     <None Remove="View\Images\Textures\grass.png" />
     <None Remove="View\Images\Textures\policeDepartment.png" />
@@ -75,6 +76,7 @@
   <ItemGroup>
     <Resource Include="View\Images\banner.png" />
     <Resource Include="View\Images\icon.ico" />
+    <Resource Include="View\Images\Textures\fire.png" />
     <Resource Include="View\Images\Textures\fireDepartment.png" />
     <Resource Include="View\Images\Textures\grass.png" />
     <Resource Include="View\Images\Textures\policeDepartment.png" />
