@@ -193,6 +193,7 @@ namespace CCity.ViewModel
             _model.BudgetChanged += Model_BudgetChanged;
             _model.PopulationChanged += Model_PopulationChanged;
             _model.SpeedChanged += Model_SpeedChanged;
+            _model.FireTruckMoved += Model_FireTruckMoved;
                 
             CreateTable();
             CreateToolbar();
@@ -568,6 +569,20 @@ namespace CCity.ViewModel
             {
                 int index = field.Y * _model.Width + field.X;
                 RefreshFieldItem(Fields[index]);
+            }
+        }
+
+        private void Model_FireTruckMoved(object? sender, FieldEventArgs e)
+        {
+            foreach (Field field in e.Fields)
+            {
+                int index = field.Y * _model.Width + field.X;
+                RefreshFieldItem(Fields[index]);
+            }
+            foreach(Field field in _model.FireTruckLocations())
+            {
+                int index = field.Y * _model.Width + field.X;
+                Fields[index].Texture = Texture.Firetruck;
             }
         }
 
