@@ -40,6 +40,7 @@
     <None Remove="View\Images\Textures\Tools\commercialZone.png" />
     <None Remove="View\Images\Textures\Tools\cursor.png" />
     <None Remove="View\Images\Textures\Tools\fireDepartment.png" />
+    <None Remove="View\Images\Textures\Tools\flintAndSteel.png" />
     <None Remove="View\Images\Textures\Tools\industrialZone.png" />
     <None Remove="View\Images\Textures\Tools\policeDepartment.png" />
     <None Remove="View\Images\Textures\Tools\residentialZone.png" />
@@ -100,6 +101,7 @@
     <Resource Include="View\Images\Textures\Tools\commercialZone.png" />
     <Resource Include="View\Images\Textures\Tools\cursor.png" />
     <Resource Include="View\Images\Textures\Tools\fireDepartment.png" />
+    <Resource Include="View\Images\Textures\Tools\flintAndSteel.png" />
     <Resource Include="View\Images\Textures\Tools\industrialZone.png" />
     <Resource Include="View\Images\Textures\Tools\policeDepartment.png" />
     <Resource Include="View\Images\Textures\Tools\residentialZone.png" />

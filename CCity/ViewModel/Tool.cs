@@ -20,6 +20,7 @@ namespace CCity.ViewModel
         PowerPlant,
         Pole,
         Forest,
-        Bulldozer
+        Bulldozer,
+        FlintAndSteel
     }
 }
