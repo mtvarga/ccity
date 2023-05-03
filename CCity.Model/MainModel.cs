@@ -280,7 +280,7 @@ namespace CCity.Model
 
         private void EngageFireEmergency()
         {
-            Speed = Speed.Normal;
+            Speed = Speed.Slow;
             SpeedChanged?.Invoke(this, EventArgs.Empty);
         }
 
