@@ -54,7 +54,7 @@ namespace CCity.Model
 
         public static int AbsoluteDistance(Field? f1, Field? f2) => (f1, f2) switch
         {
-            (not null, not null) =>  AbsoluteDistance(f1.X, f1.X, f2.X, f2.Y),
+            (not null, not null) =>  AbsoluteDistance(f1.X, f1.Y, f2.X, f2.Y),
             _ => 0
         };
 
@@ -128,7 +128,7 @@ namespace CCity.Model
                     
                     pi[v.X, v.Y] = u;
                     d[v.X, v.Y] = d[u.X, u.Y] + 1;
-                    q.UpdatePriority(neighbor, d[u.X, u.Y] + 1);
+                    q.UpdatePriority(neighbor, d[v.X, v.Y]);
                 }
 
                 u = q.Dequeue().Field;
