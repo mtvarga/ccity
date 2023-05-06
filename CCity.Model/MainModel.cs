@@ -104,6 +104,26 @@ namespace CCity.Model
             }
         }
 
+        public void IgniteBuilding(int x, int y)
+        {
+            List<Field>? updatedFields = null;
+            
+            try
+            {
+                updatedFields = new List<Field> { _fieldManager.IgniteBuilding(x, y) };
+                
+                // A building was set on fire
+                EngageFireEmergency();
+            }
+            catch (Exception e)
+            {
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(e.Message));
+            }
+            
+            if (updatedFields != null)
+                FieldsUpdated?.Invoke(this, new FieldEventArgs(updatedFields));
+        } 
+
         public void ChangeTax(TaxType type, double amount)
         {
             if(!_globalManager.ChangeTax(type, amount))
