@@ -15,7 +15,7 @@ namespace CCity.Model
 
         public override int MaintenanceCost => 10;
 
-        public override int NeededElectricity => 1;
+        public override int NeededElectricity => 0;
 
         public override bool CouldGivePublicityTo(Placeable _) => true;
 
@@ -34,6 +34,13 @@ namespace CCity.Model
                 Pole => true,
                 _ => false
             };
+        }
+
+        public override void MakeRoot(SpreadType spreadType)
+        {
+            if (spreadType != SpreadType.Publicity) return;
+            base.MakeRoot(spreadType);
+            MaxSpreadValue[spreadType] = () => 1;
         }
 
         #endregion

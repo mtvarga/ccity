@@ -86,12 +86,14 @@ namespace CCity.Model
 
             _publicitySpreader = new Spreader(
                 SpreadType.Publicity,
+                false,
                 (s, t) => s.CouldGivePublicityTo(t),
                 (p) => GetNeighbours(p)
                 );
 
             _electricitySpreader = new Spreader(
                 SpreadType.Electricity,
+                true,
                 (s, t) => s.CouldGiveElectricityTo(t),
                 (p) => GetNeighbours(p)
                 );
@@ -373,7 +375,7 @@ namespace CCity.Model
             //
             //(we cant do it in the previous loop,
             //because modifiedFields could have expanded due to switching on PowerPlant(s))
-            foreach (Field f in modifiedFields)
+            foreach (Field f in modifiedFields.ToList())
             {
                 if(f.Placeable != null)
                 {
