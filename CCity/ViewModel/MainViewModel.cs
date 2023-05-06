@@ -64,6 +64,7 @@ namespace CCity.ViewModel
         public bool SelectedFieldIsZone { get => IsFieldSelected && _selectedField!.Placeable is Zone; }
         public int SelectedFieldCurrentElectricity { get => IsFieldSelected && _selectedField!.HasPlaceable ? _selectedField.Placeable!.CurrentSpreadValue[SpreadType.Electricity] : 0; }
         public int SelectedFieldNeededElectricity { get => IsFieldSelected && _selectedField!.HasPlaceable ? _selectedField.Placeable!.MaxSpreadValue[SpreadType.Electricity]() : 0; }
+        public bool SelectedFieldIsIncinerated { get => IsFieldSelected && _selectedField!.HasPlaceable && _selectedField!.Placeable is IFlammable && ((IFlammable)_selectedField!.Placeable!).Burning; }
         //public string SelectedFieldCitizenName { get; }
         public int Width { get => _model.Width; }
         public int Height { get => _model.Height; }
@@ -170,7 +171,7 @@ namespace CCity.ViewModel
         public DelegateCommand ChangeSpeedCommand { get; } 
         
         //TO DO
-        public DelegateCommand SendFiretruckCommand { get; private set; }
+        public DelegateCommand SendFiretruckToSelectedFieldCommand { get; private set; }
         public DelegateCommand UpgradeCommand { get; private set; }
         public DelegateCommand ChangeMinimapSizeCommand { get; private set; }
         public DelegateCommand CloseSelectedFieldWindowCommand { get; private set; }
@@ -192,6 +193,7 @@ namespace CCity.ViewModel
             _model.BudgetChanged += Model_BudgetChanged;
             _model.PopulationChanged += Model_PopulationChanged;
             _model.SpeedChanged += Model_SpeedChanged;
+            _model.FireTruckMoved += Model_FireTruckMoved;
                 
             CreateTable();
             CreateToolbar();
@@ -209,8 +211,8 @@ namespace CCity.ViewModel
             TogglePublicityCommand = new DelegateCommand(param => OnTogglePublicity());
             ToggleElectricityCommand = new DelegateCommand(param => OnToggleElecticity());
             ChangeMinimapSizeCommand = new DelegateCommand(param => OnChangeMinimapSize());
-            ChangeSpeedCommand =
-                new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
+            ChangeSpeedCommand = new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
+            SendFiretruckToSelectedFieldCommand = new DelegateCommand(param => OnSendFiretruckToSelectedFieldCommand());
 
             InputCityName = "";
             InputMayorName = "";
@@ -278,7 +280,8 @@ namespace CCity.ViewModel
                 Tool.Stadium,
                 Tool.PowerPlant,
                 Tool.Road,
-                Tool.Bulldozer
+                Tool.Bulldozer,
+                Tool.FlintAndSteel
             };
             Tools = new();
             int number = 0;
@@ -340,6 +343,7 @@ namespace CCity.ViewModel
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
             if (!field.HasPlaceable) return Texture.None;
+            if (field.Placeable is IFlammable && ((IFlammable)field.Placeable).Burning) return Texture.Fire;
             return GetTextureFromPlaceable(field.ActualPlaceable!);
         }
 
@@ -441,6 +445,7 @@ namespace CCity.ViewModel
 
         private void FieldClicked(int index)
         {
+            //Coord will be removed (so x and y remains without coord.) in the viewmodel branch, I won't modify it in this branch
             (int x, int y) coord = GetCordinates(index);
             switch (SelectedTool)
             {
@@ -454,6 +459,7 @@ namespace CCity.ViewModel
                 case Tool.PowerPlant: _model.Place(coord.x, coord.y, new PowerPlant()); break;
                 case Tool.Road: _model.Place(coord.x, coord.y, new Road()); break;
                 case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
+                case Tool.FlintAndSteel: _model.IgniteBuilding(coord.x, coord.y); break;
                 default: throw new Exception();
             }
         }
@@ -481,6 +487,7 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(SelectedFieldPopulation));
             OnPropertyChanged(nameof(SelectedFieldSatisfaction));
             OnPropertyChanged(nameof(SelectedFieldIsZone));
+            OnPropertyChanged(nameof(SelectedFieldIsIncinerated));
 
             OnPropertyChanged(nameof(SelectedFieldCurrentElectricity));
             OnPropertyChanged(nameof(SelectedFieldNeededElectricity));
@@ -562,6 +569,20 @@ namespace CCity.ViewModel
             {
                 int index = field.Y * _model.Width + field.X;
                 RefreshFieldItem(Fields[index]);
+            }
+        }
+
+        private void Model_FireTruckMoved(object? sender, FieldEventArgs e)
+        {
+            foreach (Field field in e.Fields)
+            {
+                int index = field.Y * _model.Width + field.X;
+                RefreshFieldItem(Fields[index]);
+            }
+            foreach(Field field in _model.FireTruckLocations())
+            {
+                int index = field.Y * _model.Width + field.X;
+                Fields[index].Texture = Texture.Firetruck;
             }
         }
 
@@ -671,6 +692,14 @@ namespace CCity.ViewModel
         private void OnChangeMinimapSize()
         {
             MinimapMinimized = !MinimapMinimized;
+        }
+
+        private void OnSendFiretruckToSelectedFieldCommand()
+        {
+            if (_selectedField != null)
+            {
+                _model.DeployFireTruck(_selectedField.X, _selectedField.Y);
+            }
         }
 
         public void ExitToMainMenu()

@@ -14,7 +14,9 @@
     <None Remove="View\Images\banner.png" />
     <None Remove="View\Images\icon.ico" />
     <None Remove="View\Images\profile.png" />
+    <None Remove="View\Images\Textures\fire.png" />
     <None Remove="View\Images\Textures\fireDepartment.png" />
+    <None Remove="View\Images\Textures\firetruck.png" />
     <None Remove="View\Images\Textures\grass.png" />
     <None Remove="View\Images\Textures\policeDepartment.png" />
     <None Remove="View\Images\Textures\Roads\roadBottomClose.png" />
@@ -40,6 +42,7 @@
     <None Remove="View\Images\Textures\Tools\commercialZone.png" />
     <None Remove="View\Images\Textures\Tools\cursor.png" />
     <None Remove="View\Images\Textures\Tools\fireDepartment.png" />
+    <None Remove="View\Images\Textures\Tools\flintAndSteel.png" />
     <None Remove="View\Images\Textures\Tools\industrialZone.png" />
     <None Remove="View\Images\Textures\Tools\policeDepartment.png" />
     <None Remove="View\Images\Textures\Tools\residentialZone.png" />
@@ -74,7 +77,9 @@
   <ItemGroup>
     <Resource Include="View\Images\banner.png" />
     <Resource Include="View\Images\icon.ico" />
+    <Resource Include="View\Images\Textures\fire.png" />
     <Resource Include="View\Images\Textures\fireDepartment.png" />
+    <Resource Include="View\Images\Textures\firetruck.png" />
     <Resource Include="View\Images\Textures\grass.png" />
     <Resource Include="View\Images\Textures\policeDepartment.png" />
     <Resource Include="View\Images\Textures\Roads\roadBottomClose.png" />
@@ -100,6 +105,7 @@
     <Resource Include="View\Images\Textures\Tools\commercialZone.png" />
     <Resource Include="View\Images\Textures\Tools\cursor.png" />
     <Resource Include="View\Images\Textures\Tools\fireDepartment.png" />
+    <Resource Include="View\Images\Textures\Tools\flintAndSteel.png" />
     <Resource Include="View\Images\Textures\Tools\industrialZone.png" />
     <Resource Include="View\Images\Textures\Tools\policeDepartment.png" />
     <Resource Include="View\Images\Textures\Tools\residentialZone.png" />

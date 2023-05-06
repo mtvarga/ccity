@@ -24,12 +24,12 @@
 
         public List<Citizen> Citizens { get; }
 
-        double IFlammable.Pontential => throw new NotImplementedException();
+        public abstract byte Potential { get; }
+    
+        bool IFlammable.Burning { get; set; }
 
-        double IFlammable.Health => throw new NotImplementedException();
-
-        bool IFlammable.IsOnFire { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
+        ushort IFlammable.Health { get; set; } = IFlammable.FlammableMaxHealth;
+        
         Level IUpgradeable.Level { get => _level; set => _level = value; }
 
         int IUpgradeable.NextUpgradeCost => ((int)_level + 1) * upgradeCost;

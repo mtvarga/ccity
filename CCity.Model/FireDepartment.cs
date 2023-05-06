@@ -13,6 +13,8 @@ namespace CCity.Model
 
         private const int effectRadius = 10;
 
+        private const int FireDeparmentInitialFireTruckCount = 1;
+
         #endregion
 
         #region Properties
@@ -23,7 +25,7 @@ namespace CCity.Model
 
         public override int NeededElectricity => 20;
 
-        public int AvailableFiretrucks { get; internal set; }
+        public int AvailableFireTrucks { get; internal set; } = FireDeparmentInitialFireTruckCount;
 
         #endregion
 
