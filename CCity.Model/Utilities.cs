@@ -91,14 +91,15 @@ namespace CCity.Model
                 d[i, j] = float.PositiveInfinity;
                 pi[i, j] = null;
 
-                if (i == f1.X || j == f2.Y) 
+                if (i == f1.X && j == f1.Y) 
                     continue;
                 
                 nodes[i, j] = new FieldNode(fields[i, j]);
                 q.Enqueue(nodes[i, j], d[i, j]);
             }
-
+            
             var u = f1;
+            d[u.X, u.Y] = 0;
 
             while (d[u.X, u.Y] < float.PositiveInfinity && q.Any())
             {
@@ -107,16 +108,16 @@ namespace CCity.Model
                 
                 var neighbors = new List<FieldNode>();
 
-                if (u.X - 1 > 0 && fields[u.X - 1, u.Y].Placeable is Road)
+                if (u.X - 1 > 0 && (fields[u.X - 1, u.Y].Placeable is Road || fields[u.X - 1, u.Y] == f2))
                     neighbors.Add(nodes[u.X - 1, u.Y]);
 
-                if (u.Y - 1 > 0 && fields[u.X, u.Y - 1].Placeable is Road)
+                if (u.Y - 1 > 0 && (fields[u.X, u.Y - 1].Placeable is Road || fields[u.X, u.Y - 1] == f2))
                     neighbors.Add(nodes[u.X, u.Y - 1]);
 
-                if (u.X + 1 < width && fields[u.X + 1, u.Y].Placeable is Road)
+                if (u.X + 1 < width && (fields[u.X + 1, u.Y].Placeable is Road || fields[u.X + 1, u.Y] == f2))
                     neighbors.Add(nodes[u.X + 1, u.Y]);
 
-                if (u.Y + 1 < height && fields[u.X, u.Y + 1].Placeable is Road)
+                if (u.Y + 1 < height && (fields[u.X, u.Y + 1].Placeable is Road || fields[u.X, u.Y + 1] == f2))
                     neighbors.Add(nodes[u.X, u.Y + 1]);
 
                 foreach (var neighbor in neighbors)
