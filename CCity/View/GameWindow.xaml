@@ -410,7 +410,18 @@
                                 <Run Text="/"/>
                                 <Run Text="{Binding SelectedFieldNeededElectricity, Mode=OneWay}"/>
                             </TextBlock>
-
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="5 5 5 10">
+                            <Button Command="{Binding SendFiretruckToSelectedFieldCommand}" Height="24">Tűzoltófecskendő</Button>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedFieldIsIncinerated}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
                         </StackPanel>
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Microsoft.VisualBasic;
 
 namespace CCity.Model
 {
@@ -28,7 +29,6 @@ namespace CCity.Model
         public int Population { get => _citizenManager.Population; }
         public int Width { get => _fieldManager.Width; }
         public int Height { get => _fieldManager.Height; }
-
 
         #endregion
 
@@ -91,10 +91,38 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
-        public void SendFiretruck(int x, int y)
+        public void DeployFireTruck(int x, int y)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _fieldManager.DeployFireTruck(x, y);
+                FireTruckMoved?.Invoke(this, new FieldEventArgs(new List<Field>()));
+            }
+            catch (Exception e)
+            {
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(e.Message));
+            }
         }
+
+        public void IgniteBuilding(int x, int y)
+        {
+            List<Field>? updatedFields = null;
+            
+            try
+            {
+                updatedFields = new List<Field> { _fieldManager.IgniteBuilding(x, y) };
+                
+                // A building was set on fire
+                EngageFireEmergency();
+            }
+            catch (Exception e)
+            {
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(e.Message));
+            }
+            
+            if (updatedFields != null)
+                FieldsUpdated?.Invoke(this, new FieldEventArgs(updatedFields));
+        } 
 
         public void ChangeTax(TaxType type, double amount)
         {
@@ -107,6 +135,9 @@ namespace CCity.Model
 
         public void ChangeSpeed(Speed speed)
         {
+            if (_fieldManager.FireEmergencyPresent)
+                return;
+            
             Speed = speed;
             SpeedChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -156,6 +187,8 @@ namespace CCity.Model
 
         public (int[], List<Road>) GetFourRoadNeighbours(Road road) => _fieldManager.GetFourRoadNeighbours(road);
 
+        public List<Field> FireTruckLocations() => _fieldManager.FireTruckLocations();
+        
         #endregion
 
         #region Private methods
@@ -165,9 +198,26 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
         
-        private void Tick() 
+        private void Tick()
         {
+            List<Field>? updatedFields = null;
+            List<Field>? oldFireTruckLocations = null;
+            
+            if (_fieldManager.FireEmergencyPresent)
+            {
+                if (_fieldManager.FireTrucksDeployed)
+                    oldFireTruckLocations = _fieldManager.UpdateFireTrucks();
+
+                updatedFields = _fieldManager.UpdateBurningBuildings();
+            }
+
             GameTicked?.Invoke(this, EventArgs.Empty);
+            
+            if (updatedFields != null)
+                FieldsUpdated?.Invoke(this, new FieldEventArgs(updatedFields));
+
+            if (oldFireTruckLocations != null)
+                FireTruckMoved?.Invoke(this, new FieldEventArgs(oldFireTruckLocations));
         }
 
         private void MonthlyTick()
@@ -208,6 +258,15 @@ namespace CCity.Model
             foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
             
+            var field = _fieldManager.IgniteRandomBuilding();
+
+            if (field != null)
+            {
+                // A building was set on fire
+                EngageFireEmergency();
+                fields.Add(field);
+            }
+            
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
 
             if (!newCitizens.Any()) 
@@ -237,6 +296,12 @@ namespace CCity.Model
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        private void EngageFireEmergency()
+        {
+            Speed = Speed.Slow;
+            SpeedChanged?.Invoke(this, EventArgs.Empty);
+        }
+
         public double ZoneSatisfaction(Zone zone) => _globalManager.CalculateSatisfaction(zone);
         
         #endregion
@@ -245,6 +310,7 @@ namespace CCity.Model
 
         public event EventHandler<EventArgs>? GameTicked;
         public event EventHandler<FieldEventArgs>? FieldsUpdated;
+        public event EventHandler<FieldEventArgs>? FireTruckMoved;
         public event EventHandler<ErrorEventArgs> ErrorOccured;
         public event EventHandler<EventArgs>? PopulationChanged;
         public event EventHandler<EventArgs>? BudgetChanged;

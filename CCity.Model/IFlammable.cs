@@ -8,25 +8,22 @@ namespace CCity.Model
 {
     public interface IFlammable
     {
+        #region Constants
+
+        internal const ushort FlammableMaxHealth = 400;
+        
+        #endregion
+        
         #region Properties
 
-        public double Pontential { get; }
-        public double Health { get; }
-        public bool IsOnFire { get; internal set; }
+        // For convenience, we store the potential of a flammable catching fire as an integer between 0 and 100.
+        public byte Potential { get; }
 
-        #endregion
-
-        #region Pulbic methods
-
-        public void Incinerate()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TakeDamage()
-        {
-            throw new NotImplementedException();
-        }
+        public bool Burning { get; internal set; }
+        
+        // For convenience, since a building takes about 400 ticks to burn down completely, we store the health of 
+        // a flammable as an integer between 0 and 400.
+        public ushort Health { get; internal set; }
 
         #endregion
     }

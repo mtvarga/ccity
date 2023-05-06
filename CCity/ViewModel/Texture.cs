@@ -41,6 +41,8 @@ namespace CCity.ViewModel
         CommercialZoneLevel1Full,
         IndustrialZoneLevel1Half,
         IndustrialZoneLevel1Full,
+        Fire,
+        Firetruck,
         Unhandled
     }
 }
