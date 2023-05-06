@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace CCity.Model
 {
-    public class Forest: Placeable
+    public class Forest : Placeable
     {
+
+        public int MaxAge => 10;
 
         #region Properties 
 
@@ -15,9 +17,12 @@ namespace CCity.Model
 
         public override int MaintenanceCost => 10;
 
-        public int GrowthMonthsLeft { get; private set; }
+        public int GrowthMonts { get; private set; }
+
+        public int Age => 10;
 
         #endregion
 
     }
+
 }

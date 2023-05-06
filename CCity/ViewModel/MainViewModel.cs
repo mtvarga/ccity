@@ -222,11 +222,13 @@ namespace CCity.ViewModel
 
         private void OnTogglePublicity()
         {
+            IsElectricityToggled = false;
             IsPublicityToggled = !IsPublicityToggled;
             foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem, true);
         }
         private void OnToggleElecticity()
         {
+            IsPublicityToggled = false;
             IsElectricityToggled = !IsElectricityToggled;
             foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem, true);
         }
@@ -279,6 +281,8 @@ namespace CCity.ViewModel
                 Tool.FireDepartment,
                 Tool.Stadium,
                 Tool.PowerPlant,
+                Tool.Pole,
+                Tool.Forest,
                 Tool.Road,
                 Tool.Bulldozer,
                 Tool.FlintAndSteel
@@ -354,22 +358,39 @@ namespace CCity.ViewModel
                 FireDepartment => Texture.FireDepartment,
                 PoliceDepartment => Texture.PoliceDepartment,
                 Stadium => Texture.Stadium,
+                PowerPlant => Texture.PowerPlant,
+                Pole => Texture.Pole,
                 Road road => ReturnAndHandleRoadTexture(road),
                 Zone zone => GetZoneTexture(zone),
+                Forest forest => GetForestTexture(forest),
                 Filler filler => GetFillerTexture(filler),
                 _ => Texture.Unhandled
             };
         }
 
+        private Texture GetForestTexture(Forest forest)
+        {
+            Texture texture = Texture.Forest;
+            int shifter = forest.Age / (forest.MaxAge * 2);
+            texture += shifter;
+            return texture;
+        }
+
         private Texture GetZoneTexture(Zone zone)
         {
             if (zone.Empty) return Texture.None;
-            Texture texture = Texture.None;
-            switch (zone)
+            String textureString = zone switch
             {
-                case ResidentialZone _: texture = Texture.ResidentialZoneLevel1Half; break;
-                case CommercialZone _: texture = Texture.CommercialZoneLevel1Half; break;
-                case IndustrialZone _: texture = Texture.IndustrialZoneLevel1Half; break;
+                ResidentialZone => nameof(ResidentialZone),
+                CommercialZone => nameof(CommercialZone),
+                _ => nameof(IndustrialZone),
+            };
+            textureString += ((IUpgradeable)zone).Level.ToString();
+            textureString += "Half";
+            Texture texture;
+            if (!Enum.TryParse(textureString, out texture))
+            {
+                return Texture.Unhandled;
             }
             if (!zone.BelowHalfPopulation) ++texture;
             return texture;
@@ -381,8 +402,7 @@ namespace CCity.ViewModel
             Field fillerField = ((Placeable)filler).Owner!;
             (int x, int y) = (fillerField.X - mainField.X, mainField.Y - fillerField.Y);
             string enumString = $"{GetTextureFromPlaceable((Placeable)filler.Main).ToString()}_{x}_{y}";
-            Texture texture;
-            if(Texture.TryParse(enumString, out texture)) return texture;
+            if (Enum.TryParse(enumString, out Texture texture)) return texture;
             else return Texture.Unhandled;
         }
 
@@ -408,33 +428,11 @@ namespace CCity.ViewModel
 
         private Texture GetRoadTexture(Road road)
         {
-            (int[] id, List<Road> roads) = _model.GetFourRoadNeighbours(road);
-            (int, int, int, int) neighbours = (id[0], id[1], id[2], id[3]);
-            switch (neighbours)
-            {
-                //
-                case (1, 0, 1, 0): return Texture.RoadVertical;
-                case (0, 1, 0, 1): return Texture.RoadHorizontal;
-                case (1, 1, 1, 1): return Texture.RoadCross;
-                case (0, 0, 0, 0): return Texture.RoadCross;
-                //turns
-                case (1, 0, 0, 1): return Texture.RoadTopLeft;
-                case (1, 1, 0, 0): return Texture.RoadTopRight;
-                case (0, 0, 1, 1): return Texture.RoadBottomLeft;
-                case (0, 1, 1, 0): return Texture.RoadBottomRight;
-                //nots
-                case (0, 1, 1, 1): return Texture.RoadNotTop;
-                case (1, 1, 0, 1): return Texture.RoadNotBottom;
-                case (1, 1, 1, 0): return Texture.RoadNotLeft;
-                case (1, 0, 1, 1): return Texture.RoadNotRight;
-                //closes
-                case (1, 0, 0, 0): return Texture.RoadTopClose;
-                case (0, 0, 1, 0): return Texture.RoadBottomClose;
-                case (0, 0, 0, 1): return Texture.RoadLeftClose;
-                case (0, 1, 0, 0): return Texture.RoadRightClose;
-
-                default: return Texture.Unhandled;
-            }
+            (int[] id, _) = _model.GetFourRoadNeighbours(road);
+            (int t, int r, int b, int l) = (id[0], id[1], id[2], id[3]);
+            string enumString = $"Road_{t}_{r}_{b}_{l}";
+            if (Enum.TryParse(enumString, out Texture texture)) return texture;
+            else return Texture.Unhandled;
         }
 
         private void UnselectField()
@@ -457,7 +455,9 @@ namespace CCity.ViewModel
                 case Tool.PoliceDepartment: _model.Place(coord.x, coord.y, new PoliceDepartment()); break;
                 case Tool.Stadium: _model.Place(coord.x, coord.y, new Stadium()); break;
                 case Tool.PowerPlant: _model.Place(coord.x, coord.y, new PowerPlant()); break;
+                case Tool.Pole: _model.Place(coord.x, coord.y, new Pole()); break;
                 case Tool.Road: _model.Place(coord.x, coord.y, new Road()); break;
+                case Tool.Forest: _model.Place(coord.x, coord.y, new Forest()); break;
                 case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
                 case Tool.FlintAndSteel: _model.IgniteBuilding(coord.x, coord.y); break;
                 default: throw new Exception();
@@ -491,11 +491,6 @@ namespace CCity.ViewModel
 
             OnPropertyChanged(nameof(SelectedFieldCurrentElectricity));
             OnPropertyChanged(nameof(SelectedFieldNeededElectricity));
-
-            if (_selectedField.Placeable is Road)
-            {
-                Road road = (Road)_selectedField.Placeable;
-            }
         }
 
         private int PercentToInt(double percent) => (int)Math.Floor(percent * 100);
@@ -507,24 +502,17 @@ namespace CCity.ViewModel
             return (x, y);
         }
 
-        //TO DO: Utilities or Placeable
-        private Placeable GetRoot(Placeable placeable)
-        {
-            if (placeable is Filler) return (Placeable)(((Filler)placeable).Main);
-            else return placeable;
-        }
-
         private string GetFieldName(Field? selectedField)
         {
             if (selectedField is null || selectedField.Placeable is null) return "Üres mező";
-            Placeable placeable = GetRoot(selectedField.Placeable!);
-            switch (placeable)
+            switch (selectedField.Placeable!)
             {
                 case ResidentialZone _: return "Lakózóna";
                 case CommercialZone _: return "Kereskedelmi zóna";
                 case IndustrialZone _: return "Ipari zóna";
                 case Road road: if(road.IsPublic) return "Közút"; else return "Út";
                 case PoliceDepartment _: return "Rendőrség";
+                case PowerPlant _: return "Erőmű";
                 case FireDepartment _: return "Tűzoltóság";
                 case Stadium _: return "Stadion";
                 default: return "Épület";

@@ -51,8 +51,8 @@ namespace CCity.View
 
         private void SetMinimapBorder(ScrollViewer scrollViewer)
         {
-            var contentWidth = scrollViewer.ExtentWidth;
-            var contentHeight = scrollViewer.ExtentHeight;
+            var contentWidth = scrollViewer.ExtentWidth - 300;
+            var contentHeight = scrollViewer.ExtentHeight - 300;
             var viewportWidth = scrollViewer.ViewportWidth;
             var viewportHeight = scrollViewer.ViewportHeight;
             var borderWidth = Minimap.ActualWidth * (viewportWidth / contentWidth);
@@ -60,8 +60,8 @@ namespace CCity.View
             MinimapBorder.Width = borderWidth;
             MinimapBorder.Height = borderHeight;
 
-            var leftPercentage = scrollViewer.HorizontalOffset / (scrollViewer.ExtentWidth - scrollViewer.ViewportWidth);
-            var topPercentage = scrollViewer.VerticalOffset / (scrollViewer.ExtentHeight - scrollViewer.ViewportHeight);
+            var leftPercentage = (scrollViewer.HorizontalOffset - 150) / (contentWidth - viewportWidth);
+            var topPercentage = (scrollViewer.VerticalOffset - 150) / (contentHeight - viewportHeight);
             var leftPos = (Minimap.ActualWidth - MinimapBorder.Width - 4) * leftPercentage;
             var topPos = (Minimap.ActualHeight - MinimapBorder.Height - 4) * topPercentage;
             Canvas.SetLeft(MinimapBorder, leftPos);
@@ -103,9 +103,12 @@ namespace CCity.View
             scrollViewer.ScrollToBottom();
 
             var contentWidth = scrollViewer.ExtentWidth;
+            var contentHeight = scrollViewer.ExtentHeight;
             var viewportWidth = scrollViewer.ViewportWidth;
+            var viewportHeight= scrollViewer.ViewportHeight;
 
             scrollViewer.ScrollToHorizontalOffset((contentWidth - viewportWidth) / 2);
+            scrollViewer.ScrollToVerticalOffset(contentHeight - viewportHeight - 150);
 
             SetMinimapBorder(scrollViewer);
         }

@@ -13,13 +13,14 @@
              SizeChanged="UserControl_SizeChanged">
     <UserControl.Resources>
         <viewmodel:TextureEnumToPath x:Key="TextureEnumToPath" />
+        <viewmodel:TextureEnumToIsOversized x:Key="TextureEnumToIsOversized" />
         <viewmodel:ColorToSolidColorBrush x:Key="ColorToSolidColorBrush" />
         <viewmodel:ToolEnumToPath x:Key="ToolEnumToPath" />
     </UserControl.Resources>
     <Grid>
         <!--Sidebar-->
         <Grid Panel.ZIndex="10">
-            <Border Background="#C8D2BB" Width="80" Height="Auto" Margin="7" CornerRadius="12" Padding="0 4" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <Border Background="#CCC" Width="78" Height="Auto" Margin="7" CornerRadius="5" Padding="0 4" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <StackPanel Orientation="Vertical">
                 <ItemsControl ItemsSource="{Binding Tools}">
                     <ItemsControl.ItemsPanel>
@@ -29,11 +30,11 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding ClickCommand}" Cursor="Hand" Width="36" Height="36" Margin="0" CommandParameter="{Binding Number}">
-                                <Grid>
+                                <Button Command="{Binding ClickCommand}" Cursor="Hand" Width="36" Height="36" Margin="0" CommandParameter="{Binding Number}">
+                                    <Grid>
                                     <Grid Panel.ZIndex="1">
-                                        <Image Stretch="Fill" Source="{Binding Tool, Converter={StaticResource ToolEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality">
-                                            <Image.Clip>
+                                            <Image Stretch="Fill" Source="{Binding Tool, Converter={StaticResource ToolEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality">
+                                                <Image.Clip>
                                                 <RectangleGeometry RadiusX="3" RadiusY="3" Rect="0,0,32,32" />
                                             </Image.Clip>
                                         </Image>
@@ -69,14 +70,67 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <StackPanel Margin="0 5 0 0" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-                        <StackPanel Orientation="Vertical">
-                            <Button Content="Közút" Height="24" Margin="0 5" Command="{Binding TogglePublicityCommand}"/>
-                            <Button Content="Áram" Height="24" Margin="0 5" Command="{Binding ToggleElectricityCommand}"/>
-                            <Button Content="Frissítés" Height="24" Margin="0 5" Command="{Binding RefreshMapCommand}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Height="35" Width="35" Margin="1 5" FontSize="8" Command="{Binding TogglePublicityCommand}">
+                                Közút
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPublicityToggled}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsPublicityToggled}" Value="False">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="BorderThickness" Value="2"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                                            BorderBrush="{TemplateBinding Background}"
+                                                            Background="#FFF"
+                                                            CornerRadius="4">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Height="35" Width="35" Margin="1 5" FontSize="8" Command="{Binding ToggleElectricityCommand}">
+                                Áram
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsElectricityToggled}" Value="True">
+                                                <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsElectricityToggled}" Value="False">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="BorderThickness" Value="2"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                                            BorderBrush="{TemplateBinding Background}"
+                                                            Background="#FFF"
+                                                            CornerRadius="4">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="0 5">
                             <!-- ADÓ ÁLLÍTÓ GOMBOK -->
-                            <StackPanel Orientation="Horizontal" Margin="0 2" Height="28">
+                            <StackPanel Orientation="Horizontal" Margin="2" Height="28">
                                 <Border Background="#EEE" CornerRadius="7 0 0 7">
                                     <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResidentialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                                 </Border>
@@ -120,7 +174,7 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Margin="0 2" Height="28">
+                            <StackPanel Orientation="Horizontal" Margin="2" Height="28">
                                 <Border Background="#EEE" CornerRadius="7 0 0 7">
                                     <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding CommercialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                                 </Border>
@@ -164,7 +218,7 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Margin="0 2" Height="28">
+                            <StackPanel Orientation="Horizontal" Margin="2" Height="28">
                                 <Border Background="#EEE" CornerRadius="7 0 0 7">
                                     <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding IndustrialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                                 </Border>
@@ -217,7 +271,7 @@
             </Border>
             <!-- Status bar -->
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Left" >
-                <Border x:Name="Minimap" Width="Auto" Height="Auto" BorderThickness="2" BorderBrush="#C8D2BB" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="21 0">
+                <Border x:Name="Minimap" Width="Auto" Height="Auto" BorderThickness="2" BorderBrush="#CCC" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="21 0">
                     <Grid>
                         <Canvas HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Panel.ZIndex="20" ClipToBounds="True">
                             <Rectangle x:Name="MinimapBorder" Stroke="#D02" StrokeThickness="1" Fill="Transparent"/>
@@ -254,7 +308,7 @@
                         </Style>
                     </Border.Style>
                 </Border>
-                <Border Background="#C8D2BB" Margin="7" CornerRadius="14" Height="28">
+                <Border Background="#CCC" Margin="7" CornerRadius="14" Height="28">
                     <StackPanel Orientation="Horizontal">
                         <Button Width="28" Height="28" Cursor="Hand" FontSize="20" Command="{Binding ChangeMinimapSizeCommand}">
                             <Button.Style>
@@ -352,7 +406,7 @@
                     </StackPanel>
                 </Border>
             </StackPanel>
-            <Border Background="#C8D2BB" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="7" CornerRadius="14" Height="28">
+            <Border Background="#CCC" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="7" CornerRadius="14" Height="28">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Population, StringFormat='🤵 {0:N0}'}" Margin="7"/>
                     <TextBlock Text="{Binding Satisfaction, StringFormat='👍 {0}%'}" Margin="7"/>
@@ -366,7 +420,7 @@
         <!--Center-->
         <Grid x:Name="Center">
             <Grid Panel.ZIndex="2">
-                <Border Background="#C8D2BB" CornerRadius="5" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
+                <Border Background="#CCC" CornerRadius="5" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
                     <StackPanel Orientation="Vertical">
                         <Button Width="24" Height="24" Cursor="Hand" FontSize="14"  HorizontalAlignment="Right" Margin="5" Command="{Binding CloseSelectedFieldWindowCommand}" Content="×">
                             <Button.Style>
@@ -443,29 +497,79 @@
                     Loaded="MapScrollViewer_Loaded"
                     ScrollChanged="MapScrollViewer_ScrollChanged"
                     SizeChanged="MapScrollViewer_SizeChanged">
-                    <ItemsControl ItemsSource="{Binding Fields}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}" Width="Auto" Height="Auto"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Command="{Binding ClickCommand}" Width="50" Height="50" CommandParameter="{Binding Number}" Style="{StaticResource FieldButton}" RenderOptions.EdgeMode="Aliased">
-                                    <Grid>
-                                        <Grid Panel.ZIndex="3" Background="#00000000" MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave"></Grid>
-                                        <Grid Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}" Panel.ZIndex="2"></Grid>
-                                        <Grid Panel.ZIndex="1">
-                                            <Image Stretch="Fill" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <Grid>
+                        <ItemsControl ItemsSource="{Binding Fields}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="{Binding Height}" Columns="{Binding Width}" Width="Auto" Height="Auto" Margin="150"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding ClickCommand}" Width="50" Height="50" CommandParameter="{Binding Number}" Style="{StaticResource FieldButton}" RenderOptions.EdgeMode="Aliased">
+                                        <Grid>
+                                            <Canvas Panel.ZIndex="3" Width="50">
+                                                <Grid Panel.ZIndex="6" Background="#00000000" Width="50" MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave">
+                                                    <Grid Width="50" Height="50" VerticalAlignment="Bottom" Background="{Binding OverlayColor, Converter={StaticResource ColorToSolidColorBrush}}" Panel.ZIndex="5"></Grid>
+                                                    <Grid.Style>
+                                                        <Style TargetType="Grid">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Texture, Converter={StaticResource TextureEnumToIsOversized}}" Value="True">
+                                                                    <Setter Property="Height" Value="65"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Texture, Converter={StaticResource TextureEnumToIsOversized}}" Value="False">
+                                                                    <Setter Property="Height" Value="50"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Grid.Style>
+                                                </Grid>
+                                                <Grid Width="50" Panel.ZIndex="2">
+                                                    <Image Width="50" Stretch="Uniform" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                    <Grid.Style>
+                                                        <Style TargetType="Grid">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Texture, Converter={StaticResource TextureEnumToIsOversized}}" Value="True">
+                                                                    <Setter Property="Height" Value="65"/>
+                                                                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Texture, Converter={StaticResource TextureEnumToIsOversized}}" Value="False">
+                                                                    <Setter Property="Height" Value="50"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Grid.Style>
+                                                </Grid>
+                                                <Canvas.Style>
+                                                    <Style TargetType="Canvas">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Texture, Converter={StaticResource TextureEnumToIsOversized}}" Value="True">
+                                                                <Setter Property="Height" Value="65"/>
+                                                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding Texture, Converter={StaticResource TextureEnumToIsOversized}}" Value="False">
+                                                                <Setter Property="Height" Value="50"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Canvas.Style>
+                                            </Canvas>
+                                            <Grid Panel.ZIndex="0">
+                                                <Image Stretch="Fill" Source="Images/Textures/grass.png" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                            </Grid>
                                         </Grid>
-                                        <Grid Panel.ZIndex="0">
-                                            <Image Stretch="Fill" Source="Images/Textures/grass.png"/>
-                                        </Grid>
-                                    </Grid>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Grid.Background>
+                            <VisualBrush TileMode="Tile" Viewport="0,0,400,400" ViewportUnits="Absolute">
+                                <VisualBrush.Visual>
+                                    <Image Source="Images/Textures/background.png" />
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </Grid.Background>
+                    </Grid>
                 </ScrollViewer>
             </Grid>
         </Grid>
