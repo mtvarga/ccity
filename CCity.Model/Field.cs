@@ -12,8 +12,10 @@
 
         #region Fields
 
-        public Placeable? Placeable { get; internal set; }
+        public Placeable? Placeable { get => _placeable == null ? null : _placeable.Root; }
+        public Placeable? ActualPlaceable { get => _placeable; }
 
+        private Placeable? _placeable;
         private int _policeDepartmentEffect;
         private int _stadiumEffect;
         private int _fireDepartmentEffect;
@@ -35,7 +37,7 @@
 
         public Field(int x, int y)
         {
-            Placeable = null;
+            _placeable = null;
             X = x;
             Y = y;
             _policeDepartmentEffect = 0;
@@ -82,24 +84,24 @@
 
         public void RefreshPublicity()
         {
-            if (Placeable != null)
+            if (_placeable != null)
             {
-                Placeable.IsPublic = true;
+                //Placeable.IsPublic = true;
             }
         }
 
         internal bool Place(Placeable placeable)
         {
-            if (Placeable != null) return false;
-            Placeable = placeable;
+            if (_placeable != null) return false;
+            _placeable = placeable;
             placeable.PlaceAt(this);
             return true;
         }
 
         internal bool Demolish()
         {
-            if (Placeable == null) return false;
-            Placeable = null;
+            if (_placeable == null) return false;
+            _placeable = null;
             return true;
         }
 

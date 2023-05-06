@@ -21,7 +21,7 @@ namespace CCity.Model
 
         public void Upgrade()
         {
-            throw new NotImplementedException();
+            if (CanUpgrade) Level++;
         }
 
         #endregion

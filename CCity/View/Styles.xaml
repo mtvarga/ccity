@@ -5,7 +5,7 @@
     <!-- Colors -->
 
     <SolidColorBrush x:Key="PrimaryColor" Color="#6C8A88"/>
-    <SolidColorBrush x:Key="PrimaryColorLight" Color="#8fc2bf"/>
+    <SolidColorBrush x:Key="PrimaryColorLight" Color="#9db3b1"/>
     <SolidColorBrush x:Key="SecondaryColor" Color="LightGray"/>
 
     <!--<Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
@@ -184,7 +184,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border BorderThickness="{TemplateBinding BorderThickness}"
                             BorderBrush="{TemplateBinding Background}"
-                            Background="#FFF"
+                            Background="Transparent"
                             CornerRadius="3">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
