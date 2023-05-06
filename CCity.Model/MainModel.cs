@@ -210,17 +210,6 @@ namespace CCity.Model
 
                 updatedFields = _fieldManager.UpdateBurningBuildings();
             }
-            else
-            {
-                var field = _fieldManager.IgniteRandomBuilding();
-
-                if (field != null)
-                {
-                    // A building was set on fire
-                    EngageFireEmergency();
-                    updatedFields = new List<Field> { field };
-                }
-            }
 
             GameTicked?.Invoke(this, EventArgs.Empty);
             
@@ -268,6 +257,15 @@ namespace CCity.Model
             foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
+            
+            var field = _fieldManager.IgniteRandomBuilding();
+
+            if (field != null)
+            {
+                // A building was set on fire
+                EngageFireEmergency();
+                fields.Add(field);
+            }
             
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
 
