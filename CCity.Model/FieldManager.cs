@@ -140,6 +140,18 @@ namespace CCity.Model
             throw new NotImplementedException();
         }
 
+        public Field IgniteBuilding(int x, int y)
+        {
+            if (!OnMap(x, y))
+                throw new Exception("IGNITE_BUILDING-OUT_OF_FIELD_BOUNDS");
+
+            if (Fields[x, y].Placeable is null or not IFlammable { Burning: false })
+                throw new Exception("IGNITE_BUILDING-BAD_FIELD");
+            
+            Ignite(Fields[x, y].Placeable!);
+            return Fields[x, y];
+        }
+        
         public Field? IgniteRandomBuilding()
         {
             var random = new Random(DateTime.Now.Millisecond);
@@ -211,7 +223,7 @@ namespace CCity.Model
             // TODO: Find the shortest path from the fire department to the fire
             // However we find this, it should return a queue of Fields which encode the path the fire truck should take
 
-            var shortestRoad = Utilities.ShortestRoad(Fields, Width, Height, Fields[x, y], closestFireDepartment);
+            var shortestRoad = Utilities.ShortestRoad(Fields, Width, Height, closestFireDepartment, Fields[x, y]);
 
             if (!shortestRoad.Any() || closestFireDepartment.Placeable is not FireDepartment fireDepartment) 
                 return;
@@ -233,34 +245,31 @@ namespace CCity.Model
             
             foreach (var path in FireTruckPaths)
             {
-                if (path.Any())
-                {
-                    var oldLocation = path.Pop();
+                var oldLocation = path.Pop();
 
-                    if (path.Any() && path.Peek().Placeable is not Road and { } placeable)
-                    {
-                        // The fire truck is standing next to the burning building
-                        path.Pop();
+                if (path.Any() && path.Peek().Placeable is not Road and { } placeable)
+                {
+                    // The fire truck is standing next to the burning building
+                    path.Pop();
                         
-                        // Start saving the building
-                        BuildingsBeingSaved.Add(oldLocation, placeable);
+                    // Start saving the building
+                    BuildingsBeingSaved.Add(oldLocation, placeable);
                         
-                        // TEMPORARY SOLUTION:
-                        // Add the last road 8 times so that the fire truck will stand next to the building for 2 secs
-                        for (var i = 0; i < 8; i++)
-                            path.Push(oldLocation);
-                    }
-                    else if (!path.Any())
-                    {
-                        PutOut(BuildingsBeingSaved[oldLocation]);
-                        BuildingsBeingSaved.Remove(oldLocation);
-                    }
-                    
-                    result.Add(oldLocation);
+                    // TEMPORARY SOLUTION:
+                    // Add the last road 8 times so that the fire truck will stand next to the building for 2 secs
+                    for (var i = 0; i < 8; i++)
+                        path.Push(oldLocation);
                 }
-                else
-                    FireTruckPaths.Remove(path);
+                else if (!path.Any())
+                {
+                    PutOut(BuildingsBeingSaved[oldLocation]);
+                    BuildingsBeingSaved.Remove(oldLocation);
+                }
+                    
+                result.Add(oldLocation);
             }
+
+            FireTruckPaths.RemoveAll(p => !p.Any());
 
             return result;
         }
@@ -494,7 +503,7 @@ namespace CCity.Model
                 throw new Exception("Internal inconsistency: Attempted to ignite a non-flammable Placeable");
             
             flammable.Burning = true;
-            flammable.Health = 1; // Reset the building's health upon ignition
+            flammable.Health = IFlammable.FlammableMaxHealth; // Reset the building's health upon ignition
             
             BurningBuildings.Add(placeable);
         }
