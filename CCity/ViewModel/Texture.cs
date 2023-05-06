@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,39 +10,76 @@ namespace CCity.ViewModel
     {
 
         None,
+
         Pole,
+
         WireVertical,
         WireHorizontal,
-        RoadVertical,
-        RoadHorizontal,
-        RoadTopLeft,
-        RoadTopRight,
-        RoadBottomLeft,
-        RoadBottomRight,
-        RoadNotTop,
-        RoadNotBottom,
-        RoadNotLeft,
-        RoadNotRight,
-        RoadTopClose,
-        RoadBottomClose,
-        RoadLeftClose,
-        RoadRightClose,
-        RoadCross,
+
+        Road_1_0_1_0,
+        Road_0_1_0_1,
+        Road_1_1_1_1,
+        Road_0_0_0_0,
+
+        Road_1_0_0_1,
+        Road_1_1_0_0,
+        Road_0_0_1_1,
+        Road_0_1_1_0,
+        
+        Road_0_1_1_1,
+        Road_1_1_0_1,
+        Road_1_1_1_0,
+        Road_1_0_1_1,
+
+        Road_1_0_0_0,
+        Road_0_0_1_0,
+        Road_0_0_0_1,
+        Road_0_1_0_0,
+
         FireDepartment,
+        FireDepartment_1_0,
+
         PoliceDepartment,
+        PoliceDepartment_1_0,
+
         Forest,
+        ForestHalf,
+        ForestFull,
+
         Stadium,
         Stadium_0_1,
         Stadium_1_1,
         Stadium_1_0,
-        ResidentialZoneLevel1Half,
-        ResidentialZoneLevel1Full,
-        CommercialZoneLevel1Half,
-        CommercialZoneLevel1Full,
-        IndustrialZoneLevel1Half,
-        IndustrialZoneLevel1Full,
+
+        PowerPlant,
+        PowerPlant_0_1,
+        PowerPlant_1_1,
+        PowerPlant_1_0,
+
+        ResidentialZoneBeginnerHalf,
+        ResidentialZoneBeginnerFull,
+        ResidentialZoneIntermediateHalf,
+        ResidentialZoneIntermediateFull,
+        ResidentialZoneAdvancedHalf,
+        ResidentialZoneAdvancedFull,
+
+        CommercialZoneBeginnerHalf,
+        CommercialZoneBeginnerFull,
+        CommercialZoneIntermediateHalf,
+        CommercialZoneIntermediateFull,
+        CommercialZoneAdvancedHalf,
+        CommercialZoneAdvancedFull,
+
+        IndustrialZoneBeginnerHalf,
+        IndustrialZoneBeginnerFull,
+        IndustrialZoneIntermediateHalf,
+        IndustrialZoneIntermediateFull,
+        IndustrialZoneAdvancedHalf,
+        IndustrialZoneAdvancedFull,
+
         Fire,
         Firetruck,
+
         Unhandled
     }
 }

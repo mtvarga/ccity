@@ -6,13 +6,19 @@ using System.Threading.Tasks;
 
 namespace CCity.Model
 {
-    public class PoliceDepartment : Placeable, IFlammable
+    public class PoliceDepartment : Placeable, IFlammable, IMultifield
     {
         #region Constants
 
         private const int effectRadius = 10;
 
         private const byte PoliceDepartmentPotential = 1;
+
+        #endregion
+
+        #region Fields
+
+        List<Filler> _occupies;
 
         #endregion
 
@@ -29,6 +35,21 @@ namespace CCity.Model
         bool IFlammable.Burning { get; set; }
 
         ushort IFlammable.Health { get; set; } = IFlammable.FlammableMaxHealth;
+
+        int IMultifield.Width => 2;
+
+        int IMultifield.Height => 1;
+
+        List<Filler> IMultifield.Occupies { get => _occupies; set => _occupies = value; }
+
+        #endregion
+
+        #region Constructor
+
+        public PoliceDepartment()
+        {
+            _occupies = new();
+        }
 
         #endregion
 
