@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,7 +21,6 @@ namespace CCity.Model
         public override int PlacementCost => 100;
 
         public override int MaintenanceCost => 10;
-
 
         double IFlammable.Pontential => throw new NotImplementedException();
 
@@ -43,7 +43,13 @@ namespace CCity.Model
             _occupies = new();
         }
 
-        #endregion
+        public override void MakeRoot(SpreadType spreadType)
+        {
+            if (spreadType != SpreadType.Electricity) return;
+            base.MakeRoot(spreadType);
+            MaxSpreadValue[spreadType] = () => 1000;
+        }
 
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -30,6 +30,7 @@ namespace CCity.ViewModel
         private string _inputCityName;
         private Field? _selectedField;
         private bool _isPublicityToggled;
+        private bool _isElectricityToggled;
 
         #endregion
 
@@ -61,6 +62,8 @@ namespace CCity.ViewModel
         public int SelectedFieldSatisfaction { get => SelectedFieldIsZone ? PercentToInt(_model.ZoneSatisfaction((Zone)_selectedField!.Placeable!)) : 0; }
         public int SelectedFieldPopulation { get => SelectedFieldIsZone ? ((Zone)_selectedField!.Placeable!).Count : 0; }
         public bool SelectedFieldIsZone { get => IsFieldSelected && _selectedField!.Placeable is Zone; }
+        public int SelectedFieldCurrentElectricity { get => IsFieldSelected && _selectedField!.HasPlaceable ? _selectedField.Placeable!.CurrentSpreadValue[SpreadType.Electricity] : 0; }
+        public int SelectedFieldNeededElectricity { get => IsFieldSelected && _selectedField!.HasPlaceable ? _selectedField.Placeable!.MaxSpreadValue[SpreadType.Electricity]() : 0; }
         //public string SelectedFieldCitizenName { get; }
         public int Width { get => _model.Width; }
         public int Height { get => _model.Height; }
@@ -104,6 +107,19 @@ namespace CCity.ViewModel
                 {
                     _isPublicityToggled = value;
                     OnPropertyChanged(nameof(IsPublicityToggled));
+                }
+            }
+        }
+
+        public bool IsElectricityToggled
+        {
+            get { return _isElectricityToggled; }
+            set
+            {
+                if (value != _isElectricityToggled)
+                {
+                    _isElectricityToggled = value;
+                    OnPropertyChanged(nameof(IsElectricityToggled));
                 }
             }
         }
@@ -160,6 +176,7 @@ namespace CCity.ViewModel
         public DelegateCommand CloseSelectedFieldWindowCommand { get; private set; }
         public DelegateCommand StartNewGameCommand { get; private set; }
         public DelegateCommand TogglePublicityCommand { get; private set; }
+        public DelegateCommand ToggleElectricityCommand { get; private set; }
 
         #endregion
 
@@ -190,21 +207,27 @@ namespace CCity.ViewModel
             RefreshMapCommand = new DelegateCommand(param => OnRefreshMap());
             StartNewGameCommand = new DelegateCommand(param => OnStartNewGame());
             TogglePublicityCommand = new DelegateCommand(param => OnTogglePublicity());
+            ToggleElectricityCommand = new DelegateCommand(param => OnToggleElecticity());
+            ChangeMinimapSizeCommand = new DelegateCommand(param => OnChangeMinimapSize());
             ChangeSpeedCommand =
                 new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
 
             InputCityName = "";
             InputMayorName = "";
             IsPublicityToggled = false;
+            IsElectricityToggled = false;
         }
 
         private void OnTogglePublicity()
         {
-            _isPublicityToggled = !_isPublicityToggled;
-            OnPropertyChanged(nameof(IsPublicityToggled));
+            IsPublicityToggled = !IsPublicityToggled;
             foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem, true);
         }
-
+        private void OnToggleElecticity()
+        {
+            IsElectricityToggled = !IsElectricityToggled;
+            foreach (FieldItem fieldItem in Fields) RefreshFieldItem(fieldItem, true);
+        }
 
         private void Model_NewGame(object? sender, EventArgs e)
         {
@@ -253,6 +276,7 @@ namespace CCity.ViewModel
                 Tool.PoliceDepartment,
                 Tool.FireDepartment,
                 Tool.Stadium,
+                Tool.PowerPlant,
                 Tool.Road,
                 Tool.Bulldozer
             };
@@ -296,36 +320,41 @@ namespace CCity.ViewModel
                 }
             }
             
-            if (field.Placeable!.IsPublic && IsPublicityToggled) return Color.FromArgb(50, 22, 32, 255); 
+            if (field.Placeable!.IsPublic && IsPublicityToggled) return Color.FromArgb(50, 22, 32, 255);
+            if (field.Placeable!.IsElectrified && IsElectricityToggled) return Color.FromArgb(50, 255, 255, 32);
             else return Color.FromArgb(0, 0, 0, 0);
         }
 
         private Color GetMinimapColorFromFieldItem(FieldItem fieldItem)
         {
-            return Color.FromRgb(0, 255, 0);
+            Field field = _model.Fields[fieldItem.X, fieldItem.Y];
+            if (!field.HasPlaceable) return Color.FromRgb(0, 255, 0);
+            return field.Placeable! switch
+            {
+                Road => Color.FromRgb(0, 0, 0),
+                _ => Color.FromRgb(0, 255, 0)
+            };
         }
 
         private Texture GetTextureFromFieldItem(FieldItem fieldItem)
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
             if (!field.HasPlaceable) return Texture.None;
-            return GetTextureFromPlaceable(field.Placeable!);
+            return GetTextureFromPlaceable(field.ActualPlaceable!);
         }
 
         private Texture GetTextureFromPlaceable(Placeable placeable)
         {
-            switch (placeable)
+            return placeable switch
             {
-                case FireDepartment _: return Texture.FireDepartment;
-                case PoliceDepartment _: return Texture.PoliceDepartment;
-                case Stadium _: return Texture.Stadium;
-                case Road road:
-                    SetNeighboursRoadTexture(road);
-                    return GetRoadTexture(road);
-                case Filler filler: return GetFillerTexture(filler);
-                case Zone zone: return GetZoneTexture(zone);
-                default: return Texture.Unhandled;
-            }
+                FireDepartment => Texture.FireDepartment,
+                PoliceDepartment => Texture.PoliceDepartment,
+                Stadium => Texture.Stadium,
+                Road road => ReturnAndHandleRoadTexture(road),
+                Zone zone => GetZoneTexture(zone),
+                Filler filler => GetFillerTexture(filler),
+                _ => Texture.Unhandled
+            };
         }
 
         private Texture GetZoneTexture(Zone zone)
@@ -361,6 +390,12 @@ namespace CCity.ViewModel
                 FieldItem fieldItem = GetFieldItemFromField(neighbour.Owner!);
                 fieldItem.Texture = GetRoadTexture(neighbour);
             }
+        }
+
+        private Texture ReturnAndHandleRoadTexture(Road road)
+        {
+            SetNeighboursRoadTexture(road);
+            return GetRoadTexture(road);
         }
 
         private int CalculateIndexFromField(Field field) => field.X * _model.Width + field.Y;
@@ -416,6 +451,7 @@ namespace CCity.ViewModel
                 case Tool.FireDepartment: _model.Place(coord.x, coord.y, new FireDepartment()); break;
                 case Tool.PoliceDepartment: _model.Place(coord.x, coord.y, new PoliceDepartment()); break;
                 case Tool.Stadium: _model.Place(coord.x, coord.y, new Stadium()); break;
+                case Tool.PowerPlant: _model.Place(coord.x, coord.y, new PowerPlant()); break;
                 case Tool.Road: _model.Place(coord.x, coord.y, new Road()); break;
                 case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
                 default: throw new Exception();
@@ -445,6 +481,9 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(SelectedFieldPopulation));
             OnPropertyChanged(nameof(SelectedFieldSatisfaction));
             OnPropertyChanged(nameof(SelectedFieldIsZone));
+
+            OnPropertyChanged(nameof(SelectedFieldCurrentElectricity));
+            OnPropertyChanged(nameof(SelectedFieldNeededElectricity));
 
             if (_selectedField.Placeable is Road)
             {
@@ -627,6 +666,11 @@ namespace CCity.ViewModel
                 
                 _ => _model.Speed
             });
+        }
+
+        private void OnChangeMinimapSize()
+        {
+            MinimapMinimized = !MinimapMinimized;
         }
 
         public void ExitToMainMenu()
