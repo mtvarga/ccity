@@ -459,7 +459,7 @@ namespace CCity.ViewModel
                 case Tool.PowerPlant: _model.Place(coord.x, coord.y, new PowerPlant()); break;
                 case Tool.Road: _model.Place(coord.x, coord.y, new Road()); break;
                 case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
-                case Tool.FlintAndSteel: throw new NotImplementedException(); //_model.Incinerate(coord.x, coord.y) or sg like this comes here
+                case Tool.FlintAndSteel: _model.IgniteBuilding(coord.x, coord.y); break;
                 default: throw new Exception();
             }
         }
@@ -696,7 +696,10 @@ namespace CCity.ViewModel
 
         private void OnSendFiretruckToSelectedFieldCommand()
         {
-            throw new NotImplementedException();
+            if (_selectedField != null)
+            {
+                _model.DeployFireTruck(_selectedField.X, _selectedField.Y);
+            }
         }
 
         public void ExitToMainMenu()
