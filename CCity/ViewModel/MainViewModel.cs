@@ -371,7 +371,7 @@ namespace CCity.ViewModel
         private Texture GetForestTexture(Forest forest)
         {
             Texture texture = Texture.Forest;
-            int shifter = forest.Age / (forest.MaxAge * 2);
+            int shifter = (forest.Age * 2) / forest.MaxAge;
             texture += shifter;
             return texture;
         }

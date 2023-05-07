@@ -37,10 +37,8 @@ namespace CCity.ViewModel
         Road_0_1_0_0,
 
         FireDepartment,
-        FireDepartment_1_0,
 
         PoliceDepartment,
-        PoliceDepartment_1_0,
 
         Forest,
         ForestHalf,

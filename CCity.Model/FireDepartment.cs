@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CCity.Model
 {
-    public class FireDepartment : Placeable, IMultifield
+    public class FireDepartment : Placeable
     {
         #region Constants
 
@@ -17,11 +17,6 @@ namespace CCity.Model
 
         #endregion
 
-        #region Fields
-
-        List<Filler> _occupies;
-
-        #endregion
 
         #region Properties
 
@@ -32,21 +27,6 @@ namespace CCity.Model
         public override int NeededElectricity => 20;
 
         public int AvailableFireTrucks { get; internal set; } = FireDeparmentInitialFireTruckCount;
-
-        int IMultifield.Width => 2;
-
-        int IMultifield.Height => 1;
-
-        List<Filler> IMultifield.Occupies { get => _occupies; set => _occupies = value; }
-
-        #endregion
-
-        #region Constructor
-
-        public FireDepartment()
-        {
-            _occupies = new();
-        }
 
         #endregion
 

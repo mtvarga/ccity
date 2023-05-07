@@ -16,7 +16,6 @@
     <None Remove="View\Images\profile.png" />
     <None Remove="View\Images\Textures\background.png" />
     <None Remove="View\Images\Textures\fireDepartment.png" />
-    <None Remove="View\Images\Textures\fireDepartment_1_0.png" />
     <None Remove="View\Images\Textures\forest.png" />
     <None Remove="View\Images\Textures\forestFull.png" />
     <None Remove="View\Images\Textures\forestHalf.png" />
@@ -26,7 +25,6 @@
     <None Remove="View\Images\Textures\paving.png" />
     <None Remove="View\Images\Textures\pole.png" />
     <None Remove="View\Images\Textures\policeDepartment.png" />
-    <None Remove="View\Images\Textures\policeDepartment_1_0.png" />
     <None Remove="View\Images\Textures\powerPlant.png" />
     <None Remove="View\Images\Textures\powerPlant_0_1.png" />
     <None Remove="View\Images\Textures\powerPlant_1_0.png" />
@@ -128,7 +126,6 @@
     <Resource Include="View\Images\Textures\background.png" />
     <Resource Include="View\Images\Textures\concrete.png" />
     <Resource Include="View\Images\Textures\fireDepartment.png" />
-    <Resource Include="View\Images\Textures\fireDepartment_1_0.png" />
     <Resource Include="View\Images\Textures\forest.png" />
     <Resource Include="View\Images\Textures\forestFull.png" />
     <Resource Include="View\Images\Textures\forestHalf.png" />
@@ -138,7 +135,6 @@
     <Resource Include="View\Images\Textures\paving.png" />
     <Resource Include="View\Images\Textures\pole.png" />
     <Resource Include="View\Images\Textures\policeDepartment.png" />
-    <Resource Include="View\Images\Textures\policeDepartment_1_0.png" />
     <Resource Include="View\Images\Textures\powerPlant.png" />
     <Resource Include="View\Images\Textures\powerPlant_0_1.png" />
     <Resource Include="View\Images\Textures\powerPlant_1_0.png" />

@@ -20,10 +20,8 @@ namespace CCity.ViewModel
                 return texture switch
                 {
                     Texture.FireDepartment => true,
-                    Texture.FireDepartment_1_0 => true,
 
                     Texture.PoliceDepartment => true,
-                    Texture.PoliceDepartment_1_0 => true,
 
                     Texture.Stadium_0_1 => true,
                     Texture.Stadium_1_1 => true,
