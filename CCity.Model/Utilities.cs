@@ -72,6 +72,30 @@ namespace CCity.Model
             return (resultTrue, resultFalse);
         }
 
+        public static List<(int, int)> GetPointsBetween(Field s, Field t)
+        {
+            const double errorBound = 0.00;
+
+            double dX = s.X - t.X;
+            double dY = s.Y - t.Y;
+            double density = (Math.Abs(dX) + 1) * (Math.Abs(dY) + 1);
+
+            double stepX = dX / density;
+            double stepY = dY / density;
+
+            HashSet<(int, int)> points = new();
+            for (int i = 0; i < density; i++)
+            {
+                (double X, double Y) = (s.X - i * stepX, s.Y - i * stepY);
+                for (int j = -1; j <= 1; j++)
+                    for (int k = -1; k <= 1; k++)
+                        points.Add(((int)Math.Round(X + j * errorBound), (int)Math.Round(Y + k * errorBound)));
+            }
+            points.Remove((s.X, s.Y));
+            points.Remove((t.X, t.Y));
+
+            return points.ToList();
+        }
         // NOTE: The first item in this queue is the road next to the field and the last item in this queue is the field which we must get to
         // If the queue is empty, it means there is no road connecting the two fields
         public static Stack<Field> ShortestRoad(Field[,] fields, int width, int height, Field f1, Field f2)

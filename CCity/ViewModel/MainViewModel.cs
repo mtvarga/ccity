@@ -58,7 +58,7 @@ namespace CCity.ViewModel
         public int SelectedFieldFireDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.FireDepartmentEffect) : 0; }
         public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField.StadiumEffect) : 0; }
         public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField.IndustrialEffect) : 0; }
-        //public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
+        public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
         public int SelectedFieldSatisfaction { get => SelectedFieldIsZone ? PercentToInt(_model.ZoneSatisfaction((Zone)_selectedField!.Placeable!)) : 0; }
         public int SelectedFieldPopulation { get => SelectedFieldIsZone ? ((Zone)_selectedField!.Placeable!).Count : 0; }
         public bool SelectedFieldIsZone { get => IsFieldSelected && _selectedField!.Placeable is Zone; }
@@ -282,8 +282,8 @@ namespace CCity.ViewModel
                 Tool.Stadium,
                 Tool.PowerPlant,
                 Tool.Pole,
-                Tool.Forest,
                 Tool.Road,
+                Tool.Forest,
                 Tool.Bulldozer,
                 Tool.FlintAndSteel
             };
@@ -487,6 +487,7 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(SelectedFieldPopulation));
             OnPropertyChanged(nameof(SelectedFieldSatisfaction));
             OnPropertyChanged(nameof(SelectedFieldIsZone));
+            OnPropertyChanged(nameof(SelectedFieldForestEffect));
             OnPropertyChanged(nameof(SelectedFieldIsIncinerated));
 
             OnPropertyChanged(nameof(SelectedFieldCurrentElectricity));
@@ -515,6 +516,7 @@ namespace CCity.ViewModel
                 case PowerPlant _: return "Erőmű";
                 case FireDepartment _: return "Tűzoltóság";
                 case Stadium _: return "Stadion";
+                case Forest _: return "Erdő";
                 default: return "Épület";
             }
         }
