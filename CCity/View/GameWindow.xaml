@@ -458,6 +458,7 @@
                             <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
                             <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
                             <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
+                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldForestEffect, StringFormat='Erdő effekt: {0}%'}"/>
                             <TextBlock Margin="0 2">
                                 <Run Text="Áramellátás: "/>
                                 <Run Text="{Binding SelectedFieldCurrentElectricity, Mode=OneWay}"/>

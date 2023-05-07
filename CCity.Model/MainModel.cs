@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.VisualBasic;
 
 namespace CCity.Model
@@ -257,6 +257,8 @@ namespace CCity.Model
             foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
+
+            fields = fields.Concat(_fieldManager.GrowForests()).ToList();
             
             var field = _fieldManager.IgniteRandomBuilding();
 
@@ -268,6 +270,7 @@ namespace CCity.Model
             }
             
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
+
 
             if (!newCitizens.Any()) 
                 return;
