@@ -439,6 +439,8 @@ namespace CCity.Model
                 }
             }
 
+            modifiedFields.Add(placeable.Owner);
+
             //At this point, both electricity and publicity spreaded
             //Now we can check modified placeables, and switch them on/off based on the two props mentioned
             //
@@ -549,7 +551,11 @@ namespace CCity.Model
                     effectedFields.Add(fillerField);
                 }
             }
-            List<Field> modifiedFieldsBySpreading = placeable.Effect(SpreadPlaceableEffect, false);
+            //TEMP SOLUTION
+            //TO DO - consistent SpreadPlaceableEffect
+            List<Field> modifiedFieldsBySpreading; /*= placeable.Effect(SpreadPlaceableEffect, false);*/
+            if(placeable is Forest) modifiedFieldsBySpreading = placeable.Effect(SpreadForestEffect, false);
+            else modifiedFieldsBySpreading = placeable.Effect(SpreadPlaceableEffect, false);
             field.Demolish();
             effectedFields.Add(field);
             return effectedFields.Concat(modifiedFieldsBySpreading).Concat(GetNeighbours(placeable).Select(e => e.Owner!)).ToList();
@@ -767,7 +773,7 @@ namespace CCity.Model
                 int randY = rand.Next(0, Height);
                 if(!Fields[randX, randY].HasPlaceable)
                 {
-                    Place(randX, randY, new Forest());
+                    Place(randX, randY, new Forest(true));
                     Field field = Fields[randX, randY];
                     int forestSize = rand.Next(2,3);
                     int density = rand.Next(4, 10);
