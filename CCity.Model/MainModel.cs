@@ -62,9 +62,13 @@ namespace CCity.Model
 
                 FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
             }
-            catch (Exception ex)
+            catch (GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.Message));
+                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
+            catch(Exception)
+            {
+                ErrorOccured.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -80,9 +84,13 @@ namespace CCity.Model
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
                 FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
             }
-            catch(Exception ex)
+            catch(GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.Message));
+                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
+            catch (Exception)
+            {
+                ErrorOccured.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -98,9 +106,13 @@ namespace CCity.Model
                 _fieldManager.DeployFireTruck(x, y);
                 FireTruckMoved?.Invoke(this, new FieldEventArgs(new List<Field>()));
             }
-            catch (Exception e)
+            catch (GameErrorException ex)
             {
-                ErrorOccured?.Invoke(this, new ErrorEventArgs(e.Message));
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
+            catch(Exception)
+            {
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -115,9 +127,13 @@ namespace CCity.Model
                 // A building was set on fire
                 EngageFireEmergency();
             }
-            catch (Exception e)
+            catch(GameErrorException ex)
             {
-                ErrorOccured?.Invoke(this, new ErrorEventArgs(e.Message));
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
+            catch (Exception)
+            {
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
             
             if (updatedFields != null)

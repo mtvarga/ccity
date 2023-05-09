@@ -8,11 +8,11 @@ namespace CCity.Model
 {
     public class ErrorEventArgs
     {
-        public string ErrorCode { get; }
+        public GameErrorType ErrorType { get; }
 
-        public ErrorEventArgs(string code)
+        public ErrorEventArgs(GameErrorType errorType)
         {
-            ErrorCode = code;
+            ErrorType = errorType;
         }
     }
 }
