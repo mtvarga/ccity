@@ -411,7 +411,7 @@
                     <TextBlock Text="{Binding Population, StringFormat='🤵 {0:N0}'}" Margin="7"/>
                     <TextBlock Text="{Binding Satisfaction, StringFormat='👍 {0}%'}" Margin="7"/>
                     <TextBlock Text="{Binding Budget, StringFormat='💎 {0:N0}'}" Margin="7"/>
-                    <!-- <TextBlock Text="{Binding Date, StringFormat='📆 {0}'}" Margin="7"/> -->
+                    <TextBlock Text="{Binding Date, StringFormat='📅 yyyy.MM.dd'}" Margin="7"/>
                 </StackPanel>
             </Border>
         </Grid>

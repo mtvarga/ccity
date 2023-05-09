@@ -14,6 +14,8 @@ namespace CCity.Model
         private int _counter;
         private int _monthCounter;
 
+        DateTime _date;
+
         #endregion
 
         #region Properties
@@ -23,13 +25,12 @@ namespace CCity.Model
         public Field[,] Fields { get => _fieldManager.Fields; }
         public int Budget { get => _globalManager.Budget; }
         public Taxes Taxes { get => _globalManager.Taxes; }
-        public int Date { get; }
+        public DateTime Date { get  => _date; }
         public Speed Speed { get; private set; }
         public double Satisfaction { get => _globalManager.TotalSatisfaction; }
         public int Population { get => _citizenManager.Population; }
         public int Width { get => _fieldManager.Width; }
         public int Height { get => _fieldManager.Height; }
-
         #endregion
 
         #region Constructors
@@ -43,6 +44,8 @@ namespace CCity.Model
             _counter = 0;
             _monthCounter = 0;
             Speed = Speed.Normal;
+
+            _date = DateTime.Now;
         }
 
         #endregion
@@ -168,6 +171,16 @@ namespace CCity.Model
                 _ => _counter
             };
 
+            _date = Speed switch
+            {
+                Speed.Slow => _date.AddMinutes(10),
+                Speed.Normal => _date.AddHours(3),
+                Speed.Fast => _date.AddHours(45),
+                _ => _date
+            };
+
+            DateChanged?.Invoke(this, EventArgs.Empty);
+
             Tick();
 
             if (_counter / (double)4096 >= 1)
@@ -208,11 +221,6 @@ namespace CCity.Model
         #endregion
 
         #region Private methods
-
-        private void ChangeDate()
-        {
-            throw new NotImplementedException();
-        }
         
         private void Tick()
         {
@@ -336,6 +344,7 @@ namespace CCity.Model
         public event EventHandler<EventArgs>? SatisfactionChanged;
         public event EventHandler<EventArgs>? TaxChanged;
         public event EventHandler<EventArgs>? SpeedChanged;
+        public event EventHandler<EventArgs>? DateChanged;
         public event EventHandler<EventArgs>? NewGame;
         public event EventHandler<EventArgs>? GameOver;
 

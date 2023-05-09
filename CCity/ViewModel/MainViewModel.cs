@@ -71,6 +71,8 @@ namespace CCity.ViewModel
         public string OutputCityName { get => _inputCityName == "" ? "Városvezetés a hobbim." : _inputCityName + " büszke polgármestere vagyok."; }
         public string OutputMayorName { get => _inputMayorName == "" ? "Polgármester" : _inputMayorName; }
         public bool CanStart { get => _inputMayorName != "" && _inputCityName != ""; }
+        public DateTime Date { get => _model.Date; }
+
 
         public Tool SelectedTool => _selectedToolItem.Tool;
 
@@ -194,6 +196,7 @@ namespace CCity.ViewModel
             _model.PopulationChanged += Model_PopulationChanged;
             _model.SpeedChanged += Model_SpeedChanged;
             _model.FireTruckMoved += Model_FireTruckMoved;
+            _model.DateChanged += Model_DateChanged;
                 
             CreateTable();
             CreateToolbar();
@@ -218,6 +221,7 @@ namespace CCity.ViewModel
             InputMayorName = "";
             IsPublicityToggled = false;
             IsElectricityToggled = false;
+
         }
 
         private void OnTogglePublicity()
@@ -575,6 +579,8 @@ namespace CCity.ViewModel
                 Fields[index].Texture = Texture.Firetruck;
             }
         }
+
+        private void Model_DateChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(Date));
 
         private void Model_ErrorOccured(object? sender, ErrorEventArgs e)
         {
