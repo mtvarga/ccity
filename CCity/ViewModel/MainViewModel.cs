@@ -579,15 +579,21 @@ namespace CCity.ViewModel
         private void Model_ErrorOccured(object? sender, ErrorEventArgs e)
         {
             string errorMessage="";
-            switch(e.ErrorCode)
+            switch(e.ErrorType)
             {
-                case "PLACE-OUTOFFIELDBOUNDRIES": errorMessage = "Nem építhetsz a pályán kívülre.";  break;
-                case "PLACE-ALREADYUSEDFIELD": errorMessage = "Csak üres mezőre építhetsz."; break;
-                case "DEMOLISH - OUTOFFIELDBOUNDS": errorMessage = "Nem rombolhatsz a pályán kívülről."; break;
-                case "DEMOLISH-NOTEMPTYFIELD": errorMessage = "Nem lehet üres mezőről rombolni."; break;
-                case "DEMOLISH-MAINROAD": errorMessage = "A főútat nem lehet lerombolni."; break;
-                case "DEMOLISH - FIELDHASCIZIZEN": errorMessage = "Csak az üres zónát lehet visszaminősíteni."; break;
-                case "DEMOLISH-FIELDPUBLICITY": errorMessage = "Az út rombolásával legalább egy épület elérhetetlenné válna.";break;
+                case GameErrorType.PlaceOutOfFieldBoundries: errorMessage = "Nem építhetsz a pályán kívülre.";  break;
+                case GameErrorType.PlaceAlreadyUsedField: errorMessage = "Csak pályán belüli üres mezőre a építhetsz."; break;
+                case GameErrorType.DemolishOutOfFieldBoundries: errorMessage = "Nem rombolhatsz a pályán kívülről."; break;
+                case GameErrorType.DemolishEmptyField: errorMessage = "Nem lehet üres mezőről rombolni."; break;
+                case GameErrorType.DemolishMainRoad: errorMessage = "A főútat nem lehet lerombolni."; break;
+                case GameErrorType.DemolishFieldHasCitizen: errorMessage = "Csak az üres zónát lehet visszaminősíteni."; break;
+                case GameErrorType.DemolishFieldPublicity: errorMessage = "Az út rombolásával legalább egy épület elérhetetlenné válna.";break;
+                case GameErrorType.DeployFireTruckNoFire: errorMessage = "Csak égő épülethez küldhetsz tűzoltóautót."; break;
+                case GameErrorType.DeployFireTruckOutOfFieldBounds: errorMessage = "Pályán kívüli mezőre nem küldhetsz tűzoltóautót."; break;
+                case GameErrorType.DeployFireTruckBadBuilding: errorMessage = "Az épület nem éghető.";break;
+                case GameErrorType.DeployFireTruckNoneAvaiable: errorMessage = "Nincs elérhető tűzoltóautó vagy nincs lehelyezve tűzoltóság.";break;
+                case GameErrorType.Unhandled: errorMessage = "Valami hiba történt."; break;
+                default: errorMessage = "Kezeletlen hiba."; break;
             }
             MessageBox.Show("A művelet nem végezhető el: \n"+errorMessage, "Hiba", MessageBoxButton.OK, MessageBoxImage.Warning);
         }

@@ -117,7 +117,7 @@ namespace CCity.Model
 
         public List<Field> Place(int x, int y, Placeable placeable)
         {
-            if (!OnMap(x, y)) throw new Exception("PLACE-OUTOFFIELDBOUNDRIES");
+            if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.PlaceOutOfFieldBoundries);
 
             Field field = Fields[x, y];
             List<Field> modifiedFields = PlaceDemolishManager(field, placeable,true);
@@ -133,10 +133,10 @@ namespace CCity.Model
 
         public (Placeable, List<Field>) Demolish(int x, int y)
         {
-            if (!OnMap(x, y)) throw new Exception("DEMOLISH-OUTOFFIELDBOUNDS");
+            if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.DemolishOutOfFieldBoundries);
 
             Field field = Fields[x, y];
-            if (!field.HasPlaceable) throw new Exception("DEMOLISH-NOTEMPTYFIELD");
+            if (!field.HasPlaceable) throw new GameErrorException(GameErrorType.DemolishEmptyField);
             Placeable placeable = field.Placeable!.Root;
             List<Field> modifiedFields = PlaceDemolishManager(field,placeable,false);
             List<Field> modifiedFieldsBySpreading;
@@ -243,20 +243,20 @@ namespace CCity.Model
         public void DeployFireTruck(int x, int y)
         {
             if (!FireEmergencyPresent)
-                throw new Exception("DEPLOY_FIRE_TRUCK-NO_FIRE");
+                throw new GameErrorException(GameErrorType.DeployFireTruckNoFire);
             
             if (!OnMap(x, y)) 
-                throw new Exception("DEPLOY_FIRE_TRUCK-OUT_OF_FIELD_BOUNDS");
+                throw new GameErrorException(GameErrorType.DeployFireTruckOutOfFieldBounds);
 
             var placeable = Fields[x, y].Placeable;
             
             if (placeable is not IFlammable { Burning: true })
-                throw new Exception("DEPLOY_FIRE_TRUCK-BAD_BUILDING");
+                throw new GameErrorException(GameErrorType.DeployFireTruckBadBuilding);
             
             var closestFireDepartment = NearestAvailableFireDepartment(placeable);
 
             if (closestFireDepartment == null)
-                throw new Exception("DEPLOY_FIRE_TRUCK-NONE_AVAILABLE");
+                throw new GameErrorException(GameErrorType.DeployFireTruckNoneAvaiable);
             
             // TODO: Find the shortest path from the fire department to the fire
             // However we find this, it should return a queue of Fields which encode the path the fire truck should take
@@ -351,30 +351,30 @@ namespace CCity.Model
             {
                 effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadPlaceableEffect, false)).ToList();
             }
-            if (place)
+            try
             {
-                effectedFields = effectedFields.Concat(PlaceOnField(field, placeable)).ToList();
+                if (place) effectedFields = effectedFields.Concat(PlaceOnField(field, placeable)).ToList();
+                else effectedFields = effectedFields.Concat(DemolishFromField(field)).ToList();
             }
-            else
+            finally
             {
-                effectedFields = effectedFields.Concat(DemolishFromField(field)).ToList();
+                foreach (Field industrialZone in industrialZonesAround)
+                {
+                    effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadPlaceableEffect, true)).ToList();
+                }
+                foreach (Field forest in forestsInRadius)
+                {
+                    effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, true)).ToList();
+                }
             }
-            foreach (Field industrialZone in industrialZonesAround)
-            {
-                effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadPlaceableEffect, true)).ToList();
-            }          
-            foreach (Field forest in forestsInRadius)
-            {
-                effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, true)).ToList();
-            }
-            return effectedFields;
+            return effectedFields; 
         }
 
         private List<Field> PlaceOnField(Field field, Placeable placeable)
         {
             if (!CanPlace(field, placeable))
             {
-                throw new Exception("PLACE-ALREADYUSEDFIELD");
+                throw new GameErrorException(GameErrorType.PlaceAlreadyUsedField);
             }
             List<Field> effectedFields = new() {field };
             if (placeable is IMultifield multifield)
@@ -514,8 +514,8 @@ namespace CCity.Model
 
         private bool CanDemolish(Field field)
         {
-            if (field == Fields[ROOTX, ROOTY]) throw new Exception("DEMOLISH-MAINROAD");
-            if (!field.HasPlaceable) throw new Exception("DEMOLISH-NOTEMPTYFIELD");
+            if (field == Fields[ROOTX, ROOTY]) throw new GameErrorException(GameErrorType.DemolishMainRoad);
+            if (!field.HasPlaceable) throw new GameErrorException(GameErrorType.DemolishEmptyField);
             Placeable placeable = field.Placeable!;
             switch (placeable)
             {
@@ -527,7 +527,7 @@ namespace CCity.Model
                     if (_publicitySpreader.GetAndClearModifiedFields().Find(e => e.Placeable is not Road && e.Placeable is not null && !e.Placeable!.IsPublic) != null)
                     {
                         Place(field.X, field.Y, road);
-                        throw new Exception("DEMOLISH-FIELDPUBLICITY");
+                        throw new GameErrorException(GameErrorType.DemolishFieldPublicity);
                     }
                     Place(field.X, field.Y, road);
                     break;
@@ -537,7 +537,7 @@ namespace CCity.Model
 
         private List<Field> DemolishFromField(Field field)
         {
-            if (!CanDemolish(field)) throw new Exception("DEMOLISH - FIELDHASCIZIZEN");
+            if (!CanDemolish(field)) throw new GameErrorException(GameErrorType.DemolishFieldHasCitizen);
             List<Field> effectedFields = new();
             Placeable placeable = field.Placeable!.Root;
             field = placeable.Owner!;
