@@ -276,12 +276,15 @@ namespace CCity.Model
                     _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
             }
             
-            // TODO: Optimize this!
-            List<Field> fields = new();
-            foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
+            List<Zone> affectedZones = new();
 
+            // TODO: Optimize this - add only affected zones to the list
+            foreach (Zone zone in _fieldManager.ResidentialZones(true)) affectedZones.Add(zone);
+            foreach (Zone zone in _fieldManager.CommercialZones(true)) affectedZones.Add(zone);
+            foreach (Zone zone in _fieldManager.IndustrialZones(true)) affectedZones.Add(zone);
+
+            //List fields will contain every zone's field
+            List<Field> fields = _fieldManager.UpdateModifiedZonesSpread(affectedZones);
             fields = fields.Concat(_fieldManager.GrowForests()).ToList();
             
             var field = _fieldManager.IgniteRandomBuilding();
