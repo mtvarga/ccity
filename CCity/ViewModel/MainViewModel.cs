@@ -52,8 +52,6 @@ namespace CCity.ViewModel
         public string SelectedFieldName { get => IsFieldSelected ? GetFieldName(_selectedField) : ""; }
         //public int SelectedFieldHealth { get; }
         //public string SelectedFieldIsOnFire { get; }
-        //public string SelectedFieldIsUpgradeable { get; }
-        //public int SelectedFieldUpgradeCost { get; }
         public int SelectedFieldPoliceDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.PoliceDepartmentEffect) : 0; }
         public int SelectedFieldFireDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.FireDepartmentEffect) : 0; }
         public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField.StadiumEffect) : 0; }
@@ -505,7 +503,6 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(SelectedFieldCurrentElectricity));
             OnPropertyChanged(nameof(SelectedFieldNeededElectricity));
         }
-
         private int PercentToInt(double percent) => (int)Math.Floor(percent * 100);
 
         private (int, int) GetCordinates(int index)
@@ -720,7 +717,7 @@ namespace CCity.ViewModel
             InputMayorName = "";
             IsPublicityToggled = false;
         }
-
+        
         #endregion
     }
 }

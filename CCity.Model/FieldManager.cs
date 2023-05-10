@@ -125,9 +125,15 @@ namespace CCity.Model
             return modifiedFields.Concat(modifiedFieldsBySpreading).ToList();
         }
 
-        public List<Field> Upgrade(int x, int y)
+        public (IUpgradeable, int) Upgrade(int x, int y)
         {
-            throw new NotImplementedException();
+            if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.UpgradeOutOfFieldBoundries);
+            Field field = Fields[x, y];
+            if (field.Placeable is not IUpgradeable) throw new GameErrorException(GameErrorType.UpgradeNotUpgradeable);
+            IUpgradeable upgradeable = (IUpgradeable)(field.Placeable);
+            int upgradeCost = upgradeable.NextUpgradeCost;
+            upgradeable.Upgrade();
+            return (upgradeable, upgradeCost);
         }
 
         public (Placeable, List<Field>) Demolish(int x, int y)
