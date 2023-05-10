@@ -525,6 +525,22 @@
                                                         </Style>
                                                     </Grid.Style>
                                                 </Grid>
+                                                <Grid Width="50" Panel.ZIndex="3">
+                                                    <Image Width="50" Stretch="Uniform" VerticalAlignment="Bottom" Source="{Binding AdditionalTexture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                    <Grid.Style>
+                                                        <Style TargetType="Grid">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Texture, Converter={StaticResource TextureEnumToIsOversized}}" Value="True">
+                                                                    <Setter Property="Height" Value="65"/>
+                                                                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Texture, Converter={StaticResource TextureEnumToIsOversized}}" Value="False">
+                                                                    <Setter Property="Height" Value="50"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Grid.Style>
+                                                </Grid>
                                                 <Grid Width="50" Panel.ZIndex="2">
                                                     <Image Width="50" Stretch="Uniform" Source="{Binding Texture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
                                                     <Grid.Style>
