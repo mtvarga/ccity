@@ -181,6 +181,13 @@ namespace CCity.Model
             return effectedFields;
         }
 
+        public List<Field> UpdateModifiedZonesSpread(List<Zone> zones)
+        {
+            List<Field> modifiedFields = new();
+            foreach (Zone zone in zones) modifiedFields = modifiedFields.Concat(RefreshSpread(zone)).ToList();
+            return modifiedFields;
+        }
+
         public Field IgniteBuilding(int x, int y)
         {
             if (!OnMap(x, y))
@@ -315,9 +322,9 @@ namespace CCity.Model
             return result;
         }
 
-        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.Where(zone => !zone.Full || showUnavailable).ToList();
-        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.Where(zone => !zone.Full || showUnavailable).ToList();
-        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.Where(zone => !zone.Full || showUnavailable).ToList();
+        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
+        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
+        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
         public List<Field> FireTruckLocations() => FireTruckPaths.Select(q => q.Peek()).ToList();
         
         #endregion
