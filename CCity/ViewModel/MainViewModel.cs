@@ -312,6 +312,7 @@ namespace CCity.ViewModel
             if (onlyOverlayColor) return;
             fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
             fieldItem.MinimapColor = GetMinimapColorFromFieldItem(fieldItem);
+            fieldItem.AdditionalTexture = GetAdditionalTextureFromFieldItem(fieldItem, fieldItem.AdditionalTexture);
         }
 
         private Color GetOverlayColorFromFieldItem(FieldItem fieldItem)
@@ -351,8 +352,15 @@ namespace CCity.ViewModel
         {
             Field field = _model.Fields[fieldItem.X, fieldItem.Y];
             if (!field.HasPlaceable) return Texture.None;
-            if (field.Placeable is IFlammable && ((IFlammable)field.Placeable).Burning) return Texture.Fire;
             return GetTextureFromPlaceable(field.ActualPlaceable!);
+        }
+        
+        private Texture GetAdditionalTextureFromFieldItem(FieldItem fieldItem, Texture oldValue)
+        {
+            Field field = _model.Fields[fieldItem.X, fieldItem.Y];
+            if (field.Placeable is Road) return oldValue;
+            else if (field.Placeable is IFlammable && ((IFlammable)field.Placeable).Burning) return Texture.Fire;
+            else return Texture.None;
         }
 
         private Texture GetTextureFromPlaceable(Placeable placeable)
@@ -571,12 +579,12 @@ namespace CCity.ViewModel
             foreach (Field field in e.Fields)
             {
                 int index = field.Y * _model.Width + field.X;
-                RefreshFieldItem(Fields[index]);
+                Fields[index].AdditionalTexture = Texture.None;
             }
             foreach(Field field in _model.FireTruckLocations())
             {
                 int index = field.Y * _model.Width + field.X;
-                Fields[index].Texture = Texture.Firetruck;
+                Fields[index].AdditionalTexture = Texture.Firetruck;
             }
         }
 
