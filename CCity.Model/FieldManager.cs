@@ -34,13 +34,13 @@ namespace CCity.Model
         public int CommercialZoneCount { get => _commercialZones.Count; }
         public int IndustrialZoneCount { get => _industrialZones.Count; }
         
-        private List<ResidentialZone> _residentialZones;
-        private List<CommercialZone> _commercialZones;
-        private List<IndustrialZone> _industrialZones;
+        private HashSet<ResidentialZone> _residentialZones;
+        private HashSet<CommercialZone> _commercialZones;
+        private HashSet<IndustrialZone> _industrialZones;
 
-        private List<Forest> _growingForests;
+        private HashSet<Forest> _growingForests;
         
-        private List<FireDepartment> FireDepartments { get; }
+        private HashSet<FireDepartment> FireDepartments { get; }
         
         private HashSet<Placeable> Flammables { get; }
         
@@ -80,7 +80,7 @@ namespace CCity.Model
             _industrialZones = new();
             _growingForests = new();
 
-            FireDepartments = new List<FireDepartment>();
+            FireDepartments = new HashSet<FireDepartment>();
             
             //starter public road
             Road starterRoad = new Road();
@@ -147,7 +147,7 @@ namespace CCity.Model
         public List<Field> GrowForests()
         {
             List<Field> effectedFields = new();
-            foreach  (Forest  forest in _growingForests)
+            foreach  (Forest  forest in _growingForests.ToList())
             {
                 if(forest.CanGrow)
                 {
@@ -157,14 +157,14 @@ namespace CCity.Model
                         List<Field> industrialZonesAround = GetPlaceableInRadius(forest.Owner!, EFFECT_RADIUS, p => p is IndustrialZone);
                         foreach (Field industrialZone in industrialZonesAround)
                         {
-                            effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadPlaceableEffect, false)).ToList();
+                            effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
                         }
                         effectedFields.Concat(forest.Effect(SpreadForestEffect, false).ToList());
                         forest.Grow();
                         effectedFields.Concat(forest.Effect(SpreadForestEffect, true).ToList());
                         foreach (Field industrialZone in industrialZonesAround)
                         {
-                            effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadPlaceableEffect, true)).ToList();
+                            effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
                         }
                     }
                     else
@@ -315,9 +315,9 @@ namespace CCity.Model
             return result;
         }
 
-        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.FindAll(zone => !zone.Full || showUnavailable);
-        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.FindAll(zone => !zone.Full || showUnavailable);
-        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.FindAll(zone => !zone.Full || showUnavailable);
+        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.Where(zone => !zone.Full || showUnavailable).ToList();
+        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.Where(zone => !zone.Full || showUnavailable).ToList();
+        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.Where(zone => !zone.Full || showUnavailable).ToList();
         public List<Field> FireTruckLocations() => FireTruckPaths.Select(q => q.Peek()).ToList();
         
         #endregion
@@ -352,7 +352,7 @@ namespace CCity.Model
             if (placeable is Forest) industrialZonesAround = GetPlaceableInRadius(field, EFFECT_RADIUS, p => p is IndustrialZone);
             foreach (Field industrialZone in industrialZonesAround)
             {
-                effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadPlaceableEffect, false)).ToList();
+                effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
             }
             try
             {
@@ -363,7 +363,7 @@ namespace CCity.Model
             {
                 foreach (Field industrialZone in industrialZonesAround)
                 {
-                    effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadPlaceableEffect, true)).ToList();
+                    effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
                 }
                 foreach (Field forest in forestsInRadius)
                 {
@@ -400,11 +400,11 @@ namespace CCity.Model
         {
             switch (placeable)
             {
-                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.RemoveAll(e => e == residentialZone); break;
-                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.RemoveAll(e => e == commercialZone); break;
-                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.RemoveAll(e => e == industrialZone); break;
-                case FireDepartment fireDepartment: if (add) FireDepartments.Add(fireDepartment); else FireDepartments.RemoveAll(fd => fd == fireDepartment);
-                    break;
+                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.Remove(residentialZone); break;
+                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.Remove(commercialZone); break;
+                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.Remove(industrialZone); break;
+                case FireDepartment fireDepartment: if (add) FireDepartments.Add(fireDepartment); else FireDepartments.Remove(fireDepartment); break;
+                case Forest forest: if (add) _growingForests.Add(forest); else _growingForests.Remove(forest); break;
                 default: break;
             }
 
@@ -442,7 +442,7 @@ namespace CCity.Model
                 }
             }
 
-            modifiedFields.Add(placeable.Owner);
+            modifiedFields.Add(placeable.Owner!);
 
             //At this point, both electricity and publicity spreaded
             //Now we can check modified placeables, and switch them on/off based on the two props mentioned
@@ -454,7 +454,7 @@ namespace CCity.Model
                 if(f.Placeable != null)
                 {
                     //TODO - electricity required for moving in
-                    UpdatePlaceableList(f.Placeable, f.Placeable.IsPublic);
+                    UpdatePlaceableList(f.Placeable, f.Placeable.ListingCondition);
 
                     //SWITCHING ON/OFF FIREDEPARTMENT COMES HERE (based on electricity and publicity)
                     //Suggestion: use f.Placeable.IsPublic && placeable.IsElectrified bool
@@ -472,18 +472,22 @@ namespace CCity.Model
                     //("try", because if it is already spreaded/revoked (stored in Placeable), skips)
                     //
                     //so it's true if the Placeable is public and electrified
-                    modifiedFields = f.Placeable switch
-                    {
-                        Forest forest => modifiedFields.Concat(forest.Effect(SpreadForestEffect, !forest.IsDemolished)).ToList(),
-                        _ => modifiedFields.Concat(f.Placeable.Effect(SpreadPlaceableEffect, f.Placeable.IsPublic && f.Placeable.IsElectrified)).ToList()
-                    };
-           
+                    modifiedFields = modifiedFields.Concat(SpreadPlaceableEffectRouter(f.Placeable)).ToList();
                 }
             }
             return modifiedFields;
         }
 
-        private List<Field> SpreadPlaceableEffect(Placeable placeable, bool add, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS)
+        private List<Field> SpreadPlaceableEffectRouter(Placeable placeable)
+        {
+            return placeable switch
+            {
+                Forest forest => forest.Effect(SpreadForestEffect, placeable.EffectSpreadingCondition),
+                _ => placeable.Effect(SpreadRadiusEffect, placeable.EffectSpreadingCondition)
+            };
+        }
+
+        private List<Field> SpreadRadiusEffect(Placeable placeable, bool add, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS)
         {
             List<Field> effectedFields = new();
             Field field = placeable.Owner!;
@@ -556,11 +560,9 @@ namespace CCity.Model
             }
             //TEMP SOLUTION
             //TO DO - consistent SpreadPlaceableEffect
-            List<Field> modifiedFieldsBySpreading; /*= placeable.Effect(SpreadPlaceableEffect, false);*/
-            if(placeable is Forest) modifiedFieldsBySpreading = placeable.Effect(SpreadForestEffect, false);
-            else modifiedFieldsBySpreading = placeable.Effect(SpreadPlaceableEffect, false);
             field.Demolish();
             effectedFields.Add(field);
+            List<Field> modifiedFieldsBySpreading = SpreadPlaceableEffectRouter(placeable);
             return effectedFields.Concat(modifiedFieldsBySpreading).Concat(GetNeighbours(placeable).Select(e => e.Owner!)).ToList();
         }
 
