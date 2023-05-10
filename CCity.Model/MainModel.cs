@@ -99,7 +99,17 @@ namespace CCity.Model
 
         public void Upgrade(int x, int y)
         {
-            throw new NotImplementedException();
+            try
+            {
+                (IUpgradeable upgradeable, int cost) = _fieldManager.Upgrade(x, y);
+                _globalManager.Pay(cost);
+                BudgetChanged?.Invoke(this, EventArgs.Empty);
+                FieldsUpdated?.Invoke(this, new FieldEventArgs(new List<Field>() { ((Placeable)upgradeable).Owner!}));
+            }
+            catch (GameErrorException ex)
+            {
+                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
         }
 
         public void DeployFireTruck(int x, int y)
