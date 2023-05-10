@@ -3,24 +3,24 @@
 image: mcr.microsoft.com/dotnet/sdk:6.0
 
 stages:
-  - build
-  #- test
-  - deploy
+  - Build
+  #- Test
+  - Deploy
 
 before_script:
   - dotnet --version
 
 # Build model
 # (Uses Linux-based runner, because windows tag is NOT specified.)
-build:model:
-  stage: build
+Build Model:
+  stage: Build
   script:
     - dotnet build CCity.Model
   
 # Build complete solution
 # (Uses Windows-based runner, because windows tag IS specified.)
-build:view:
-  stage: build
+Build View:
+  stage: Build
   # Use a Windows Server Core based docker image
   # The default mcr.microsoft.com/dotnet/sdk:6.0 would depend on Windows Nano Server, 
   # which is not enough for us, as it does not containt the desktop packs.
@@ -31,8 +31,8 @@ build:view:
 
 # Test
 # (Uses Linux-based runner, because windows tag is NOT specified.)
-# test:model:
-#   stage: test
+# Test Model:
+#   stage: Test
 #   before_script:    
 #     # Restore NuGet packages to the local .nuget folder (inside the project directory).
 #     - dotnet restore CCity.Tests --packages .nuget
@@ -48,19 +48,17 @@ build:view:
 
 # Documentation
 # (Uses Linux-based runner, because windows tag is NOT specified.)
-pages:
-  stage: deploy
+Deploy Docs:
+  stage: Deploy
   before_script:
     - apt-get update -yqq
     - apt-get install -yqq doxygen graphviz
   script:
     - doxygen
     - cp -r doc/html/. public/
-    - mkdir public/Assets
-    - cp -r Assets/. public/Assets/
   artifacts:
     paths:
       - public
     expire_in: 1 day
-  # only:
-  #   - master
+  only:
+    - master

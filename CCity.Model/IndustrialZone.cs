@@ -12,16 +12,12 @@ namespace CCity.Model
 
         private const int effectRadius = 10;
 
-        private const byte IndustrialZonePotential = 2;
-
         #endregion
 
         #region Properties
 
         public override int PlacementCost => 100;
         public override int MaintenanceCost => 10;
-        
-        public override byte Potential => IndustrialZonePotential; 
 
         #endregion
 

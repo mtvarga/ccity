@@ -1,6 +1,4 @@
-using System.Diagnostics;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public abstract class Zone : Placeable, IFlammable, IUpgradeable
     {
@@ -11,41 +9,32 @@ namespace CCity.Model
 
         #endregion
         #region Constants
-        
-        private const int BasicUpgradeCost= 100;
-        private const int BeginnerCapacity = 10;
-        private const int IntermediateCapacity = 30;
-        private const int AdvancedCapacity = 100;
+
+        private const int CapacityConstant = 10;
 
         #endregion
-       
+
         #region Properties
 
         public override int NeededElectricity => Count;
 
         public int Count => Citizens.Count;
-        
-        public int Capacity => _level switch
-        {
-            Level.Beginner => BeginnerCapacity,
-            Level.Intermediate => IntermediateCapacity,
-            Level.Advanced => AdvancedCapacity,
-            _ => throw new System.NotImplementedException()
-        };
+
+        public int Capacity => CapacityConstant;
 
         public List<Citizen> Citizens { get; }
 
-        public abstract byte Potential { get; }
-    
-        bool IFlammable.Burning { get; set; }
+        double IFlammable.Pontential => throw new NotImplementedException();
+
+        double IFlammable.Health => throw new NotImplementedException();
+
+        bool IFlammable.IsOnFire { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         Level IUpgradeable.Level { get => _level; set => _level = value; }
-        
-        int IUpgradeable.NextUpgradeCost =>_level!=Level.Advanced? ((int)_level+1)*BasicUpgradeCost: 0;
 
-        bool IUpgradeable.CanUpgrade => _level!=Level.Advanced;
-        
-        ushort IFlammable.Health { get; set; } = IFlammable.FlammableMaxHealth;
+        int IUpgradeable.NextUpgradeCost => ((int)_level + 1) * upgradeCost;
+
+        bool IUpgradeable.CanUpgrade => _level != Level.Advanced;
 
         public bool Full => Count == Capacity;
 
@@ -60,7 +49,6 @@ namespace CCity.Model
         internal Zone()
         {
             Citizens = new List<Citizen>();
-            _level = Level.Beginner;
         }
         
         #endregion
@@ -84,12 +72,7 @@ namespace CCity.Model
             double sum = Citizens.Sum(e => e.LastCalculatedSatisfaction);
             return sum / Count;
         }
-        
-        public void Upgrade()
-        {
-            if (_level == Level.Advanced) return;
-            _level++;
-        }
+
         #endregion
     }
 }

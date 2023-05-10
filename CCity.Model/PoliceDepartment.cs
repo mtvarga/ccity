@@ -12,8 +12,6 @@ namespace CCity.Model
 
         private const int effectRadius = 10;
 
-        private const byte PoliceDepartmentPotential = 1;
-
         #endregion
 
         #region Properties
@@ -24,11 +22,11 @@ namespace CCity.Model
 
         public override int NeededElectricity => 20;
 
-        byte IFlammable.Potential => PoliceDepartmentPotential;
+        double IFlammable.Pontential => throw new NotImplementedException();
 
-        bool IFlammable.Burning { get; set; }
+        double IFlammable.Health => throw new NotImplementedException();
 
-        ushort IFlammable.Health { get; set; } = IFlammable.FlammableMaxHealth;
+        bool IFlammable.IsOnFire { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         #endregion
 

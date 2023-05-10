@@ -18,8 +18,6 @@ namespace CCity.Model
         public bool EffectSpreaded { get; internal set; }
         public bool IsDemolished { get => Owner != null && Owner.Placeable == null; }
         public Placeable Root => this is Filler filler ? (Placeable)filler.Main : this;
-        public virtual bool EffectSpreadingCondition => IsPublic && IsElectrified && !IsDemolished;
-        public virtual bool ListingCondition => IsPublic && !IsDemolished;
 
         //SPREADING
 
@@ -34,7 +32,7 @@ namespace CCity.Model
         //the current value out of needed, otherwise
         public Dictionary<SpreadType, int> CurrentSpreadValue { get; set; }
 
-        public virtual bool IsPublic => GetsSpreadFrom[SpreadType.Publicity].root != null;
+        public bool IsPublic => GetsSpreadFrom[SpreadType.Publicity].root != null;
         public bool IsElectrified => CurrentSpreadValue[SpreadType.Electricity] == MaxSpreadValue[SpreadType.Electricity]() && GetsSpreadFrom[SpreadType.Electricity].root != null || GetsSpreadFrom[SpreadType.Electricity].root == this;
         public bool IsPartlyElectrified => CurrentSpreadValue[SpreadType.Electricity] > 0 && !IsElectrified;
 

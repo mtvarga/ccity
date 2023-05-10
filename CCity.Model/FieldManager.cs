@@ -1,12 +1,10 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 using System.Diagnostics;
 using System.Runtime.Intrinsics.X86;
 using System.ComponentModel.Design.Serialization;
-using System.ComponentModel.Design;
-using System.Reflection.Metadata.Ecma335;
 
 namespace CCity.Model
 {
@@ -16,14 +14,11 @@ namespace CCity.Model
 
         private const int MAX_EFFECT = 10;
         private const int EFFECT_RADIUS = 10;
-        private const int FOREST_EFFECT_RADIUS = 3;
         private const int HEIGHT = 30;
         private const int WIDTH = 45;
         private const int ROOTX = WIDTH / 2;
         private const int ROOTY = HEIGHT - 1;
 
-        private const ushort FireSpreadThreshold = IFlammable.FlammableMaxHealth / 2;
-        
         #endregion
 
         #region Fields
@@ -33,29 +28,12 @@ namespace CCity.Model
         public int Height { get; private set; }
         public int CommercialZoneCount { get => _commercialZones.Count; }
         public int IndustrialZoneCount { get => _industrialZones.Count; }
-        
-        private HashSet<ResidentialZone> _residentialZones;
-        private HashSet<CommercialZone> _commercialZones;
-        private HashSet<IndustrialZone> _industrialZones;
+        private Dictionary<Forest, int> _growingForests;
+        private List<Field> _burningBuildings;
+        private List<ResidentialZone> _residentialZones;
+        private List<CommercialZone> _commercialZones;
+        private List<IndustrialZone> _industrialZones;
 
-        private HashSet<Forest> _growingForests;
-        
-        private HashSet<FireDepartment> FireDepartments { get; }
-        
-        private HashSet<Placeable> Flammables { get; }
-        
-        private HashSet<Placeable> BurningBuildings { get; }
-
-        public bool FireEmergencyPresent => BurningBuildings.Any();
-
-        private List<Stack<Field>> FireTruckPaths { get; }
-        
-        private Dictionary<Field, Placeable> BuildingsBeingSaved { get; }
-        
-        private List<Field> SavedBuildings { get; }
-
-        public bool FireTrucksDeployed => FireTruckPaths.Any();
-        
         private Spreader _publicitySpreader;
         private Spreader _electricitySpreader;
 
@@ -73,15 +51,15 @@ namespace CCity.Model
                 for (int j = 0; j < Height; j++)
                     Fields[i, j] = new Field(i, j);
 
+            //todo: Place forests
+
             //lists
             _growingForests = new();
+            _burningBuildings = new();
             _residentialZones = new();
             _commercialZones = new();
             _industrialZones = new();
-            _growingForests = new();
 
-            FireDepartments = new HashSet<FireDepartment>();
-            
             //starter public road
             Road starterRoad = new Road();
             PlaceOnField(Fields[ROOTX, ROOTY], starterRoad);
@@ -100,14 +78,6 @@ namespace CCity.Model
                 (s, t) => s.CouldGiveElectricityTo(t),
                 (p) => GetNeighbours(p)
                 );
-
-            GenerateRandomForests();
-
-            Flammables = new HashSet<Placeable>();
-            BurningBuildings = new HashSet<Placeable>();
-            BuildingsBeingSaved = new Dictionary<Field, Placeable>();
-            SavedBuildings = new List<Field>();
-            FireTruckPaths = new List<Stack<Field>>();
         }
 
         #endregion
@@ -116,223 +86,46 @@ namespace CCity.Model
 
         public List<Field> Place(int x, int y, Placeable placeable)
         {
-            if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.PlaceOutOfFieldBoundries);
+            if (!OnMap(x, y)) throw new Exception("PLACE-OUTOFFIELDBOUNDRIES");
 
             Field field = Fields[x, y];
-            List<Field> modifiedFields = PlaceDemolishManager(field, placeable,true);
-            List<Field> modifiedFieldsBySpreading;
-            modifiedFieldsBySpreading = RefreshSpread(placeable);
+            List<Field> modifiedFields = PlaceOnField(field, placeable);
+            List<Field> modifiedFieldsBySpreading = RefreshSpread(placeable);
             return modifiedFields.Concat(modifiedFieldsBySpreading).ToList();
         }
 
-        public (IUpgradeable, int) Upgrade(int x, int y)
+        public List<Field> Upgrade(int x, int y)
         {
-            if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.UpgradeOutOfFieldBoundries);
-            Field field = Fields[x, y];
-            if (field.Placeable is not IUpgradeable) throw new GameErrorException(GameErrorType.UpgradeNotUpgradeable);
-            IUpgradeable upgradeable = (IUpgradeable)(field.Placeable);
-            int upgradeCost = upgradeable.NextUpgradeCost;
-            upgradeable.Upgrade();
-            return (upgradeable, upgradeCost);
+            throw new NotImplementedException();
         }
 
         public (Placeable, List<Field>) Demolish(int x, int y)
         {
-            if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.DemolishOutOfFieldBoundries);
+            if (!OnMap(x, y)) throw new Exception("DEMOLISH-OUTOFFIELDBOUNDS");
 
             Field field = Fields[x, y];
-            if (!field.HasPlaceable) throw new GameErrorException(GameErrorType.DemolishEmptyField);
+            if (!field.HasPlaceable) throw new Exception("DEMOLISH-NOTEMPTYFIELD");
             Placeable placeable = field.Placeable!.Root;
-            List<Field> modifiedFields = PlaceDemolishManager(field,placeable,false);
-            List<Field> modifiedFieldsBySpreading;
-            modifiedFieldsBySpreading = RefreshSpread(placeable);
+            List<Field> modifiedFields = DemolishFromField(field);
+            List<Field> modifiedFieldsBySpreading = RefreshSpread(placeable);
             UpdatePlaceableList(placeable, false);
             return (placeable, modifiedFields.Concat(modifiedFieldsBySpreading).ToList());
         }
 
         public List<Field> GrowForests()
         {
-            List<Field> effectedFields = new();
-            foreach  (Forest  forest in _growingForests.ToList())
-            {
-                if(forest.CanGrow)
-                {
-                    effectedFields.Add(forest.Owner!);
-                    if (forest.WillAge)
-                    {
-                        List<Field> industrialZonesAround = GetPlaceableInRadius(forest.Owner!, EFFECT_RADIUS, p => p is IndustrialZone);
-                        foreach (Field industrialZone in industrialZonesAround)
-                        {
-                            effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
-                        }
-                        effectedFields.Concat(forest.Effect(SpreadForestEffect, false).ToList());
-                        forest.Grow();
-                        effectedFields.Concat(forest.Effect(SpreadForestEffect, true).ToList());
-                        foreach (Field industrialZone in industrialZonesAround)
-                        {
-                            effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
-                        }
-                    }
-                    else
-                    {
-                        forest.Grow();
-                    }
-                    
-                }
-                else
-                {
-                    _growingForests.Remove(forest);
-                }
-            }
-            return effectedFields;
+            throw new NotImplementedException();
         }
 
-        public List<Field> UpdateModifiedZonesSpread(List<Zone> zones)
+        public Field RandomIncinerate()
         {
-            List<Field> modifiedFields = new();
-            foreach (Zone zone in zones) modifiedFields = modifiedFields.Concat(RefreshSpread(zone)).ToList();
-            return modifiedFields;
+            throw new NotImplementedException();
         }
 
-        public Field IgniteBuilding(int x, int y)
-        {
-            if (!OnMap(x, y))
-                throw new Exception("IGNITE_BUILDING-OUT_OF_FIELD_BOUNDS");
+        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.FindAll(zone => !zone.Full || showUnavailable);
+        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.FindAll(zone => !zone.Full || showUnavailable);
+        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.FindAll(zone => !zone.Full || showUnavailable);
 
-            if (Fields[x, y].Placeable is null or not IFlammable { Burning: false })
-                throw new Exception("IGNITE_BUILDING-BAD_FIELD");
-            
-            Ignite(Fields[x, y].Placeable!);
-            return Fields[x, y];
-        }
-        
-        public Field? IgniteRandomBuilding()
-        {
-            var random = new Random(DateTime.Now.Millisecond);
-            
-            foreach (var placeable in Flammables)
-            {
-                if (placeable is not IFlammable flammable) 
-                    throw new Exception("Internal inconsistency: FieldManager is tracking a non-flammable Placeable as flammable");
-
-                if (random.Next(0, 100) > flammable.Potential) 
-                    continue;
-                
-                // For now, only 1 building will be ignited at once
-                Ignite(placeable);
-                return placeable.Owner;
-            }
-
-            return null;
-        }
-
-        public List<Field> UpdateBurningBuildings()
-        {
-            var result = new List<Field>();
-            result.AddRange(SavedBuildings);
-            SavedBuildings.Clear();
-            
-            foreach (var placeable in BurningBuildings)
-            {
-                if (placeable is not IFlammable { Burning: true } flammable)
-                    throw new Exception("Internal inconsistency: FieldManager is tracking a non-flammable Placeable or a flammable that is not burning as a burning building");
-
-                var oldHealth = flammable.Health;
-                
-                Damage(placeable);
-
-                if (oldHealth > FireSpreadThreshold && flammable.Health < FireSpreadThreshold)
-                    result.AddRange(SpreadFire(placeable));
-
-                if (flammable.Health > 0)
-                    result.Add(placeable.Owner!);
-                else
-                {
-                    // TODO: Destroy the placeable that is burning
-                    // For this, we must adjust how the Demolish() method works
-                }
-            }
-
-            return result;
-        }
-
-        public void DeployFireTruck(int x, int y)
-        {
-            if (!FireEmergencyPresent)
-                throw new GameErrorException(GameErrorType.DeployFireTruckNoFire);
-            
-            if (!OnMap(x, y)) 
-                throw new GameErrorException(GameErrorType.DeployFireTruckOutOfFieldBounds);
-
-            var placeable = Fields[x, y].Placeable;
-            
-            if (placeable is not IFlammable { Burning: true })
-                throw new GameErrorException(GameErrorType.DeployFireTruckBadBuilding);
-            
-            var closestFireDepartment = NearestAvailableFireDepartment(placeable);
-
-            if (closestFireDepartment == null)
-                throw new GameErrorException(GameErrorType.DeployFireTruckNoneAvaiable);
-            
-            // TODO: Find the shortest path from the fire department to the fire
-            // However we find this, it should return a queue of Fields which encode the path the fire truck should take
-
-            var shortestRoad = Utilities.ShortestRoad(Fields, Width, Height, closestFireDepartment, Fields[x, y]);
-
-            if (!shortestRoad.Any() || closestFireDepartment.Placeable is not FireDepartment fireDepartment) 
-                return;
-            
-            FireTruckPaths.Add(shortestRoad);
-            fireDepartment.AvailableFireTrucks--;
-        }
-
-        // NOTE: This method returns the old locations (aka. the location of the fire trucks in the previous tick) of all the fire trucks
-        public List<Field> UpdateFireTrucks()
-        {
-            if (!FireEmergencyPresent)
-                throw new Exception("Internal inconsistency: Attempted to update fire truck locations when there is no fire emergency present");
-            
-            if (!FireTrucksDeployed)
-                throw new Exception("Internal inconsistency: Attempted to update fire truck locations when there have been no fire trucks deployed yet");
-
-            var result = new List<Field>();
-            
-            foreach (var path in FireTruckPaths)
-            {
-                var oldLocation = path.Pop();
-
-                if (path.Any() && path.Peek().Placeable is not Road and { } placeable)
-                {
-                    // The fire truck is standing next to the burning building
-                    path.Pop();
-                        
-                    // Start saving the building
-                    BuildingsBeingSaved.Add(oldLocation, placeable);
-                        
-                    // TEMPORARY SOLUTION:
-                    // Add the last road 8 times so that the fire truck will stand next to the building for 2 secs
-                    for (var i = 0; i < 8; i++)
-                        path.Push(oldLocation);
-                }
-                else if (!path.Any())
-                {
-                    PutOut(BuildingsBeingSaved[oldLocation]);
-                    BuildingsBeingSaved.Remove(oldLocation);
-                }
-                    
-                result.Add(oldLocation);
-            }
-
-            FireTruckPaths.RemoveAll(p => !p.Any());
-
-            return result;
-        }
-
-        public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
-        public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
-        public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
-        public List<Field> FireTruckLocations() => FireTruckPaths.Select(q => q.Peek()).ToList();
-        
         #endregion
 
         #region Private methods
@@ -353,46 +146,13 @@ namespace CCity.Model
             return true;
         }
 
-        private List<Field> PlaceDemolishManager(Field field, Placeable placeable,bool place)
-        {
-            List<Field> effectedFields = new();
-            List<Field> forestsInRadius = GetPlaceableInRadius(field, FOREST_EFFECT_RADIUS, p => p is Forest);
-            foreach (Field forest in forestsInRadius)
-            {
-                effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, false)).ToList();
-            }
-            List<Field> industrialZonesAround = new();
-            if (placeable is Forest) industrialZonesAround = GetPlaceableInRadius(field, EFFECT_RADIUS, p => p is IndustrialZone);
-            foreach (Field industrialZone in industrialZonesAround)
-            {
-                effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
-            }
-            try
-            {
-                if (place) effectedFields = effectedFields.Concat(PlaceOnField(field, placeable)).ToList();
-                else effectedFields = effectedFields.Concat(DemolishFromField(field)).ToList();
-            }
-            finally
-            {
-                foreach (Field industrialZone in industrialZonesAround)
-                {
-                    effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
-                }
-                foreach (Field forest in forestsInRadius)
-                {
-                    effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, true)).ToList();
-                }
-            }
-            return effectedFields; 
-        }
-
         private List<Field> PlaceOnField(Field field, Placeable placeable)
         {
             if (!CanPlace(field, placeable))
             {
-                throw new GameErrorException(GameErrorType.PlaceAlreadyUsedField);
+                throw new Exception("PLACE-ALREADYUSEDFIELD");
             }
-            List<Field> effectedFields = new() {field };
+            List<Field> effectedFields = new();
             if (placeable is IMultifield multifield)
             {
                 List<(int, int)> fillerCoordinates = GetMultifieldFillerCoordinates(field, multifield);
@@ -406,6 +166,7 @@ namespace CCity.Model
                 }
             }
             field.Place(placeable);
+            effectedFields.Add(field);
             return effectedFields;
         }
 
@@ -413,31 +174,19 @@ namespace CCity.Model
         {
             switch (placeable)
             {
-                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.Remove(residentialZone); break;
-                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.Remove(commercialZone); break;
-                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.Remove(industrialZone); break;
-                case FireDepartment fireDepartment: if (add) FireDepartments.Add(fireDepartment); else FireDepartments.Remove(fireDepartment); break;
-                case Forest forest: if (add) _growingForests.Add(forest); else _growingForests.Remove(forest); break;
+                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.RemoveAll(e => e == residentialZone); break;
+                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.RemoveAll(e => e == commercialZone); break;
+                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.RemoveAll(e => e == industrialZone); break;
                 default: break;
             }
-
-            if (placeable is IFlammable flammable)
-            {
-                if (add)
-                    Flammables.Add(placeable);
-                else if (flammable.Burning)
-                    throw new Exception("Internal inconsistency: Attempted to remove remove tracking of flammable that is currently burning");
-                else
-                    Flammables.Remove(placeable);
-            }
         }
+
 
         //you can rename it, i was not creative sorry
         //Method called in Place and Demolish (see references)
         private List<Field> RefreshSpread(Placeable placeable)
         {
             if (placeable == null) return new();
-
             _publicitySpreader.Refresh(placeable);
             List<Field> modifiedFields = _publicitySpreader.GetAndClearModifiedFields();
 
@@ -455,8 +204,6 @@ namespace CCity.Model
                 }
             }
 
-            modifiedFields.Add(placeable.Owner!);
-
             //At this point, both electricity and publicity spreaded
             //Now we can check modified placeables, and switch them on/off based on the two props mentioned
             //
@@ -467,7 +214,7 @@ namespace CCity.Model
                 if(f.Placeable != null)
                 {
                     //TODO - electricity required for moving in
-                    UpdatePlaceableList(f.Placeable, f.Placeable.ListingCondition);
+                    UpdatePlaceableList(f.Placeable, f.Placeable.IsPublic);
 
                     //SWITCHING ON/OFF FIREDEPARTMENT COMES HERE (based on electricity and publicity)
                     //Suggestion: use f.Placeable.IsPublic && placeable.IsElectrified bool
@@ -485,22 +232,13 @@ namespace CCity.Model
                     //("try", because if it is already spreaded/revoked (stored in Placeable), skips)
                     //
                     //so it's true if the Placeable is public and electrified
-                    modifiedFields = modifiedFields.Concat(SpreadPlaceableEffectRouter(f.Placeable)).ToList();
+                    modifiedFields = modifiedFields.Concat(f.Placeable.Effect(SpreadPlaceableEffect, f.Placeable.IsPublic && f.Placeable.IsElectrified)).ToList();
                 }
             }
             return modifiedFields;
         }
 
-        private List<Field> SpreadPlaceableEffectRouter(Placeable placeable)
-        {
-            return placeable switch
-            {
-                Forest forest => forest.Effect(SpreadForestEffect, placeable.EffectSpreadingCondition),
-                _ => placeable.Effect(SpreadRadiusEffect, placeable.EffectSpreadingCondition)
-            };
-        }
-
-        private List<Field> SpreadRadiusEffect(Placeable placeable, bool add, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS)
+        private List<Field> SpreadPlaceableEffect(Placeable placeable, bool add, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS)
         {
             List<Field> effectedFields = new();
             Field field = placeable.Owner!;
@@ -510,17 +248,8 @@ namespace CCity.Model
                 if (OnMap(coord.X, coord.Y))
                 {
                     int effect = (int)Math.Round(coord.weight * MAX_EFFECT);
-                    Field effectedField = Fields[coord.X, coord.Y];
-                    if (placeable is IndustrialZone)
-                    {
-                        List<Field> forestsBetween = GetPlaceablesBetween(field, effectedField, p => p is Forest);
-                        foreach (Field forest in forestsBetween)
-                        {
-                            Forest actualForest = (Forest)forest.Placeable!;
-                            effect -= (int)Math.Round(MAX_EFFECT * actualForest.EffectRate);
-                        }
-                    }
                     if (!add) effect *= -1;
+                    Field effectedField = Fields[coord.X, coord.Y];
                     effectFunction(effectedField, effect);
                     effectedFields.Add(effectedField);
                 }
@@ -534,8 +263,8 @@ namespace CCity.Model
 
         private bool CanDemolish(Field field)
         {
-            if (field == Fields[ROOTX, ROOTY]) throw new GameErrorException(GameErrorType.DemolishMainRoad);
-            if (!field.HasPlaceable) throw new GameErrorException(GameErrorType.DemolishEmptyField);
+            if (field == Fields[ROOTX, ROOTY]) throw new Exception("DEMOLISH-MAINROAD");
+            if (!field.HasPlaceable) throw new Exception("DEMOLISH-NOTEMPTYFIELD");
             Placeable placeable = field.Placeable!;
             switch (placeable)
             {
@@ -547,7 +276,7 @@ namespace CCity.Model
                     if (_publicitySpreader.GetAndClearModifiedFields().Find(e => e.Placeable is not Road && e.Placeable is not null && !e.Placeable!.IsPublic) != null)
                     {
                         Place(field.X, field.Y, road);
-                        throw new GameErrorException(GameErrorType.DemolishFieldPublicity);
+                        throw new Exception("DEMOLISH-FIELDPUBLICITY");
                     }
                     Place(field.X, field.Y, road);
                     break;
@@ -557,7 +286,7 @@ namespace CCity.Model
 
         private List<Field> DemolishFromField(Field field)
         {
-            if (!CanDemolish(field)) throw new GameErrorException(GameErrorType.DemolishFieldHasCitizen);
+            if (!CanDemolish(field)) throw new Exception("DEMOLISH - FIELDHASCIZIZEN");
             List<Field> effectedFields = new();
             Placeable placeable = field.Placeable!.Root;
             field = placeable.Owner!;
@@ -571,11 +300,9 @@ namespace CCity.Model
                     effectedFields.Add(fillerField);
                 }
             }
-            //TEMP SOLUTION
-            //TO DO - consistent SpreadPlaceableEffect
+            List<Field> modifiedFieldsBySpreading = placeable.Effect(SpreadPlaceableEffect, false);
             field.Demolish();
             effectedFields.Add(field);
-            List<Field> modifiedFieldsBySpreading = SpreadPlaceableEffectRouter(placeable);
             return effectedFields.Concat(modifiedFieldsBySpreading).Concat(GetNeighbours(placeable).Select(e => e.Owner!)).ToList();
         }
 
@@ -604,76 +331,6 @@ namespace CCity.Model
 
         #endregion
 
-        #region Fire Related
-
-        private void Ignite(Placeable placeable)
-        {
-            if (placeable is not IFlammable flammable)
-                throw new Exception("Internal inconsistency: Attempted to ignite a non-flammable Placeable");
-            
-            flammable.Burning = true;
-            flammable.Health = IFlammable.FlammableMaxHealth; // Reset the building's health upon ignition
-            
-            BurningBuildings.Add(placeable);
-        }
-
-        private void PutOut(Placeable placeable)
-        {
-            if (placeable is not IFlammable flammable)
-                throw new Exception("Internal inconsistency: Attempted to put out fire on a non-flammable Placeable");
-            
-            flammable.Burning = false;
-            
-            BurningBuildings.Remove(placeable);
-            SavedBuildings.Add(placeable.Owner!);
-        }
-
-        private void Damage(Placeable placeable)
-        {
-            if (placeable is not IFlammable { Burning: true } flammable)
-                throw new Exception("Internal inconsistency: Attempted to take fire damage on a non-flammable Placeable or on a flammable that is not burning");
-
-            // In one tick, the building takes 0.25% damage
-            // This way:
-            //  - the building takes 1% damage in 1 second
-            //  - the building is completely destroyed in 100 seconds
-            flammable.Health -= 1;
-
-            if (flammable.Health <= 0)
-                BurningBuildings.Remove(placeable);
-        }
-
-        private List<Field> SpreadFire(Placeable placeable)
-        {
-            if (placeable is not IFlammable { Burning: true, Health: < FireSpreadThreshold })
-                throw new Exception("Internal inconsistency: Attempted to spread fire from a non-flammable Placeable or on a flammable that isn't burning or its health is not low enough in order for the fire to spread");
-
-            var flammableNeighbors = GetNeighbours(placeable).Where(p => p is IFlammable).ToList();
-
-            foreach (var neighbor in flammableNeighbors)
-                Ignite(neighbor);
-
-            return flammableNeighbors.Select(p => p.Owner!).ToList();
-        }
-
-        private Field? NearestAvailableFireDepartment(Placeable p)
-        {
-            var nearestFireDepartment = FireDepartments.FirstOrDefault();
-            var smallestDistance = Utilities.AbsoluteDistance(p, nearestFireDepartment);
-            
-            foreach (var fireDepartment in FireDepartments)
-            {
-                var currentDistance = Utilities.AbsoluteDistance(p, fireDepartment);
-
-                if (fireDepartment.AvailableFireTrucks > 0 && currentDistance < smallestDistance)
-                    (nearestFireDepartment, smallestDistance) = (fireDepartment, currentDistance);
-            }
-
-            return nearestFireDepartment?.Owner;
-        }
-        
-        #endregion
-        
         #region Helpers
 
         private bool OnMap(int x, int y)
@@ -752,98 +409,8 @@ namespace CCity.Model
             return coordinates;
         }
 
-        private List<Field> GetPlaceablesBetween(Field s, Field t, Func<Placeable, bool> cond)
-        {
-            List<(int, int)> getPointsBetween = Utilities.GetPointsBetween(s, t);
-            getPointsBetween = getPointsBetween.Where(e => cond(Fields[e.Item1, e.Item2].Placeable!)).ToList();
-            List<Field> placeables = new List<Field>();
-            foreach ((int X,int Y) coord in getPointsBetween)
-            {
-                placeables.Add(Fields[coord.X, coord.Y]);
-            }
-            return placeables;
-        }
-        private List<Field> GetPlaceableInRadius(Field field, int radius, Func<Placeable, bool> cond)
-        {
-            List<Field> placeables = new List<Field>();
-            List<(int, int)> cordinates = (Utilities.GetPointsInRadius(field, radius)).ToList();
-            foreach ((int X, int Y) coord in cordinates)
-            {
-                if (!OnMap(coord.X, coord.Y) || field == Fields[coord.X, coord.Y]) continue;
-                Field fieldInRadius = Fields[coord.X, coord.Y];
-                if (cond(fieldInRadius.Placeable!)) placeables.Add(fieldInRadius);
-            }
-            return placeables;
-        }
+#endregion
 
-        #endregion
-
-        #region Forest related
-
-        private void GenerateRandomForests()
-        {
-            Random rand = new Random();
-            int forestCount = rand.Next(3, 5);
-            int i = 0;
-            while (i < forestCount)
-            {
-                int randX = rand.Next(0, Width);
-                int randY = rand.Next(0, Height);
-                if(!Fields[randX, randY].HasPlaceable)
-                {
-                    Place(randX, randY, new Forest(true));
-                    Field field = Fields[randX, randY];
-                    int forestSize = rand.Next(2,3);
-                    int density = rand.Next(4, 10);
-                    GenerateForestAround(field,forestSize,density);
-                    i++;
-                }
-
-            }
-        }
-
-        private void GenerateForestAround(Field field,int forestSize,int density)
-        {
-            Random rand = new Random();
-            List<(int, int)> cordinates = Utilities.GetPointsInRadius(field, forestSize).ToList();
-            foreach ((int x,int y) cord  in cordinates)
-            {
-                if (rand.Next(0, 10) < density)
-                {
-                    if (OnMap(cord.x,cord.y) && !Fields[cord.x,cord.y].HasPlaceable)
-                    {
-                        Place(cord.x, cord.y, new Forest(true));
-                    }
-                }
-            }
-        }
-
-        private List<Field> SpreadForestEffect(Placeable placeable,bool add,Action<Field,int> effectFunction,int radius)
-        {
-            Forest forest = (Forest)placeable;
-            List<Field> effectedFields = new();
-            Field field = forest.Owner!;
-            List<(int,int)> cordinates = (Utilities.GetPointsInRadius(field,radius)).ToList();
-            foreach ((int X,int Y) coord in cordinates)
-            {
-                if(OnMap(coord.X,coord.Y))
-                {
-                    Field effectedField = Fields[coord.X,coord.Y];
-                    if(GetPlaceablesBetween(field,effectedField,p => p is not null && p is not Road && p is not Pole).Count==0)
-                    {
-                        int effect = (int)Math.Round(MAX_EFFECT * forest.EffectRate);
-                        if (!add) effect *= -1;
-                        effectFunction(effectedField,effect);
-                        effectedFields.Add(effectedField);
-                    }
-                    
-                }
-            }
-            return effectedFields;
-        }
-
-        #endregion
-
-        #endregion
+#endregion
     }
 }
