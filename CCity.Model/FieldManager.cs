@@ -33,13 +33,12 @@ namespace CCity.Model
         public int Height { get; private set; }
         public int CommercialZoneCount { get => _commercialZones.Count; }
         public int IndustrialZoneCount { get => _industrialZones.Count; }
-        private Dictionary<Forest, int> _growingForests;
         
         private List<ResidentialZone> _residentialZones;
         private List<CommercialZone> _commercialZones;
         private List<IndustrialZone> _industrialZones;
 
-        private List<Forest> _forests;
+        private List<Forest> _growingForests;
         
         private List<FireDepartment> FireDepartments { get; }
         
@@ -79,7 +78,7 @@ namespace CCity.Model
             _residentialZones = new();
             _commercialZones = new();
             _industrialZones = new();
-            _forests = new();
+            _growingForests = new();
 
             FireDepartments = new List<FireDepartment>();
             
@@ -148,7 +147,7 @@ namespace CCity.Model
         public List<Field> GrowForests()
         {
             List<Field> effectedFields = new();
-            foreach  (Forest  forest in _forests)
+            foreach  (Forest  forest in _growingForests)
             {
                 if(forest.CanGrow)
                 {
@@ -173,6 +172,10 @@ namespace CCity.Model
                         forest.Grow();
                     }
                     
+                }
+                else
+                {
+                    _growingForests.Remove(forest);
                 }
             }
             return effectedFields;
