@@ -18,6 +18,10 @@ namespace CCity.Model
 
         public override int MaintenanceCost => CanGrow ? 10 : 0;
 
+        public override bool EffectSpreadingCondition => !IsDemolished;
+
+        public override bool ListingCondition => !IsDemolished && CanGrow;
+
         public int GrowthMonts { get; private set; }
 
         public bool WillAge => GrowthMonts % 12 == 11;
@@ -26,10 +30,12 @@ namespace CCity.Model
 
         public bool CanGrow => Age < MaxAge;
 
-        public int Age => GrowthMonts / 12; 
+        public int Age => GrowthMonts / 12;
+
+        public override bool IsPublic => true;
 
         #endregion
-          
+
         #region Constructor
 
         public Forest(bool starter=false)
