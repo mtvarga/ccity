@@ -49,14 +49,16 @@ namespace CCity.ViewModel
         public int ResidentialTax { get => PercentToInt(_model.Taxes.ResidentalTax); }
         public int IndustrialTax { get => PercentToInt(_model.Taxes.IndustrialTax); }
         public bool IsFieldSelected { get => _selectedField != null; }
-        public string SelectedFieldName { get => IsFieldSelected ? GetFieldName(_selectedField) : ""; }
+        public string SelectedFieldName { get => IsFieldSelected ? GetPlaceableName(_selectedField!.Placeable) : ""; }
         //public int SelectedFieldHealth { get; }
         //public string SelectedFieldIsOnFire { get; }
-        public int SelectedFieldPoliceDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.PoliceDepartmentEffect) : 0; }
-        public int SelectedFieldFireDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField.FireDepartmentEffect) : 0; }
-        public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField.StadiumEffect) : 0; }
-        public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField.IndustrialEffect) : 0; }
-        public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField.ForestEffect) : 0; }
+        //public string SelectedFieldIsUpgradeable { get; }
+        //public int SelectedFieldUpgradeCost { get; }
+        public int SelectedFieldPoliceDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.PoliceDepartmentEffect) : 0; }
+        public int SelectedFieldFireDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.FireDepartmentEffect) : 0; }
+        public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.StadiumEffect) : 0; }
+        public int SelectedFieldIndustrialEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.IndustrialEffect) : 0; }
+        public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.ForestEffect) : 0; }
         public int SelectedFieldSatisfaction { get => SelectedFieldIsZone ? PercentToInt(_model.ZoneSatisfaction((Zone)_selectedField!.Placeable!)) : 0; }
         public int SelectedFieldPopulation { get => SelectedFieldIsZone ? ((Zone)_selectedField!.Placeable!).Count : 0; }
         public bool SelectedFieldIsZone { get => IsFieldSelected && _selectedField!.Placeable is Zone; }
@@ -71,6 +73,13 @@ namespace CCity.ViewModel
         public bool CanStart { get => _inputMayorName != "" && _inputCityName != ""; }
         public DateTime Date { get => _model.Date; }
 
+        //SelectedTool info
+        public bool SelectedToolHasInfo { get => GetToolPlaceable(SelectedTool) != null; }
+        public string SelectedToolPlaceableName { get => SelectedToolHasInfo ? GetPlaceableName(GetToolPlaceable(SelectedTool)) : ""; }
+        public int SelectedToolPlaceableWidth { get => SelectedToolHasInfo ? GetPlaceableInfo(GetToolPlaceable(SelectedTool)!).Width : 0; }
+        public int SelectedToolPlaceableHeight { get => SelectedToolHasInfo ? GetPlaceableInfo(GetToolPlaceable(SelectedTool)!).Height : 0; }
+        public int SelectedToolPlaceablePlacementCost { get => SelectedToolHasInfo ? GetPlaceableInfo(GetToolPlaceable(SelectedTool)!).PlacementCost : 0; }
+        public int SelectedToolPlaceableMaintenanceCost { get => SelectedToolHasInfo ? GetPlaceableInfo(GetToolPlaceable(SelectedTool)!).MaintenanceCost : 0; }
 
         public Tool SelectedTool => _selectedToolItem.Tool;
 
@@ -286,8 +295,8 @@ namespace CCity.ViewModel
                 Tool.Pole,
                 Tool.Road,
                 Tool.Forest,
-                Tool.Bulldozer,
-                Tool.FlintAndSteel
+                Tool.FlintAndSteel,
+                Tool.Bulldozer
             };
             Tools = new();
             int number = 0;
@@ -359,6 +368,14 @@ namespace CCity.ViewModel
             if (field.Placeable is Road) return oldValue;
             else if (field.Placeable is IFlammable && ((IFlammable)field.Placeable).Burning) return Texture.Fire;
             else return Texture.None;
+        }
+
+        private (int Width, int Height, int PlacementCost, int MaintenanceCost) GetPlaceableInfo(Placeable placeable)
+        {
+            int width = 1;
+            int height = 1;
+            if (placeable is IMultifield multifield) (width, height) = (multifield.Width, multifield.Height);
+            return (width, height, placeable.PlacementCost, placeable.MaintenanceCost);
         }
 
         private Texture GetTextureFromPlaceable(Placeable placeable)
@@ -451,26 +468,36 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(IsFieldSelected));
         }
 
+        private Placeable? GetToolPlaceable(Tool tool) => tool switch {
+            Tool.ResidentialZone => new ResidentialZone(),
+            Tool.CommercialZone => new CommercialZone(),
+            Tool.IndustrialZone => new IndustrialZone(),
+            Tool.FireDepartment => new FireDepartment(),
+            Tool.PoliceDepartment => new PoliceDepartment(),
+            Tool.Stadium => new Stadium(),
+            Tool.PowerPlant => new PowerPlant(),
+            Tool.Pole => new Pole(),
+            Tool.Road => new Road(),
+            Tool.Forest => new Forest(),
+            _ => null
+        };
+
         private void FieldClicked(int index)
         {
-            //Coord will be removed (so x and y remains without coord.) in the viewmodel branch, I won't modify it in this branch
-            (int x, int y) coord = GetCordinates(index);
-            switch (SelectedTool)
+            (int x, int y) = GetCordinates(index);
+            Placeable? placeable = GetToolPlaceable(SelectedTool);
+            if(placeable == null)
             {
-                case Tool.Cursor: SelectField(index); break;
-                case Tool.ResidentialZone: _model.Place(coord.x, coord.y, new ResidentialZone()); break;
-                case Tool.CommercialZone: _model.Place(coord.x, coord.y, new CommercialZone()); break;
-                case Tool.IndustrialZone: _model.Place(coord.x, coord.y, new IndustrialZone()); break;
-                case Tool.FireDepartment: _model.Place(coord.x, coord.y, new FireDepartment()); break;
-                case Tool.PoliceDepartment: _model.Place(coord.x, coord.y, new PoliceDepartment()); break;
-                case Tool.Stadium: _model.Place(coord.x, coord.y, new Stadium()); break;
-                case Tool.PowerPlant: _model.Place(coord.x, coord.y, new PowerPlant()); break;
-                case Tool.Pole: _model.Place(coord.x, coord.y, new Pole()); break;
-                case Tool.Road: _model.Place(coord.x, coord.y, new Road()); break;
-                case Tool.Forest: _model.Place(coord.x, coord.y, new Forest()); break;
-                case Tool.Bulldozer: _model.Demolish(coord.x, coord.y); break;
-                case Tool.FlintAndSteel: _model.IgniteBuilding(coord.x, coord.y); break;
-                default: throw new Exception();
+                switch (SelectedTool)
+                {
+                    case Tool.Cursor: SelectField(index); break;
+                    case Tool.Bulldozer: _model.Demolish(x, y); break;
+                    case Tool.FlintAndSteel: _model.IgniteBuilding(x, y); break;
+                    default: throw new Exception();
+                }
+            } else
+            {
+                _model.Place(x, y, placeable);
             }
         }
 
@@ -481,6 +508,12 @@ namespace CCity.ViewModel
             _selectedToolItem.IsSelected = true;
             if (SelectedTool != Tool.Cursor) UnselectField();
             OnPropertyChanged(nameof(SelectedTool));
+            OnPropertyChanged(nameof(SelectedToolHasInfo));
+            OnPropertyChanged(nameof(SelectedToolPlaceableName));
+            OnPropertyChanged(nameof(SelectedToolPlaceableWidth));
+            OnPropertyChanged(nameof(SelectedToolPlaceableHeight));
+            OnPropertyChanged(nameof(SelectedToolPlaceablePlacementCost));
+            OnPropertyChanged(nameof(SelectedToolPlaceableMaintenanceCost));
         }
 
         private void SelectField(int index)
@@ -512,10 +545,10 @@ namespace CCity.ViewModel
             return (x, y);
         }
 
-        private string GetFieldName(Field? selectedField)
+        private string GetPlaceableName(Placeable? placeable)
         {
-            if (selectedField is null || selectedField.Placeable is null) return "Üres mező";
-            switch (selectedField.Placeable!)
+            if (placeable == null) return "Üres mező";
+            switch (placeable)
             {
                 case ResidentialZone _: return "Lakózóna";
                 case CommercialZone _: return "Kereskedelmi zóna";

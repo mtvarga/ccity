@@ -131,7 +131,7 @@
                         <StackPanel Orientation="Vertical" Margin="0 5">
                             <!-- ADÓ ÁLLÍTÓ GOMBOK -->
                             <StackPanel Orientation="Horizontal" Margin="2" Height="28">
-                                <Border Background="#EEE" CornerRadius="7 0 0 7">
+                                <Border Background="#FFF" CornerRadius="7 0 0 7">
                                     <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ResidentialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                                 </Border>
                                 <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
@@ -175,7 +175,7 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="2" Height="28">
-                                <Border Background="#EEE" CornerRadius="7 0 0 7">
+                                <Border Background="#FFF" CornerRadius="7 0 0 7">
                                     <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding CommercialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                                 </Border>
                                 <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
@@ -219,7 +219,7 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="2" Height="28">
-                                <Border Background="#EEE" CornerRadius="7 0 0 7">
+                                <Border Background="#FFF" CornerRadius="7 0 0 7">
                                     <TextBlock Width="42" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding IndustrialTax, StringFormat={}{0}%}" TextAlignment="Center"/>
                                 </Border>
                                 <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
@@ -420,75 +420,116 @@
         <!--Center-->
         <Grid x:Name="Center">
             <Grid Panel.ZIndex="2">
-                <Border Background="#CCC" CornerRadius="5" Width="150" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="7">
-                    <StackPanel Orientation="Vertical">
-                        <Button Width="24" Height="24" Cursor="Hand" FontSize="14"  HorizontalAlignment="Right" Margin="5" Command="{Binding CloseSelectedFieldWindowCommand}" Content="×">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border 
-                                                    Background="{StaticResource PrimaryColor}"
-                                                    CornerRadius="12">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        <TextBlock Margin="5" FontWeight="Bold" FontSize="14" Text="{Binding SelectedFieldName}"/>
-                        <StackPanel Orientation="Vertical" Margin="5 10 5 0">
-                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldPopulation, StringFormat='Polgárok: {0} fő'}"/>
-                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldSatisfaction, StringFormat='Elégedettség: {0}%'}"/>
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedFieldIsZone}" Value="False">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right">
+                    <Button Command="{Binding ExitGameCommand}" HorizontalAlignment="Right" Width="24" Height="24" Cursor="Hand" Margin="12" FontSize="14" Content="×">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border 
+                                                        Background="{StaticResource DangerColor}"
+                                                        CornerRadius="12">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Border Background="#CCC" CornerRadius="5" Margin="7">
+                        <StackPanel Orientation="Vertical" Margin="5 10">
+                            <TextBlock FontWeight="Bold" Margin="0 5" HorizontalAlignment="Center" Text="{Binding SelectedToolPlaceableName}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0 1">
+                                <Label Margin="0" Padding="0" Content="Méret: "/>
+                                <Label Margin="0" Padding="0" Content="{Binding SelectedToolPlaceableWidth}"/>
+                                <Label Margin="0" Padding="0" Content="×"/>
+                                <Label Margin="0" Padding="0" Content="{Binding SelectedToolPlaceableHeight}"/>
+                            </StackPanel>
+                            <TextBlock Margin="0 1" Text="{Binding SelectedToolPlaceablePlacementCost, StringFormat='Lehelyezés: {0} emeráld'}"/>
+                            <TextBlock Margin="0 1" Text="{Binding SelectedToolPlaceableMaintenanceCost, StringFormat='Fenntartás: {0} emeráld/év'}"/>
                         </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="5 5 5 10">
-                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldPoliceDepartmentEffect, StringFormat='Rendőrség effekt: {0}%'}"/>
-                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
-                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
-                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
-                            <TextBlock Margin="0 2" Text="{Binding SelectedFieldForestEffect, StringFormat='Erdő effekt: {0}%'}"/>
-                            <TextBlock Margin="0 2">
-                                <Run Text="Áramellátás: "/>
-                                <Run Text="{Binding SelectedFieldCurrentElectricity, Mode=OneWay}"/>
-                                <Run Text="/"/>
-                                <Run Text="{Binding SelectedFieldNeededElectricity, Mode=OneWay}"/>
-                            </TextBlock>
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedToolHasInfo}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+                    <Border Background="#CCC" CornerRadius="5" Width="150" Margin="7">
+                        <StackPanel Orientation="Vertical">
+                            <Button Width="24" Height="24" Cursor="Hand" FontSize="14"  HorizontalAlignment="Right" Margin="5" Command="{Binding CloseSelectedFieldWindowCommand}" Content="×">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border 
+                                                        Background="{StaticResource PrimaryColor}"
+                                                        CornerRadius="12">
+                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <TextBlock Margin="5" FontWeight="Bold" FontSize="14" Text="{Binding SelectedFieldName}"/>
+                            <StackPanel Orientation="Vertical" Margin="5 10 5 0">
+                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldPopulation, StringFormat='Polgárok: {0} fő'}"/>
+                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldSatisfaction, StringFormat='Elégedettség: {0}%'}"/>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedFieldIsZone}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="5 5 5 10">
+                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldPoliceDepartmentEffect, StringFormat='Rendőrség effekt: {0}%'}"/>
+                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
+                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
+                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
+                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldForestEffect, StringFormat='Erdő effekt: {0}%'}"/>
+                                <TextBlock Margin="0 2">
+                                    <Run Text="Áramellátás: "/>
+                                    <Run Text="{Binding SelectedFieldCurrentElectricity, Mode=OneWay}"/>
+                                    <Run Text="/"/>
+                                    <Run Text="{Binding SelectedFieldNeededElectricity, Mode=OneWay}"/>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="5 5 5 10">
+                                <Button Command="{Binding SendFiretruckToSelectedFieldCommand}" Height="24">Tűzoltófecskendő</Button>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectedFieldIsIncinerated}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="5 5 5 10">
-                            <Button Command="{Binding SendFiretruckToSelectedFieldCommand}" Height="24">Tűzoltófecskendő</Button>
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedFieldIsIncinerated}" Value="False">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
-                        </StackPanel>
-                        <StackPanel.Style>
-                            <Style TargetType="StackPanel">
+                        <Border.Style>
+                            <Style TargetType="Border">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsFieldSelected}" Value="False">
                                         <Setter Property="Visibility" Value="Collapsed"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </StackPanel.Style>
-                    </StackPanel>
-                </Border>
+                        </Border.Style>
+                    </Border>
+                </StackPanel>
             </Grid>
             <Grid Panel.ZIndex="1" x:Name="FieldsContainerGrid">
                 <ScrollViewer x:Name="MapScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" CanContentScroll="False" PanningMode="Both"
