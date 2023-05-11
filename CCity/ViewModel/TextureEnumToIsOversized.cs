@@ -29,8 +29,6 @@ namespace CCity.ViewModel
                     Texture.PowerPlant_0_1 => true,
                     Texture.PowerPlant_1_1 => true,
 
-                    Texture.Pole => true,
-
                     Texture.ForestFull => true,
 
                     Texture.ResidentialZoneAdvancedHalf => true, Texture.ResidentialZoneAdvancedFull => true,

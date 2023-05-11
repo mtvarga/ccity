@@ -86,8 +86,8 @@
     <None Remove="View\Images\Textures\Zones\commercialZoneIntermediateHalf.png" />
     <None Remove="View\Images\Textures\Zones\commercialZoneLevel1Full.png" />
     <None Remove="View\Images\Textures\Zones\commercialZoneLevel1Half.png" />
-    <None Remove="View\Images\Textures\Zones\iIndustrialZoneAdvancedHalf.png" />
     <None Remove="View\Images\Textures\Zones\industrialZoneAdvancedFull.png" />
+    <None Remove="View\Images\Textures\Zones\industrialZoneAdvancedHalf.png" />
     <None Remove="View\Images\Textures\Zones\industrialZoneBeginnerFull.png" />
     <None Remove="View\Images\Textures\Zones\industrialZoneBeginnerHalf.png" />
     <None Remove="View\Images\Textures\Zones\industrialZoneIntermediateFull.png" />
@@ -180,7 +180,7 @@
     <Resource Include="View\Images\Textures\Zones\commercialZoneBeginnerHalf.png" />
     <Resource Include="View\Images\Textures\Zones\commercialZoneIntermediateFull.png" />
     <Resource Include="View\Images\Textures\Zones\commercialZoneIntermediateHalf.png" />
-    <Resource Include="View\Images\Textures\Zones\iIndustrialZoneAdvancedHalf.png" />
+    <Resource Include="View\Images\Textures\Zones\industrialZoneAdvancedHalf.png" />
     <Resource Include="View\Images\Textures\Zones\industrialZoneAdvancedFull.png" />
     <Resource Include="View\Images\Textures\Zones\industrialZoneBeginnerFull.png" />
     <Resource Include="View\Images\Textures\Zones\industrialZoneBeginnerHalf.png" />
