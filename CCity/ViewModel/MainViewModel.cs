@@ -1,19 +1,9 @@
+using CCity.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Navigation;
-using System.Xml.Serialization;
-using CCity.Model;
-using Microsoft.Win32;
 
 namespace CCity.ViewModel
 {
@@ -31,6 +21,7 @@ namespace CCity.ViewModel
         private Field? _selectedField;
         private bool _isPublicityToggled;
         private bool _isElectricityToggled;
+        private bool _isLogbookToggled;
 
         #endregion
 
@@ -38,6 +29,7 @@ namespace CCity.ViewModel
 
         public ObservableCollection<FieldItem> Fields { get; private set; }
         public ObservableCollection<ToolItem> Tools { get; private set; }
+        public ObservableCollection<TransactionItem> Logbook { get; private set; }
         public string MayorName { get => _model.MayorName; }
         public string CityName { get => _model.CityName; }
         public int Budget { get => _model.Budget; }
@@ -105,6 +97,19 @@ namespace CCity.ViewModel
                 {
                     _mapPosition = value;
                     OnPropertyChanged(nameof(MapPosition));
+                }
+            }
+        }
+
+        public bool IsLogbookToggled
+        {
+            get { return _isLogbookToggled; }
+            set
+            {
+                if (value != _isLogbookToggled)
+                {
+                    _isLogbookToggled = value;
+                    OnPropertyChanged(nameof(IsLogbookToggled));
                 }
             }
         }
@@ -177,7 +182,9 @@ namespace CCity.ViewModel
         public DelegateCommand ChangeCommercialTaxCommand { get; private set; }
         public DelegateCommand ChangeIndustrialTaxCommand { get; private set; }
         public DelegateCommand RefreshMapCommand { get; private set; }
-        
+        public DelegateCommand ToggleLogbookCommand { get; private set; }
+
+
         public DelegateCommand ChangeSpeedCommand { get; } 
         
         //TO DO
@@ -209,6 +216,7 @@ namespace CCity.ViewModel
                 
             CreateTable();
             CreateToolbar();
+            Logbook = new();
 
             NewGameCommand = new DelegateCommand(param => OnNewGame());
             PauseGameCommand = new DelegateCommand(param => OnPauseGame());
@@ -226,6 +234,7 @@ namespace CCity.ViewModel
             ChangeSpeedCommand = new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
             UpgradeSelectedFieldCommand = new DelegateCommand(param => OnUpgradeCommand());
             SendFiretruckToSelectedFieldCommand = new DelegateCommand(param => OnSendFiretruckToSelectedFieldCommand());
+            ToggleLogbookCommand = new DelegateCommand(param => OnToggleLogbookCommand());
 
             InputCityName = "";
             InputMayorName = "";
@@ -571,6 +580,7 @@ namespace CCity.ViewModel
                 case FireDepartment _: return "Tűzoltóság";
                 case Stadium _: return "Stadion";
                 case Forest _: return "Erdő";
+                case Pole _: return "Magasfeszültségű távvezeték";
                 default: return "Épület";
             }
         }
@@ -579,6 +589,43 @@ namespace CCity.ViewModel
         {
             return Fields[field.X + field.Y * Width];
         }
+
+        private string GetPlaceableTransactionName(PlaceableTransactionType placeableTransactionType) => placeableTransactionType switch
+        {
+            PlaceableTransactionType.Placement => "lehelyezés",
+            PlaceableTransactionType.Maintenance => "fenntartás",
+            PlaceableTransactionType.Upgrade => "fejlesztés",
+            PlaceableTransactionType.Takeback => "visszatérítés",
+            _ => throw new ArgumentException()
+        };
+
+        private TransactionItem GetTransactionItemFromITransaction(ITransaction transaction)
+        {
+            TransactionItem transactionItem = new TransactionItem { Amount = transaction.Amount, Add = transaction.Add };
+            switch (transaction)
+            {
+                case PlaceableTransaction placeableTransaction:
+                    transactionItem.TransactionName = $"{GetPlaceableName(placeableTransaction.Placeable)} {GetPlaceableTransactionName(placeableTransaction.TransactionType)}";
+                    break;
+                case TaxTransaction taxTransaction:
+                    transactionItem.TransactionName = $"{GetPlaceableName(taxTransaction.Placeable)} adó beszedés";
+                    break;
+            }
+            return transactionItem;
+        }
+
+        private void RefreshTransactionLog()
+        {
+            LinkedListNode<ITransaction>? currentModelNode = _model.Logbook.First;
+            Logbook.Clear();
+            while(currentModelNode != null)
+            {
+                Logbook.Add(GetTransactionItemFromITransaction(currentModelNode.ValueRef));
+                currentModelNode = currentModelNode.Next;
+            }
+            OnPropertyChanged(nameof(Logbook));
+        }
+
 
         private void Model_GameTicked(object? o, EventArgs e)
         {
@@ -592,6 +639,7 @@ namespace CCity.ViewModel
 
         private void Model_BudgetChanged(object? o, EventArgs e)
         {
+            RefreshTransactionLog();
             OnPropertyChanged(nameof(Budget));
         }
 
@@ -764,6 +812,12 @@ namespace CCity.ViewModel
                 _model.DeployFireTruck(_selectedField.X, _selectedField.Y);
             }
         }
+
+        private void OnToggleLogbookCommand()
+        {
+            IsLogbookToggled = !IsLogbookToggled;
+        }
+
 
         public void ExitToMainMenu()
         {
