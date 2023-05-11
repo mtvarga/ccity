@@ -11,10 +11,8 @@ namespace CCity.Model
         private CitizenManager _citizenManager;
         private GlobalManager _globalManager;
 
-        private int _counter;
-        private int _monthCounter;
-
         DateTime _date;
+        DateTime _previousDate;
 
         #endregion
 
@@ -41,8 +39,6 @@ namespace CCity.Model
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
 
-            _counter = 0;
-            _monthCounter = 0;
             Speed = Speed.Normal;
 
             _date = DateTime.Now;
@@ -176,14 +172,8 @@ namespace CCity.Model
 
         public void TimerTick()
         {
-            _counter = Speed switch
-            {
-                Speed.Slow => _counter + 1,
-                Speed.Normal => _counter + 16,
-                Speed.Fast => _counter + 256,
-                _ => _counter
-            };
 
+            _previousDate = _date;
             _date = Speed switch
             {
                 Speed.Slow => _date.AddMinutes(10),
@@ -196,20 +186,9 @@ namespace CCity.Model
 
             Tick();
 
-            if (_counter / (double)4096 >= 1)
-            {
-                _monthCounter++;
-                _counter -= 4096;
-                
-                MonthlyTick();
-            }
-            
-            if (_monthCounter == 12)
-            {
-                _monthCounter = 0;
-                
-                YearlyTick();
-            }
+            if(_previousDate.Month != _date.Month) MonthlyTick();
+
+            if(_previousDate.Year != _date.Year) YearlyTick();
         }
 
         public void StartNewGame(string cityName, string mayorName)
@@ -220,8 +199,7 @@ namespace CCity.Model
             CityName = cityName;
             MayorName = mayorName;
 
-            _counter = 0;
-            _monthCounter = 0;
+            _date=DateTime.Now;
             Speed = Speed.Normal;
 
             NewGame?.Invoke(this, EventArgs.Empty);
