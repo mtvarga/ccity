@@ -91,9 +91,9 @@ internal class FireManager
     {
         var result = new List<Field>();
         
-        foreach (var fire in ActiveFires)
-        {
-            switch (fire.AssignedFireTruck)
+        foreach (var fire in ActiveFires.ToList())  // We need .ToList() because fire.Neutralize() and SpreadFire() will
+        {                                           // modify the iterated collection. Not the most efficient, but likely 
+            switch (fire.AssignedFireTruck)         // there will not be that many buildings burning at once.
             {
                 case null or { Active: true, Moving: true }:
                     // Damage the building if there is no assigned fire truck yet or it is still on its way
@@ -123,7 +123,6 @@ internal class FireManager
         return result;
     }
 
-    // This method requires the level data (fields, width, height) so that it can calculate the shortest roads
     internal FireTruck? DeployFireTruck(Fire fire)
     {
         // Find nearest fire truck
@@ -152,9 +151,9 @@ internal class FireManager
     {
         var result = new List<Field>();
 
-        foreach (var fireTruck in DeployedFireTrucks)
-        {
-            result.Add(fireTruck.Location);
+        foreach (var fireTruck in DeployedFireTrucks.ToList())  // We need .ToList() because we are modifying the iterated collection.
+        {                                                       // This is not the most efficient, but likely there won't be 
+            result.Add(fireTruck.Location);                     // thousands of fire trucks deployed at once.
             fireTruck.Update();
             
             if (!fireTruck.Deployed)
