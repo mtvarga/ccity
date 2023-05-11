@@ -5,6 +5,12 @@ namespace CCity.Model
 {
     public class MainModel
     {
+        #region Constants
+
+        internal const int TicksPerSecond = 4; 
+        
+        #endregion
+
         #region Fields
 
         private FieldManager _fieldManager;
@@ -96,7 +102,6 @@ namespace CCity.Model
             try
             {
                 _fieldManager.DeployFireTruck(x, y);
-                FireTruckMoved?.Invoke(this, new FieldEventArgs(new List<Field>()));
             }
             catch (Exception e)
             {
@@ -135,7 +140,7 @@ namespace CCity.Model
 
         public void ChangeSpeed(Speed speed)
         {
-            if (_fieldManager.FireEmergencyPresent)
+            if (_fieldManager.FirePresent)
                 return;
             
             Speed = speed;
@@ -187,7 +192,7 @@ namespace CCity.Model
 
         public (int[], List<Road>) GetFourRoadNeighbours(Road road) => _fieldManager.GetFourRoadNeighbours(road);
 
-        public List<Field> FireTruckLocations() => _fieldManager.FireTruckLocations();
+        public IEnumerable<Field> FireTruckLocations() => _fieldManager.FireTruckLocations();
         
         #endregion
 
@@ -203,13 +208,11 @@ namespace CCity.Model
             List<Field>? updatedFields = null;
             List<Field>? oldFireTruckLocations = null;
             
-            if (_fieldManager.FireEmergencyPresent)
-            {
-                if (_fieldManager.FireTrucksDeployed)
-                    oldFireTruckLocations = _fieldManager.UpdateFireTrucks();
+            if (_fieldManager.FireTrucksDeployed)
+                oldFireTruckLocations = _fieldManager.UpdateFireTrucks();
 
-                updatedFields = _fieldManager.UpdateBurningBuildings();
-            }
+            if (_fieldManager.FirePresent)
+                updatedFields = _fieldManager.UpdateFires();
 
             GameTicked?.Invoke(this, EventArgs.Empty);
             
@@ -258,7 +261,7 @@ namespace CCity.Model
             foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
             
-            var field = _fieldManager.IgniteRandomBuilding();
+            var field = _fieldManager.IgniteRandomFlammable();
 
             if (field != null)
             {
