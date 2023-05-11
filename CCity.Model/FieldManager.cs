@@ -19,8 +19,6 @@ namespace CCity.Model
         private const int ROOTX = WIDTH / 2;
         private const int ROOTY = HEIGHT - 1;
 
-        private const ushort FireSpreadThreshold = IFlammable.FlammableMaxHealth / 2;
-        
         #endregion
 
         #region Fields
@@ -36,21 +34,11 @@ namespace CCity.Model
         private List<CommercialZone> _commercialZones;
         private List<IndustrialZone> _industrialZones;
         
-        private List<FireDepartment> FireDepartments { get; }
-        
-        private HashSet<Placeable> Flammables { get; }
-        
-        private HashSet<Placeable> BurningBuildings { get; }
+        public bool FirePresent => FireManager.FirePresent;
 
-        public bool FireEmergencyPresent => BurningBuildings.Any();
+        public bool FireTrucksDeployed => FireManager.FireTrucksDeployed;
 
-        private List<Stack<Field>> FireTruckPaths { get; }
-        
-        private Dictionary<Field, Placeable> BuildingsBeingSaved { get; }
-        
-        private List<Field> SavedBuildings { get; }
-
-        public bool FireTrucksDeployed => FireTruckPaths.Any();
+        private FireManager FireManager { get; }
         
         private Spreader _publicitySpreader;
         private Spreader _electricitySpreader;
@@ -77,7 +65,7 @@ namespace CCity.Model
             _commercialZones = new();
             _industrialZones = new();
 
-            FireDepartments = new List<FireDepartment>();
+            FireManager = new FireManager(this);
             
             //starter public road
             Road starterRoad = new Road();
@@ -95,12 +83,6 @@ namespace CCity.Model
                 (s, t) => s.CouldGiveElectricityTo(t),
                 (p) => GetNeighbours(p)
                 );
-
-            Flammables = new HashSet<Placeable>();
-            BurningBuildings = new HashSet<Placeable>();
-            BuildingsBeingSaved = new Dictionary<Field, Placeable>();
-            SavedBuildings = new List<Field>();
-            FireTruckPaths = new List<Stack<Field>>();
         }
 
         #endregion
@@ -147,137 +129,46 @@ namespace CCity.Model
 
             if (Fields[x, y].Placeable is null or not IFlammable { Burning: false })
                 throw new Exception("IGNITE_BUILDING-BAD_FIELD");
-            
-            Ignite(Fields[x, y].Placeable!);
-            return Fields[x, y];
-        }
-        
-        public Field? IgniteRandomBuilding()
-        {
-            var random = new Random(DateTime.Now.Millisecond);
-            
-            foreach (var placeable in Flammables)
-            {
-                if (placeable is not IFlammable flammable) 
-                    throw new Exception("Internal inconsistency: FieldManager is tracking a non-flammable Placeable as flammable");
 
-                if (random.Next(0, 100) > flammable.Potential) 
-                    continue;
-                
-                // For now, only 1 building will be ignited at once
-                Ignite(placeable);
-                return placeable.Owner;
-            }
-
-            return null;
+            return Fire.BreakOut(FireManager, Fields[x, y].Placeable!).Location;
         }
 
-        public List<Field> UpdateBurningBuildings()
-        {
-            var result = new List<Field>();
-            result.AddRange(SavedBuildings);
-            SavedBuildings.Clear();
-            
-            foreach (var placeable in BurningBuildings)
-            {
-                if (placeable is not IFlammable { Burning: true } flammable)
-                    throw new Exception("Internal inconsistency: FieldManager is tracking a non-flammable Placeable or a flammable that is not burning as a burning building");
+        public Field? IgniteRandomFlammable() => FireManager.IgniteRandomFlammable();
 
-                var oldHealth = flammable.Health;
-                
-                Damage(placeable);
-
-                if (oldHealth > FireSpreadThreshold && flammable.Health < FireSpreadThreshold)
-                    result.AddRange(SpreadFire(placeable));
-
-                if (flammable.Health > 0)
-                    result.Add(placeable.Owner!);
-                else
-                {
-                    // TODO: Destroy the placeable that is burning
-                    // For this, we must adjust how the Demolish() method works
-                }
-            }
-
-            return result;
-        }
+        public List<Field> UpdateFires() => FireManager.UpdateFires();
 
         public void DeployFireTruck(int x, int y)
         {
-            if (!FireEmergencyPresent)
+            if (!FirePresent)
                 throw new Exception("DEPLOY_FIRE_TRUCK-NO_FIRE");
             
             if (!OnMap(x, y)) 
                 throw new Exception("DEPLOY_FIRE_TRUCK-OUT_OF_FIELD_BOUNDS");
 
             var placeable = Fields[x, y].Placeable;
+            Fire? fire;
             
-            if (placeable is not IFlammable { Burning: true })
+            if (placeable == null || (fire = FireManager.Fire(placeable)) == null)
                 throw new Exception("DEPLOY_FIRE_TRUCK-BAD_BUILDING");
-            
-            var closestFireDepartment = NearestAvailableFireDepartment(placeable);
 
-            if (closestFireDepartment == null)
+            if (FireManager.DeployFireTruck(fire) == null)
                 throw new Exception("DEPLOY_FIRE_TRUCK-NONE_AVAILABLE");
-            
-            // TODO: Find the shortest path from the fire department to the fire
-            // However we find this, it should return a queue of Fields which encode the path the fire truck should take
-
-            var shortestRoad = Utilities.ShortestRoad(Fields, Width, Height, closestFireDepartment, Fields[x, y]);
-
-            if (!shortestRoad.Any() || closestFireDepartment.Placeable is not FireDepartment fireDepartment) 
-                return;
-            
-            FireTruckPaths.Add(shortestRoad);
-            fireDepartment.AvailableFireTrucks--;
         }
 
         // NOTE: This method returns the old locations (aka. the location of the fire trucks in the previous tick) of all the fire trucks
         public List<Field> UpdateFireTrucks()
         {
-            if (!FireEmergencyPresent)
-                throw new Exception("Internal inconsistency: Attempted to update fire truck locations when there is no fire emergency present");
-            
             if (!FireTrucksDeployed)
-                throw new Exception("Internal inconsistency: Attempted to update fire truck locations when there have been no fire trucks deployed yet");
+                throw new Exception("Internal inconsistency: Attempted to update fire truck locations when there are no fire trucks deployed");
 
-            var result = new List<Field>();
-            
-            foreach (var path in FireTruckPaths)
-            {
-                var oldLocation = path.Pop();
-
-                if (path.Any() && path.Peek().Placeable is not Road and { } placeable)
-                {
-                    // The fire truck is standing next to the burning building
-                    path.Pop();
-                        
-                    // Start saving the building
-                    BuildingsBeingSaved.Add(oldLocation, placeable);
-                        
-                    // TEMPORARY SOLUTION:
-                    // Add the last road 8 times so that the fire truck will stand next to the building for 2 secs
-                    for (var i = 0; i < 8; i++)
-                        path.Push(oldLocation);
-                }
-                else if (!path.Any())
-                {
-                    PutOut(BuildingsBeingSaved[oldLocation]);
-                    BuildingsBeingSaved.Remove(oldLocation);
-                }
-                    
-                result.Add(oldLocation);
-            }
-
-            FireTruckPaths.RemoveAll(p => !p.Any());
-
-            return result;
+            return FireManager.UpdateFireTrucks();
         }
 
         public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.FindAll(zone => !zone.Full || showUnavailable);
         public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.FindAll(zone => !zone.Full || showUnavailable);
         public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.FindAll(zone => !zone.Full || showUnavailable);
-        public List<Field> FireTruckLocations() => FireTruckPaths.Select(q => q.Peek()).ToList();
+        
+        public IEnumerable<Field> FireTruckLocations() => FireManager.FireTruckLocations();
         
         #endregion
 
@@ -330,7 +221,7 @@ namespace CCity.Model
                 case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.RemoveAll(e => e == residentialZone); break;
                 case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.RemoveAll(e => e == commercialZone); break;
                 case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.RemoveAll(e => e == industrialZone); break;
-                case FireDepartment fireDepartment: if (add) FireDepartments.Add(fireDepartment); else FireDepartments.RemoveAll(fd => fd == fireDepartment);
+                case FireDepartment fireDepartment: if (add) FireManager.AddFireDepartment(fireDepartment); else FireManager.RemoveFireDepartment(fireDepartment);
                     break;
                 default: break;
             }
@@ -338,11 +229,11 @@ namespace CCity.Model
             if (placeable is IFlammable flammable)
             {
                 if (add)
-                    Flammables.Add(placeable);
+                    FireManager.AddFlammable(placeable);
                 else if (flammable.Burning)
                     throw new Exception("Internal inconsistency: Attempted to remove remove tracking of flammable that is currently burning");
                 else
-                    Flammables.Remove(placeable);
+                    FireManager.RemoveFlammable(placeable);
             }
         }
 
@@ -444,6 +335,8 @@ namespace CCity.Model
                     }
                     Place(field.X, field.Y, road);
                     break;
+                case FireDepartment fireDepartment:
+                    return !fireDepartment.FireTruckDeployed;
             }
             return true;
         }
@@ -495,76 +388,6 @@ namespace CCity.Model
 
         #endregion
 
-        #region Fire Related
-
-        private void Ignite(Placeable placeable)
-        {
-            if (placeable is not IFlammable flammable)
-                throw new Exception("Internal inconsistency: Attempted to ignite a non-flammable Placeable");
-            
-            flammable.Burning = true;
-            flammable.Health = IFlammable.FlammableMaxHealth; // Reset the building's health upon ignition
-            
-            BurningBuildings.Add(placeable);
-        }
-
-        private void PutOut(Placeable placeable)
-        {
-            if (placeable is not IFlammable flammable)
-                throw new Exception("Internal inconsistency: Attempted to put out fire on a non-flammable Placeable");
-            
-            flammable.Burning = false;
-            
-            BurningBuildings.Remove(placeable);
-            SavedBuildings.Add(placeable.Owner!);
-        }
-
-        private void Damage(Placeable placeable)
-        {
-            if (placeable is not IFlammable { Burning: true } flammable)
-                throw new Exception("Internal inconsistency: Attempted to take fire damage on a non-flammable Placeable or on a flammable that is not burning");
-
-            // In one tick, the building takes 0.25% damage
-            // This way:
-            //  - the building takes 1% damage in 1 second
-            //  - the building is completely destroyed in 100 seconds
-            flammable.Health -= 1;
-
-            if (flammable.Health <= 0)
-                BurningBuildings.Remove(placeable);
-        }
-
-        private List<Field> SpreadFire(Placeable placeable)
-        {
-            if (placeable is not IFlammable { Burning: true, Health: < FireSpreadThreshold })
-                throw new Exception("Internal inconsistency: Attempted to spread fire from a non-flammable Placeable or on a flammable that isn't burning or its health is not low enough in order for the fire to spread");
-
-            var flammableNeighbors = GetNeighbours(placeable).Where(p => p is IFlammable).ToList();
-
-            foreach (var neighbor in flammableNeighbors)
-                Ignite(neighbor);
-
-            return flammableNeighbors.Select(p => p.Owner!).ToList();
-        }
-
-        private Field? NearestAvailableFireDepartment(Placeable p)
-        {
-            var nearestFireDepartment = FireDepartments.FirstOrDefault();
-            var smallestDistance = Utilities.AbsoluteDistance(p, nearestFireDepartment);
-            
-            foreach (var fireDepartment in FireDepartments)
-            {
-                var currentDistance = Utilities.AbsoluteDistance(p, fireDepartment);
-
-                if (fireDepartment.AvailableFireTrucks > 0 && currentDistance < smallestDistance)
-                    (nearestFireDepartment, smallestDistance) = (fireDepartment, currentDistance);
-            }
-
-            return nearestFireDepartment?.Owner;
-        }
-        
-        #endregion
-        
         #region Helpers
 
         private bool OnMap(int x, int y)
@@ -597,7 +420,7 @@ namespace CCity.Model
             return placeables;
         }
 
-        private List<Placeable> GetNeighbours(Placeable placeable)
+        internal List<Placeable> GetNeighbours(Placeable placeable)
         {
             List<Placeable> result = GetNeighboursBySide(placeable, 0)
                 .Concat(GetNeighboursBySide(placeable, 1))
