@@ -27,6 +27,7 @@ namespace CCity.Model
         public Speed Speed { get; private set; }
         public double Satisfaction { get => _globalManager.TotalSatisfaction; }
         public int Population { get => _citizenManager.Population; }
+        public LinkedList<ITransaction> Logbook { get => _globalManager.Logbook; }
         public int Width { get => _fieldManager.Width; }
         public int Height { get => _fieldManager.Height; }
         #endregion

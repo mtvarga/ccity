@@ -14,11 +14,12 @@ public static class Transactions
         {
             Amount = unchecked((uint)(Math.Round(ResTaxNorm * tax))),
             TaxType = taxType,
+            Placeable = new ResidentialZone()
         };
     }
     public static TaxTransaction WorkplaceTaxCollection(TaxType taxType,double tax,int citizenCount)
     {
-       
+
         return new TaxTransaction
         {
             TaxType = taxType,
@@ -27,6 +28,12 @@ public static class Transactions
                 TaxType.Commercial => unchecked((uint)(Math.Round(ComTaxNorm * tax * citizenCount))),
                 TaxType.Industrial => unchecked((uint)(Math.Round(IndTaxNorm * tax * citizenCount))),
                 _ => 0
+            },
+            Placeable = taxType switch
+            {
+                TaxType.Commercial => new CommercialZone(),
+                TaxType.Industrial => new IndustrialZone(),
+                _ => throw new ArgumentException()
             }
         };
     }
