@@ -159,13 +159,13 @@
                         throw new Exception("Wrong tax type");
                 }
             }
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = residentialTaxes,TaxType = TaxType.Residental});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = residentialTaxes,TaxType = TaxType.Residental, Placeable = new ResidentialZone()});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = commercialTaxes,TaxType = TaxType.Commercial});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = commercialTaxes,TaxType = TaxType.Commercial, Placeable = new CommercialZone()});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = industrialTaxes,TaxType = TaxType.Industrial});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = industrialTaxes,TaxType = TaxType.Industrial, Placeable = new IndustrialZone()});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
         }
