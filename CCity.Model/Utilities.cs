@@ -55,7 +55,7 @@ namespace CCity.Model
         public static int AbsoluteDistance(Field? f1, Field? f2) => (f1, f2) switch
         {
             (not null, not null) =>  AbsoluteDistance(f1.X, f1.Y, f2.X, f2.Y),
-            _ => 0
+            _ => int.MaxValue
         };
 
         public static int AbsoluteDistance(int x1, int y1, int x2, int y2) => Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
@@ -74,9 +74,9 @@ namespace CCity.Model
 
         // NOTE: The first item in this queue is the road next to the field and the last item in this queue is the field which we must get to
         // If the queue is empty, it means there is no road connecting the two fields
-        public static Stack<Field> ShortestRoad(Field[,] fields, int width, int height, Field f1, Field f2)
+        public static LinkedList<Field> ShortestRoad(Field[,] fields, int width, int height, Field f1, Field f2)
         {
-            var result = new Stack<Field>();
+            var result = new LinkedList<Field>();
             
             // Dijkstra's algorithm to find the shortest road
             var nodes = new FieldNode[width, height];
@@ -91,16 +91,15 @@ namespace CCity.Model
                 d[i, j] = float.PositiveInfinity;
                 pi[i, j] = null;
 
-                if (i == f1.X && j == f1.Y) 
-                    continue;
-                
                 nodes[i, j] = new FieldNode(fields[i, j]);
                 q.Enqueue(nodes[i, j], d[i, j]);
             }
-            
-            var u = f1;
-            d[u.X, u.Y] = 0;
 
+            d[f1.X, f1.Y] = 0;
+            q.UpdatePriority(nodes[f1.X, f1.Y], d[f1.X, f1.Y]);
+
+            var u = q.Dequeue().Field;
+            
             while (d[u.X, u.Y] < float.PositiveInfinity && q.Any())
             {
                 if (u == f2)
@@ -135,13 +134,15 @@ namespace CCity.Model
                 u = q.Dequeue().Field;
             }
 
-            if (u != f2) 
+            if (u != f2)
                 return result;
-            
+
+            //u = pi[u.X, u.Y]!; // The road next to the target
+
             while (u != f1)
             {
-                result.Push(u);
-                u = pi[u.X, u.Y];
+                u = pi[u.X, u.Y]!;
+                result.AddFirst(u);
             }
 
             return result;
