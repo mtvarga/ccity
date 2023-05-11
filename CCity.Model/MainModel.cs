@@ -58,7 +58,8 @@ namespace CCity.Model
             {
                 List<Field>  effectedFields = _fieldManager.Place(x, y, placeable);
                 List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-                _globalManager.Pay(placeable.PlacementCost);
+                _globalManager.CommitTransaction(Transactions.Placement(placeable));
+                _globalManager.AddOnlyOneToLogbook(Transactions.Placement(placeable));
                 _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
                 BudgetChanged?.Invoke(this, EventArgs.Empty);
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
@@ -81,7 +82,8 @@ namespace CCity.Model
             {
                 (Placeable placeable, List<Field>  effectedFields) = _fieldManager.Demolish(x, y);
                 List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-                _globalManager.Pay(-(placeable.PlacementCost / 2));
+                _globalManager.CommitTransaction(Transactions.Takeback(placeable));
+                _globalManager.AddOnlyOneToLogbook(Transactions.Takeback(placeable));
                 _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
                 BudgetChanged?.Invoke(this, EventArgs.Empty);
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
@@ -102,7 +104,8 @@ namespace CCity.Model
             try
             {
                 (IUpgradeable upgradeable, int cost) = _fieldManager.Upgrade(x, y);
-                _globalManager.Pay(cost);
+                _globalManager.CommitTransaction(Transactions.Upgrade((Placeable)upgradeable,cost));
+                _globalManager.AddOnlyOneToLogbook(Transactions.Upgrade((Placeable)upgradeable,cost));
                 BudgetChanged?.Invoke(this, EventArgs.Empty);
                 FieldsUpdated?.Invoke(this, new FieldEventArgs(new List<Field>() { ((Placeable)upgradeable).Owner!}));
             }
@@ -311,7 +314,6 @@ namespace CCity.Model
 
             if (!newCitizens.Any()) 
                 return;
-            
             PopulationChanged?.Invoke(this, EventArgs.Empty);
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -322,16 +324,17 @@ namespace CCity.Model
                 .Concat(_fieldManager.IndustrialZones(true)).ToList();
             
             _globalManager.CollectTax(_fieldManager.ResidentialZones(true), workplaceZones);
-            
+            var allTransactions = new List<ITransaction>();
             for (int i = 0; i < _fieldManager.Width; i++)
             for (int j = 0; j < _fieldManager.Height; j++)
             {
-                if (_fieldManager.Fields[i, j].Placeable is { } placeable)
+                if (_fieldManager.Fields[i, j].ActualPlaceable is { } placeable && placeable.MaintenanceCost>0)
                 {
-                    _globalManager.Pay(placeable.MaintenanceCost);
+                    allTransactions.Add(
+                    _globalManager.CommitTransaction(Transactions.Maintance(placeable)));
                 }
             }
-            
+            _globalManager.AddMaintenanceToLogbook(allTransactions);
             BudgetChanged?.Invoke(this, EventArgs.Empty);
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
