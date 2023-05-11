@@ -52,6 +52,8 @@ namespace CCity.Model
         public bool Empty => Count == 0;
 
         public bool BelowHalfPopulation => Count * 2 < Capacity;
+        public double DesireToMoveIn { get; set; }
+        public double DistanceEffect { get; set; }
 
         #endregion
 
