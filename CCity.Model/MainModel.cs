@@ -280,7 +280,7 @@ namespace CCity.Model
             
             if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
             {
-                newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
+                newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones,Satisfaction);
                     
                 if (newCitizens.Any())
                     _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
