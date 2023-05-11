@@ -87,9 +87,9 @@ internal class FireManager
         return null;
     }
     
-    internal List<Field> UpdateFires()
+    internal (List<Field> Updated, List<Field> Wrecked) UpdateFires()
     {
-        var result = new List<Field>();
+        (List<Field> Updated, List<Field> Wrecked) result = (new List<Field>(), new List<Field>());
         
         foreach (var fire in ActiveFires.ToList())  // We need .ToList() because fire.Neutralize() and SpreadFire() will
         {                                           // modify the iterated collection. Not the most efficient, but likely 
@@ -102,7 +102,7 @@ internal class FireManager
                     fire.Damage();
 
                     if (oldHealth > FireSpreadThreshold && fire.Flammable.Health <= FireSpreadThreshold)
-                        result.AddRange(SpreadFire(fire));
+                        result.Updated.AddRange(SpreadFire(fire));
 
                     if (fire is { AssignedFireTruck: not null, Flammable.Health: <= 0 })
                         // Cancel the fire truck's deployment if the fire burned down the building before it could arrive
@@ -114,10 +114,7 @@ internal class FireManager
                     break;
             }
 
-            if (fire.Flammable.Health > 0)
-                result.Add(fire.Location);
-            else
-                result.AddRange(FieldManager.Demolish(fire.Location.X, fire.Location.Y).Item2);
+            (fire.Flammable.Health > 0 ? result.Updated : result.Wrecked).Add(fire.Location);
         }
 
         return result;

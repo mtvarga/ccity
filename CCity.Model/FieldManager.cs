@@ -135,7 +135,7 @@ namespace CCity.Model
 
         public Field? IgniteRandomFlammable() => FireManager.IgniteRandomFlammable();
 
-        public List<Field> UpdateFires() => FireManager.UpdateFires();
+        public (List<Field> Updated, List<Field> Wrecked) UpdateFires() => FireManager.UpdateFires();
 
         public void DeployFireTruck(int x, int y)
         {

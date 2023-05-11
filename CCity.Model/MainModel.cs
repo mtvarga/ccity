@@ -206,21 +206,47 @@ namespace CCity.Model
         private void Tick()
         {
             List<Field>? updatedFields = null;
+            List<Field>? wreckedFields = null;
             List<Field>? oldFireTruckLocations = null;
             
             if (_fieldManager.FireTrucksDeployed)
                 oldFireTruckLocations = _fieldManager.UpdateFireTrucks();
 
             if (_fieldManager.FirePresent)
-                updatedFields = _fieldManager.UpdateFires();
+            {
+                (updatedFields, wreckedFields) = _fieldManager.UpdateFires();
+
+                if (wreckedFields.Any())
+                {
+                    var citizens = wreckedFields
+                        .Where(f => f.Placeable is Zone)
+                        .SelectMany(f => (f.Placeable as Zone)!.Citizens).ToList();
+
+                    // Move out citizens of the effected fields
+                    updatedFields.AddRange(_citizenManager.DecreasePopulation(citizens));
+                    _globalManager.UpdateSatisfaction(false, citizens, _citizenManager.Citizens);
+                    
+                    // Demolish the fields
+                    foreach (var field in wreckedFields)
+                        updatedFields.AddRange(_fieldManager.Demolish(field.X, field.Y).Item2);
+                    
+                    _globalManager.UpdateSatisfaction(Enumerable.Empty<Zone>(), _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+                }
+            }
 
             GameTicked?.Invoke(this, EventArgs.Empty);
-            
+
             if (updatedFields != null)
                 FieldsUpdated?.Invoke(this, new FieldEventArgs(updatedFields));
 
             if (oldFireTruckLocations != null)
                 FireTruckMoved?.Invoke(this, new FieldEventArgs(oldFireTruckLocations));
+
+            if (wreckedFields == null) 
+                return;
+            
+            PopulationChanged?.Invoke(this, EventArgs.Empty);
+            SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void MonthlyTick()

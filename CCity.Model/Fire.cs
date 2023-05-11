@@ -35,10 +35,10 @@ internal class Fire
         Manager.RemoveFire(this);
     }
 
-    internal static Fire BreakOut(FireManager manager, Placeable placeable)
+    internal static Fire? BreakOut(FireManager manager, Placeable placeable)
     {
-        if (placeable is not IFlammable { Burning: false } flammable)
-            throw new Exception("Internal inconsistency: Attempted to ignite a non-flammable Placeable or a flammable that is already on fire");
+        if (placeable is not IFlammable { Burning: false, Health: > 0 } flammable)
+            return null;
             
         flammable.Burning = true;
         flammable.Health = IFlammable.FlammableMaxHealth; // Reset the building's health upon ignition
