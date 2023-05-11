@@ -50,10 +50,8 @@ namespace CCity.ViewModel
         public int IndustrialTax { get => PercentToInt(_model.Taxes.IndustrialTax); }
         public bool IsFieldSelected { get => _selectedField != null; }
         public string SelectedFieldName { get => IsFieldSelected ? GetPlaceableName(_selectedField!.Placeable) : ""; }
-        //public int SelectedFieldHealth { get; }
-        //public string SelectedFieldIsOnFire { get; }
-        //public string SelectedFieldIsUpgradeable { get; }
-        //public int SelectedFieldUpgradeCost { get; }
+        public bool SelectedFieldIsUpgradeable { get => IsFieldSelected && _selectedField!.Placeable is IUpgradeable && ((IUpgradeable)(_selectedField!.Placeable)!).CanUpgrade; }
+        public int SelectedFieldUpgradeCost { get => SelectedFieldIsUpgradeable ? ((IUpgradeable)(_selectedField!.Placeable)!).NextUpgradeCost : 0; }
         public int SelectedFieldPoliceDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.PoliceDepartmentEffect) : 0; }
         public int SelectedFieldFireDepartmentEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.FireDepartmentEffect) : 0; }
         public int SelectedFieldStadiumEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.StadiumEffect) : 0; }
@@ -61,10 +59,13 @@ namespace CCity.ViewModel
         public int SelectedFieldForestEffect { get => IsFieldSelected ? PercentToInt(_selectedField!.ForestEffect) : 0; }
         public int SelectedFieldSatisfaction { get => SelectedFieldIsZone ? PercentToInt(_model.ZoneSatisfaction((Zone)_selectedField!.Placeable!)) : 0; }
         public int SelectedFieldPopulation { get => SelectedFieldIsZone ? ((Zone)_selectedField!.Placeable!).Count : 0; }
+        public int SelectedFieldCapacity { get => SelectedFieldIsZone ? ((Zone)_selectedField!.Placeable!).Capacity : 0; }
         public bool SelectedFieldIsZone { get => IsFieldSelected && _selectedField!.Placeable is Zone; }
         public int SelectedFieldCurrentElectricity { get => IsFieldSelected && _selectedField!.HasPlaceable ? _selectedField.Placeable!.CurrentSpreadValue[SpreadType.Electricity] : 0; }
         public int SelectedFieldNeededElectricity { get => IsFieldSelected && _selectedField!.HasPlaceable ? _selectedField.Placeable!.MaxSpreadValue[SpreadType.Electricity]() : 0; }
-        public bool SelectedFieldIsIncinerated { get => IsFieldSelected && _selectedField!.HasPlaceable && _selectedField!.Placeable is IFlammable && ((IFlammable)_selectedField!.Placeable!).Burning; }
+        public bool SelectedFieldIsIncinerated { get => SelectedFieldIsFlammable && ((IFlammable)_selectedField!.Placeable!).Burning; }
+        public bool SelectedFieldIsFlammable { get => IsFieldSelected && _selectedField!.HasPlaceable && _selectedField!.Placeable is IFlammable; }
+        public int SelectedFieldHealth { get => SelectedFieldIsFlammable ? PercentToInt(((IFlammable)_selectedField!.Placeable!).Health / (double)IFlammable.FlammableMaxHealth) : 0; }
         //public string SelectedFieldCitizenName { get; }
         public int Width { get => _model.Width; }
         public int Height { get => _model.Height; }
@@ -181,7 +182,7 @@ namespace CCity.ViewModel
         
         //TO DO
         public DelegateCommand SendFiretruckToSelectedFieldCommand { get; private set; }
-        public DelegateCommand UpgradeCommand { get; private set; }
+        public DelegateCommand UpgradeSelectedFieldCommand { get; private set; }
         public DelegateCommand ChangeMinimapSizeCommand { get; private set; }
         public DelegateCommand CloseSelectedFieldWindowCommand { get; private set; }
         public DelegateCommand StartNewGameCommand { get; private set; }
@@ -196,6 +197,7 @@ namespace CCity.ViewModel
         {
             _model = model;
             _model.FieldsUpdated += Model_FieldUpdated;
+            _model.GameTicked += Model_GameTicked;
             _model.ErrorOccured += Model_ErrorOccured;
             _model.TaxChanged += Model_TaxChanged;
             _model.SatisfactionChanged += Model_SatisfactionChanged;
@@ -222,6 +224,7 @@ namespace CCity.ViewModel
             ToggleElectricityCommand = new DelegateCommand(param => OnToggleElecticity());
             ChangeMinimapSizeCommand = new DelegateCommand(param => OnChangeMinimapSize());
             ChangeSpeedCommand = new DelegateCommand(param => OnChangeSpeedCommand(int.Parse(param as string ?? string.Empty)));
+            UpgradeSelectedFieldCommand = new DelegateCommand(param => OnUpgradeCommand());
             SendFiretruckToSelectedFieldCommand = new DelegateCommand(param => OnSendFiretruckToSelectedFieldCommand());
 
             InputCityName = "";
@@ -329,7 +332,7 @@ namespace CCity.ViewModel
             byte opacity = 50;
             if(field.Placeable is Zone zone)
             {
-                if (!zone.Empty) opacity = 37;
+                if (!zone.Empty) opacity = 0;
                 switch (zone)
                 {
                     case ResidentialZone _: return Color.FromArgb(opacity, 0, 255, 0);
@@ -339,7 +342,7 @@ namespace CCity.ViewModel
                 }
             }
             
-            if (field.Placeable!.IsPublic && IsPublicityToggled) return Color.FromArgb(50, 22, 32, 255);
+            if (field.Placeable!.IsPublic && field.Placeable! is not Forest && field.Placeable! is not Pole && IsPublicityToggled) return Color.FromArgb(50, 22, 32, 255);
             if (field.Placeable!.IsElectrified && IsElectricityToggled) return Color.FromArgb(50, 255, 255, 32);
             else return Color.FromArgb(0, 0, 0, 0);
         }
@@ -515,12 +518,9 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(SelectedToolPlaceablePlacementCost));
             OnPropertyChanged(nameof(SelectedToolPlaceableMaintenanceCost));
         }
-
-        private void SelectField(int index)
+        
+        private void InvokeSelectedFieldRelatedPropertyChanges()
         {
-            (int x, int y) coord = GetCordinates(index);
-
-            _selectedField = _model.Fields[coord.x, coord.y];
             OnPropertyChanged(nameof(IsFieldSelected));
             OnPropertyChanged(nameof(SelectedFieldName));
             OnPropertyChanged(nameof(SelectedFieldPoliceDepartmentEffect));
@@ -528,13 +528,25 @@ namespace CCity.ViewModel
             OnPropertyChanged(nameof(SelectedFieldStadiumEffect));
             OnPropertyChanged(nameof(SelectedFieldIndustrialEffect));
             OnPropertyChanged(nameof(SelectedFieldPopulation));
+            OnPropertyChanged(nameof(SelectedFieldCapacity));
             OnPropertyChanged(nameof(SelectedFieldSatisfaction));
             OnPropertyChanged(nameof(SelectedFieldIsZone));
             OnPropertyChanged(nameof(SelectedFieldForestEffect));
             OnPropertyChanged(nameof(SelectedFieldIsIncinerated));
-
+            OnPropertyChanged(nameof(SelectedFieldIsFlammable));
+            OnPropertyChanged(nameof(SelectedFieldHealth));
+            OnPropertyChanged(nameof(SelectedFieldIsUpgradeable));
+            OnPropertyChanged(nameof(SelectedFieldUpgradeCost));
             OnPropertyChanged(nameof(SelectedFieldCurrentElectricity));
             OnPropertyChanged(nameof(SelectedFieldNeededElectricity));
+        }
+
+        private void SelectField(int index)
+        {
+            (int x, int y) coord = GetCordinates(index);
+
+            _selectedField = _model.Fields[coord.x, coord.y];
+            InvokeSelectedFieldRelatedPropertyChanges();
         }
         private int PercentToInt(double percent) => (int)Math.Floor(percent * 100);
 
@@ -570,7 +582,7 @@ namespace CCity.ViewModel
 
         private void Model_GameTicked(object? o, EventArgs e)
         {
-            //throw new NotImplementedException();
+            InvokeSelectedFieldRelatedPropertyChanges();
         }
 
         private void Model_PopulationChanged(object? o, EventArgs e)
@@ -727,6 +739,17 @@ namespace CCity.ViewModel
                 
                 _ => _model.Speed
             });
+        }
+
+        private void OnUpgradeCommand()
+        {
+            if (_selectedField != null)
+            {
+                _model.Upgrade(_selectedField.X, _selectedField.Y);
+                OnPropertyChanged(nameof(SelectedFieldIsUpgradeable));
+                OnPropertyChanged(nameof(SelectedFieldUpgradeCost));
+                OnPropertyChanged(nameof(SelectedFieldCapacity));
+            }
         }
 
         private void OnChangeMinimapSize()

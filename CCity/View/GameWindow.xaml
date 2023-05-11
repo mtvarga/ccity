@@ -440,15 +440,15 @@
                     </Button>
                     <Border Background="#CCC" CornerRadius="5" Margin="7">
                         <StackPanel Orientation="Vertical" Margin="5 10">
-                            <TextBlock FontWeight="Bold" Margin="0 5" HorizontalAlignment="Center" Text="{Binding SelectedToolPlaceableName}"/>
+                            <TextBlock FontWeight="Bold" FontSize="14" Margin="0 10" Text="{Binding SelectedToolPlaceableName}"/>
                             <StackPanel Orientation="Horizontal" Margin="0 1">
                                 <Label Margin="0" Padding="0" Content="Méret: "/>
                                 <Label Margin="0" Padding="0" Content="{Binding SelectedToolPlaceableWidth}"/>
                                 <Label Margin="0" Padding="0" Content="×"/>
                                 <Label Margin="0" Padding="0" Content="{Binding SelectedToolPlaceableHeight}"/>
                             </StackPanel>
-                            <TextBlock Margin="0 1" Text="{Binding SelectedToolPlaceablePlacementCost, StringFormat='Lehelyezés: {0} emeráld'}"/>
-                            <TextBlock Margin="0 1" Text="{Binding SelectedToolPlaceableMaintenanceCost, StringFormat='Fenntartás: {0} emeráld/év'}"/>
+                            <TextBlock Margin="0 1" Text="{Binding SelectedToolPlaceablePlacementCost, StringFormat='Lehelyezés: {0} 💎'}"/>
+                            <TextBlock Margin="0 1" Text="{Binding SelectedToolPlaceableMaintenanceCost, StringFormat='Fenntartás: {0} 💎 / év'}"/>
                         </StackPanel>
                         <Border.Style>
                             <Style TargetType="Border">
@@ -479,9 +479,15 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <TextBlock Margin="5" FontWeight="Bold" FontSize="14" Text="{Binding SelectedFieldName}"/>
-                            <StackPanel Orientation="Vertical" Margin="5 10 5 0">
-                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldPopulation, StringFormat='Polgárok: {0} fő'}"/>
+                            <TextBlock Margin="5 0 5 10" FontWeight="Bold" FontSize="14" Text="{Binding SelectedFieldName}"/>
+                            <StackPanel Orientation="Vertical" Margin="5 0">
+                                <StackPanel Margin="0 2" Orientation="Horizontal">
+                                    <Label Margin="0" Padding="0" Content="Polgárok: "/>
+                                    <Label Margin="0" Padding="0" Content="{Binding SelectedFieldPopulation}"/>
+                                    <Label Margin="0" Padding="0" Content=" / "/>
+                                    <Label Margin="0" Padding="0" Content="{Binding SelectedFieldCapacity}"/>
+                                    <Label Margin="0" Padding="0" Content=" fő"/>
+                                </StackPanel>
                                 <TextBlock Margin="0 2" Text="{Binding SelectedFieldSatisfaction, StringFormat='Elégedettség: {0}%'}"/>
                                 <StackPanel.Style>
                                     <Style TargetType="StackPanel">
@@ -493,30 +499,82 @@
                                     </Style>
                                 </StackPanel.Style>
                             </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="5 5 5 10">
+                            <StackPanel Orientation="Vertical" Margin="5 0">
                                 <TextBlock Margin="0 2" Text="{Binding SelectedFieldPoliceDepartmentEffect, StringFormat='Rendőrség effekt: {0}%'}"/>
                                 <TextBlock Margin="0 2" Text="{Binding SelectedFieldFireDepartmentEffect, StringFormat='Tűzoltóság effekt: {0}%'}"/>
                                 <TextBlock Margin="0 2" Text="{Binding SelectedFieldStadiumEffect, StringFormat='Stadion effekt: {0}%'}"/>
                                 <TextBlock Margin="0 2" Text="{Binding SelectedFieldIndustrialEffect, StringFormat='Ipari zóna effekt: {0}%'}"/>
                                 <TextBlock Margin="0 2" Text="{Binding SelectedFieldForestEffect, StringFormat='Erdő effekt: {0}%'}"/>
-                                <TextBlock Margin="0 2">
-                                    <Run Text="Áramellátás: "/>
-                                    <Run Text="{Binding SelectedFieldCurrentElectricity, Mode=OneWay}"/>
-                                    <Run Text="/"/>
-                                    <Run Text="{Binding SelectedFieldNeededElectricity, Mode=OneWay}"/>
+                                <StackPanel Margin="0 2" Orientation="Horizontal">
+                                    <Label Margin="0" Padding="0" Content="Áramellátás: "/>
+                                    <Label Margin="0" Padding="0" Content="{Binding SelectedFieldCurrentElectricity}"/>
+                                    <Label Margin="0" Padding="0" Content=" / "/>
+                                    <Label Margin="0" Padding="0" Content="{Binding SelectedFieldNeededElectricity}"/>
+                                </StackPanel>
+                                <TextBlock Margin="0 2" Text="{Binding SelectedFieldHealth, StringFormat='Állapot: {0}%'}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedFieldIsFlammable}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
                                 </TextBlock>
                             </StackPanel>
-                            <StackPanel Orientation="Vertical" Margin="5 5 5 10">
-                                <Button Command="{Binding SendFiretruckToSelectedFieldCommand}" Height="24">Tűzoltófecskendő</Button>
-                                <StackPanel.Style>
-                                    <Style TargetType="StackPanel">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedFieldIsIncinerated}" Value="False">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </StackPanel.Style>
+                            <StackPanel Orientation="Vertical" Margin="0 5">
+                                <Button Command="{Binding UpgradeSelectedFieldCommand}" Margin="5 2" Height="24">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label Margin="0" Padding="0" Content="Fejlesztés ("/>
+                                        <Label Margin="0" Padding="0" Content="{Binding SelectedFieldUpgradeCost}"/>
+                                        <Label Margin="0" Padding="0" Content="💎)"/>
+                                    </StackPanel>
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type Button}">
+                                                        <Border x:Name="border"
+                                                    Background="{StaticResource PrimaryColor}"
+                                                    BorderThickness="0"
+                                                    CornerRadius="3">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedFieldIsUpgradeable}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <Button Command="{Binding SendFiretruckToSelectedFieldCommand}" Height="24" Margin="5 2" Content="Tűzoltófecskendő">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type Button}">
+                                                        <Border x:Name="border"
+                                                    Background="{StaticResource PrimaryColor}"
+                                                    BorderThickness="0"
+                                                    CornerRadius="3">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedFieldIsIncinerated}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
                             </StackPanel>
                         </StackPanel>
                         <Border.Style>
