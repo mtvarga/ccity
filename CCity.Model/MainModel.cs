@@ -29,20 +29,22 @@ namespace CCity.Model
         public Field[,] Fields { get => _fieldManager.Fields; }
         public int Budget { get => _globalManager.Budget; }
         public Taxes Taxes { get => _globalManager.Taxes; }
-        public DateTime Date { get  => _date; }
+        public DateTime Date { get => _date; }
         public Speed Speed { get; private set; }
         public double Satisfaction { get => _globalManager.TotalSatisfaction; }
         public int Population { get => _citizenManager.Population; }
         public LinkedList<ITransaction> Logbook { get => _globalManager.Logbook; }
         public int Width { get => _fieldManager.Width; }
         public int Height { get => _fieldManager.Height; }
+        //for test
+        public GameErrorType LastErrorType { private set; get; }
         #endregion
 
         #region Constructors
 
-        public MainModel()
+        public MainModel(bool notTestMode=true)
         {
-            _fieldManager = new FieldManager();
+            _fieldManager = new FieldManager(notTestMode);
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
 
@@ -71,11 +73,13 @@ namespace CCity.Model
             }
             catch (GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+                LastErrorType = ex.ErrorType;
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
             catch(Exception)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
+                LastErrorType = GameErrorType.Unhandled;
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -94,11 +98,12 @@ namespace CCity.Model
             }
             catch(GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+                LastErrorType = ex.ErrorType;
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
             catch (Exception)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -127,6 +132,7 @@ namespace CCity.Model
             }
             catch (GameErrorException ex)
             {
+                LastErrorType = ex.ErrorType;
                 ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
             catch(Exception)
@@ -148,6 +154,7 @@ namespace CCity.Model
             }
             catch(GameErrorException ex)
             {
+                LastErrorType = ex.ErrorType;
                 ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
             catch (Exception)
@@ -347,7 +354,7 @@ namespace CCity.Model
         public event EventHandler<EventArgs>? GameTicked;
         public event EventHandler<FieldEventArgs>? FieldsUpdated;
         public event EventHandler<FieldEventArgs>? FireTruckMoved;
-        public event EventHandler<ErrorEventArgs> ErrorOccured;
+        public event EventHandler<ErrorEventArgs>? ErrorOccured;
         public event EventHandler<EventArgs>? PopulationChanged;
         public event EventHandler<EventArgs>? BudgetChanged;
         public event EventHandler<EventArgs>? SatisfactionChanged;
