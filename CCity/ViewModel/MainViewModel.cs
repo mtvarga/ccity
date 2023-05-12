@@ -599,6 +599,14 @@ namespace CCity.ViewModel
             _ => throw new ArgumentException()
         };
 
+        private Placeable GetPlaceableFromTaxType(TaxType taxType) => taxType switch
+        {
+            TaxType.Residental => new ResidentialZone(),
+            TaxType.Commercial => new CommercialZone(),
+            TaxType.Industrial => new IndustrialZone(),
+            _ => throw new ArgumentException()
+        };
+
         private TransactionItem GetTransactionItemFromITransaction(ITransaction transaction)
         {
             TransactionItem transactionItem = new TransactionItem { Amount = transaction.Amount, Add = transaction.Add };
@@ -608,7 +616,7 @@ namespace CCity.ViewModel
                     transactionItem.TransactionName = $"{GetPlaceableName(placeableTransaction.Placeable)} {GetPlaceableTransactionName(placeableTransaction.TransactionType)}";
                     break;
                 case TaxTransaction taxTransaction:
-                    transactionItem.TransactionName = $"{GetPlaceableName(taxTransaction.Placeable)} adó beszedés";
+                    transactionItem.TransactionName = $"{GetPlaceableName(GetPlaceableFromTaxType(taxTransaction.TaxType))} adó beszedés";
                     break;
             }
             return transactionItem;
