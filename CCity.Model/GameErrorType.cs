@@ -19,6 +19,7 @@ namespace CCity.Model
         DeployFireTruckOutOfFieldBounds,
         DeployFireTruckBadBuilding,
         DeployFireTruckNoneAvaiable,
+        DeployFireTruckAlreadyAssigned,
         Unhandled,
         UpgradeOutOfFieldBoundries,
         UpgradeNotUpgradeable

@@ -704,6 +704,7 @@ namespace CCity.ViewModel
                 case GameErrorType.DeployFireTruckOutOfFieldBounds: errorMessage = "Pályán kívüli mezőre nem küldhetsz tűzoltóautót."; break;
                 case GameErrorType.DeployFireTruckBadBuilding: errorMessage = "Az épület nem éghető.";break;
                 case GameErrorType.DeployFireTruckNoneAvaiable: errorMessage = "Nincs elérhető tűzoltóautó vagy nincs lehelyezve tűzoltóság.";break;
+                case GameErrorType.DeployFireTruckAlreadyAssigned: errorMessage = "Erre a helyre már ki lett rendelve tűzoltóautó."; break;
                 case GameErrorType.Unhandled: errorMessage = "Valami hiba történt."; break;
                 default: errorMessage = "Kezeletlen hiba."; break;
             }

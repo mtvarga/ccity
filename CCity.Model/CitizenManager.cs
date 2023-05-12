@@ -110,6 +110,24 @@ namespace CCity.Model
             return result;
         }
 
+        public List<Field> DecreasePopulation(List<Citizen> citizens)
+        {
+            var result = new List<Field>();
+
+            foreach (var citizen in citizens)
+            {
+                if (Citizens.Remove(citizen))
+                {
+                    result.Add(citizen.Home.Owner!);
+                    result.Add(citizen.Workplace?.Owner!);
+                }
+                
+                citizen.MoveOut();
+            }
+
+            return result;
+        }
+
         public List<Citizen> OptimizeWorkplaces(List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
         {
             var result = new List<Citizen>();

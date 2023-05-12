@@ -11,9 +11,7 @@ namespace CCity.Model
     {
         #region Constants
 
-        private const int effectRadius = 10;
-
-        private const int FireDeparmentInitialFireTruckCount = 1;
+        private const int effectRadius = 3;
 
         #endregion
 
@@ -26,10 +24,25 @@ namespace CCity.Model
 
         public override int NeededElectricity => 20;
 
-        public int AvailableFireTrucks { get; internal set; } = FireDeparmentInitialFireTruckCount;
+        public override Field? Owner
+        {
+            get => base.Owner;
+            
+            internal set
+            {
+                if (value != null)
+                    FireTruck = new FireTruck(value);
+                
+                base.Owner = value;
+            }
+        }
+        
+        public FireTruck FireTruck { get; private set; }
+
+        internal bool FireTruckDeployed => FireTruck.Active || FireTruck.Moving;
 
         #endregion
-
+        
         #region Public methods
 
         public override List<Field> Effect(Func<Placeable, bool, Action<Field, int>, int, List<Field>> spreadingFunction, bool add)

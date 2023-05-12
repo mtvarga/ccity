@@ -55,7 +55,7 @@ namespace CCity.Model
         public static int AbsoluteDistance(Field? f1, Field? f2) => (f1, f2) switch
         {
             (not null, not null) =>  AbsoluteDistance(f1.X, f1.Y, f2.X, f2.Y),
-            _ => 0
+            _ => int.MaxValue
         };
 
         public static int AbsoluteDistance(int x1, int y1, int x2, int y2) => Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
@@ -98,9 +98,9 @@ namespace CCity.Model
         }
         // NOTE: The first item in this queue is the road next to the field and the last item in this queue is the field which we must get to
         // If the queue is empty, it means there is no road connecting the two fields
-        public static Stack<Field> ShortestRoad(Field[,] fields, int width, int height, Field f1, Field f2)
+        public static LinkedList<Field> ShortestRoad(Field[,] fields, int width, int height, Field s, HashSet<Field> goals)
         {
-            var result = new Stack<Field>();
+            var result = new LinkedList<Field>();
             
             // Dijkstra's algorithm to find the shortest road
             var nodes = new FieldNode[width, height];
@@ -115,33 +115,32 @@ namespace CCity.Model
                 d[i, j] = float.PositiveInfinity;
                 pi[i, j] = null;
 
-                if (i == f1.X && j == f1.Y) 
-                    continue;
-                
                 nodes[i, j] = new FieldNode(fields[i, j]);
                 q.Enqueue(nodes[i, j], d[i, j]);
             }
-            
-            var u = f1;
-            d[u.X, u.Y] = 0;
 
+            d[s.X, s.Y] = 0;
+            q.UpdatePriority(nodes[s.X, s.Y], d[s.X, s.Y]);
+
+            var u = q.Dequeue().Field;
+            
             while (d[u.X, u.Y] < float.PositiveInfinity && q.Any())
             {
-                if (u == f2)
+                if (goals.Contains(u))
                     break;
                 
                 var neighbors = new List<FieldNode>();
 
-                if (u.X - 1 > 0 && (fields[u.X - 1, u.Y].Placeable is Road || fields[u.X - 1, u.Y] == f2))
+                if (u.X - 1 > 0 && (fields[u.X - 1, u.Y].Placeable is Road || goals.Contains(fields[u.X - 1, u.Y])))
                     neighbors.Add(nodes[u.X - 1, u.Y]);
 
-                if (u.Y - 1 > 0 && (fields[u.X, u.Y - 1].Placeable is Road || fields[u.X, u.Y - 1] == f2))
+                if (u.Y - 1 > 0 && (fields[u.X, u.Y - 1].Placeable is Road || goals.Contains(fields[u.X, u.Y - 1])))
                     neighbors.Add(nodes[u.X, u.Y - 1]);
 
-                if (u.X + 1 < width && (fields[u.X + 1, u.Y].Placeable is Road || fields[u.X + 1, u.Y] == f2))
+                if (u.X + 1 < width && (fields[u.X + 1, u.Y].Placeable is Road || goals.Contains(fields[u.X + 1, u.Y])))
                     neighbors.Add(nodes[u.X + 1, u.Y]);
 
-                if (u.Y + 1 < height && (fields[u.X, u.Y + 1].Placeable is Road || fields[u.X, u.Y + 1] == f2))
+                if (u.Y + 1 < height && (fields[u.X, u.Y + 1].Placeable is Road || goals.Contains(fields[u.X, u.Y + 1])))
                     neighbors.Add(nodes[u.X, u.Y + 1]);
 
                 foreach (var neighbor in neighbors)
@@ -159,13 +158,15 @@ namespace CCity.Model
                 u = q.Dequeue().Field;
             }
 
-            if (u != f2) 
+            if (!goals.Contains(u))
                 return result;
-            
-            while (u != f1)
+
+            //u = pi[u.X, u.Y]!; // The road next to the target
+
+            while (u != s)
             {
-                result.Push(u);
-                u = pi[u.X, u.Y];
+                u = pi[u.X, u.Y]!;
+                result.AddFirst(u);
             }
 
             return result;

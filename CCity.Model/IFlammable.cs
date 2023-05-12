@@ -10,7 +10,6 @@ namespace CCity.Model
     {
         #region Constants
 
-        // Public so ViewModel can access it and is able to show the health %
         public const ushort FlammableMaxHealth = 400;
         
         #endregion

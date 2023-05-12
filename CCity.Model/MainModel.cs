@@ -7,10 +7,13 @@ namespace CCity.Model
     {
         #region Constants
 
+        internal const int TicksPerSecond = 4;
+        
         private const double MinSatisfaction = 0.2;
         private const int MinPopulation = 15;
 
         #endregion
+        
         #region Fields
 
         private FieldManager _fieldManager;
@@ -128,7 +131,6 @@ namespace CCity.Model
             try
             {
                 _fieldManager.DeployFireTruck(x, y);
-                FireTruckMoved?.Invoke(this, new FieldEventArgs(new List<Field>()));
             }
             catch (GameErrorException ex)
             {
@@ -147,7 +149,7 @@ namespace CCity.Model
             
             try
             {
-                updatedFields = new List<Field> { _fieldManager.IgniteBuilding(x, y) };
+                updatedFields = _fieldManager.IgniteBuilding(x, y);
                 
                 // A building was set on fire
                 EngageFireEmergency();
@@ -177,7 +179,7 @@ namespace CCity.Model
 
         public void ChangeSpeed(Speed speed)
         {
-            if (_fieldManager.FireEmergencyPresent)
+            if (_fieldManager.FirePresent)
                 return;
             
             Speed = speed;
@@ -221,7 +223,7 @@ namespace CCity.Model
 
         public (int[], List<Road>) GetFourRoadNeighbours(Road road) => _fieldManager.GetFourRoadNeighbours(road);
 
-        public List<Field> FireTruckLocations() => _fieldManager.FireTruckLocations();
+        public IEnumerable<Field> FireTruckLocations() => _fieldManager.FireTruckLocations();
         
         #endregion
 
@@ -235,23 +237,47 @@ namespace CCity.Model
                 return;
             }
             List<Field>? updatedFields = null;
+            List<Field>? wreckedFields = null;
             List<Field>? oldFireTruckLocations = null;
             
-            if (_fieldManager.FireEmergencyPresent)
-            {
-                if (_fieldManager.FireTrucksDeployed)
-                    oldFireTruckLocations = _fieldManager.UpdateFireTrucks();
+            if (_fieldManager.FireTrucksDeployed)
+                oldFireTruckLocations = _fieldManager.UpdateFireTrucks();
 
-                updatedFields = _fieldManager.UpdateBurningBuildings();
+            if (_fieldManager.FirePresent)
+            {
+                (updatedFields, wreckedFields) = _fieldManager.UpdateFires();
+
+                if (wreckedFields.Any())
+                {
+                    var citizens = wreckedFields
+                        .Where(f => f.Placeable is Zone)
+                        .SelectMany(f => (f.Placeable as Zone)!.Citizens).ToList();
+
+                    // Move out citizens of the effected fields
+                    updatedFields.AddRange(_citizenManager.DecreasePopulation(citizens));
+                    _globalManager.UpdateSatisfaction(false, citizens, _citizenManager.Citizens);
+                    
+                    // Demolish the fields
+                    foreach (var field in wreckedFields)
+                        updatedFields.AddRange(_fieldManager.Demolish(field.X, field.Y).Item2);
+                    
+                    _globalManager.UpdateSatisfaction(Enumerable.Empty<Zone>(), _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+                }
             }
 
             GameTicked?.Invoke(this, EventArgs.Empty);
-            
+
             if (updatedFields != null)
                 FieldsUpdated?.Invoke(this, new FieldEventArgs(updatedFields));
 
             if (oldFireTruckLocations != null)
                 FireTruckMoved?.Invoke(this, new FieldEventArgs(oldFireTruckLocations));
+
+            if (wreckedFields == null) 
+                return;
+            
+            PopulationChanged?.Invoke(this, EventArgs.Empty);
+            SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void MonthlyTick()
@@ -304,13 +330,13 @@ namespace CCity.Model
             foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
             
-            var field = _fieldManager.IgniteRandomBuilding();
+            var ignitedFields = _fieldManager.IgniteRandomFlammable();
 
-            if (field != null)
+            if (ignitedFields.Any())
             {
                 // A building was set on fire
                 EngageFireEmergency();
-                fields.Add(field);
+                fields.AddRange(ignitedFields);
             }
             
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));

@@ -27,7 +27,7 @@ namespace CCity.Model
 
         public override int MaintenanceCost => 10;
 
-        byte IFlammable.Potential => PowerPlantPotential;
+        byte IFlammable.Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : PowerPlantPotential;
         
         bool IFlammable.Burning { get; set; }
 
