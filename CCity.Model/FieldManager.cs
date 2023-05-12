@@ -176,7 +176,7 @@ namespace CCity.Model
             return modifiedFields;
         }
 
-        public Field IgniteBuilding(int x, int y)
+        public List<Field> IgniteBuilding(int x, int y)
         {
             if (!OnMap(x, y))
                 throw new Exception("IGNITE_BUILDING-OUT_OF_FIELD_BOUNDS");
@@ -184,10 +184,18 @@ namespace CCity.Model
             if (Fields[x, y].Placeable is null or not IFlammable { Burning: false })
                 throw new Exception("IGNITE_BUILDING-BAD_FIELD");
 
-            return Fire.BreakOut(FireManager, Fields[x, y].Placeable!).Location;
+            var result = new List<Field>();
+            
+            var fireLocation = Fire.BreakOut(FireManager, Fields[x, y].Placeable!)!.Location;
+            result.Add(fireLocation);
+            
+            if (fireLocation.Placeable is IMultifield multifield)
+                result.AddRange(multifield.Occupies.Select(f => f.Owner!));
+            
+            return result;
         }
 
-        public Field? IgniteRandomFlammable() => FireManager.IgniteRandomFlammable();
+        public List<Field> IgniteRandomFlammable() => FireManager.IgniteRandomFlammable();
 
         public (List<Field> Updated, List<Field> Wrecked) UpdateFires() => FireManager.UpdateFires();
 

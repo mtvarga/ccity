@@ -140,7 +140,7 @@ namespace CCity.Model
             
             try
             {
-                updatedFields = new List<Field> { _fieldManager.IgniteBuilding(x, y) };
+                updatedFields = _fieldManager.IgniteBuilding(x, y);
                 
                 // A building was set on fire
                 EngageFireEmergency();
@@ -305,16 +305,16 @@ namespace CCity.Model
             foreach (Zone zone in _fieldManager.IndustrialZones(true)) affectedZones.Add(zone);
 
             //List fields will contain every zone's field
-            List<Field> fields = _fieldManager.UpdateModifiedZonesSpread(affectedZones);
+            var fields = _fieldManager.UpdateModifiedZonesSpread(affectedZones);
             fields = fields.Concat(_fieldManager.GrowForests()).ToList();
             
-            var field = _fieldManager.IgniteRandomFlammable();
+            var ignitedFields = _fieldManager.IgniteRandomFlammable();
 
-            if (field != null)
+            if (ignitedFields.Any())
             {
                 // A building was set on fire
                 EngageFireEmergency();
-                fields.Add(field);
+                fields.AddRange(ignitedFields);
             }
             
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));

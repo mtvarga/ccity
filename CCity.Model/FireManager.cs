@@ -73,18 +73,23 @@ internal class FireManager
 
     internal IEnumerable<Field> FireTruckLocations() => DeployedFireTrucks.Select(ft => ft.Location);
     
-    internal Field? IgniteRandomFlammable()
+    internal List<Field> IgniteRandomFlammable()
     {
+        var result = new List<Field>();
+        
         foreach (var placeable in Flammables)
         {
             if (Random.Next(0, 99) >= Convert.ToInt32(((IFlammable)placeable).Potential))
                 continue;
 
-            Model.Fire.BreakOut(this, placeable);
-            return placeable.Owner;
+            var fireLocation = Model.Fire.BreakOut(this, placeable)!.Location;
+            result.Add(fireLocation);
+            
+            if (fireLocation.Placeable is IMultifield multifield)
+                result.AddRange(multifield.Occupies.Select(f => f.Owner!));
         }
 
-        return null;
+        return result;
     }
     
     internal (List<Field> Updated, List<Field> Wrecked) UpdateFires()
@@ -115,6 +120,9 @@ internal class FireManager
             }
 
             (fire.Flammable.Health > 0 ? result.Updated : result.Wrecked).Add(fire.Location);
+            
+            if (fire.Flammable.Health > 0 && fire.Location.Placeable is IMultifield multifield)
+                result.Updated.AddRange(multifield.Occupies.Select(f => f.Owner!));
         }
 
         return result;
