@@ -145,8 +145,16 @@ namespace CCity
         private void Model_GameOver(object? sender, EventArgs e)
         {
             _timer.Stop();
-
-            MessageBox.Show("Vége a játéknak, túl sok elégedetlen polgár volt!", "C City", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            if (MessageBox.Show("Vége a játéknak, túl sok elégedetlen polgár volt!", "C City",    MessageBoxButton.OK, MessageBoxImage.Asterisk) == MessageBoxResult.OK)
+            {
+                _mainWindow.NavigateTo(_startupWindow);
+                _viewModel.ExitToMainMenu();
+            }
+            else
+            {
+                throw new Exception("Illegal game over state!");
+            }
+         
         }
 
         #endregion

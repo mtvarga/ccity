@@ -7,10 +7,13 @@ namespace CCity.Model
     {
         #region Constants
 
-        internal const int TicksPerSecond = 4; 
+        internal const int TicksPerSecond = 4;
         
-        #endregion
+        private const double MinSatisfaction = 0.2;
+        private const int MinPopulation = 15;
 
+        #endregion
+        
         #region Fields
 
         private FieldManager _fieldManager;
@@ -29,20 +32,22 @@ namespace CCity.Model
         public Field[,] Fields { get => _fieldManager.Fields; }
         public int Budget { get => _globalManager.Budget; }
         public Taxes Taxes { get => _globalManager.Taxes; }
-        public DateTime Date { get  => _date; }
+        public DateTime Date { get => _date; }
         public Speed Speed { get; private set; }
         public double Satisfaction { get => _globalManager.TotalSatisfaction; }
         public int Population { get => _citizenManager.Population; }
         public LinkedList<ITransaction> Logbook { get => _globalManager.Logbook; }
         public int Width { get => _fieldManager.Width; }
         public int Height { get => _fieldManager.Height; }
+        //for test
+        public GameErrorType LastErrorType { private set; get; }
         #endregion
 
         #region Constructors
 
-        public MainModel()
+        public MainModel(bool notTestMode=true)
         {
-            _fieldManager = new FieldManager();
+            _fieldManager = new FieldManager(notTestMode);
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
 
@@ -71,11 +76,13 @@ namespace CCity.Model
             }
             catch (GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+                LastErrorType = ex.ErrorType;
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
             catch(Exception)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
+                LastErrorType = GameErrorType.Unhandled;
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -94,11 +101,12 @@ namespace CCity.Model
             }
             catch(GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+                LastErrorType = ex.ErrorType;
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
             catch (Exception)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -126,6 +134,7 @@ namespace CCity.Model
             }
             catch (GameErrorException ex)
             {
+                LastErrorType = ex.ErrorType;
                 ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
             catch(Exception)
@@ -147,6 +156,7 @@ namespace CCity.Model
             }
             catch(GameErrorException ex)
             {
+                LastErrorType = ex.ErrorType;
                 ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
             catch (Exception)
@@ -221,6 +231,11 @@ namespace CCity.Model
         
         private void Tick()
         {
+            if (Satisfaction<MinSatisfaction && Population>MinPopulation || Satisfaction>MinSatisfaction && Population==0)
+            {
+                GameOver?.Invoke(this, EventArgs.Empty);
+                return;
+            }
             List<Field>? updatedFields = null;
             List<Field>? wreckedFields = null;
             List<Field>? oldFireTruckLocations = null;
@@ -271,6 +286,7 @@ namespace CCity.Model
             var vacantCommercialZones = _fieldManager.CommercialZones(false).Cast<WorkplaceZone>().ToList();
             var vacantIndustrialZones = _fieldManager.IndustrialZones(false).Cast<WorkplaceZone>().ToList();
 
+            var movedOutCitizens = new List<Citizen>();
             var newCitizens = new List<Citizen>();
             
             /*if (vacantCommercialZones.Any() || vacantIndustrialZones.Any())
@@ -288,25 +304,31 @@ namespace CCity.Model
                         _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
                 }
             }*/
-            
+            movedOutCitizens = _citizenManager.DecreasePopulation();
+            if (movedOutCitizens.Any())
+                _globalManager.UpdateSatisfaction(false, movedOutCitizens, _citizenManager.Citizens);
+
+            List<Field> fields = _fieldManager.UpdateModifiedZonesSpread();
+            List<Zone> zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+
             if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
             {
                 newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones,Satisfaction);
-                    
+
                 if (newCitizens.Any())
                     _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
             }
-            
-            List<Zone> affectedZones = new();
+
+            fields = fields.Concat(_fieldManager.UpdateModifiedZonesSpread()).ToList();
+            fields = fields.Concat(_fieldManager.GrowForests()).ToList();
+            zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
 
             // TODO: Optimize this - add only affected zones to the list
-            foreach (Zone zone in _fieldManager.ResidentialZones(true)) affectedZones.Add(zone);
-            foreach (Zone zone in _fieldManager.CommercialZones(true)) affectedZones.Add(zone);
-            foreach (Zone zone in _fieldManager.IndustrialZones(true)) affectedZones.Add(zone);
-
-            //List fields will contain every zone's field
-            var fields = _fieldManager.UpdateModifiedZonesSpread(affectedZones);
-            fields = fields.Concat(_fieldManager.GrowForests()).ToList();
+            foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
             
             var ignitedFields = _fieldManager.IgniteRandomFlammable();
 
@@ -318,10 +340,6 @@ namespace CCity.Model
             }
             
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
-
-
-            if (!newCitizens.Any()) 
-                return;
             PopulationChanged?.Invoke(this, EventArgs.Empty);
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -362,7 +380,7 @@ namespace CCity.Model
         public event EventHandler<EventArgs>? GameTicked;
         public event EventHandler<FieldEventArgs>? FieldsUpdated;
         public event EventHandler<FieldEventArgs>? FireTruckMoved;
-        public event EventHandler<ErrorEventArgs> ErrorOccured;
+        public event EventHandler<ErrorEventArgs>? ErrorOccured;
         public event EventHandler<EventArgs>? PopulationChanged;
         public event EventHandler<EventArgs>? BudgetChanged;
         public event EventHandler<EventArgs>? SatisfactionChanged;

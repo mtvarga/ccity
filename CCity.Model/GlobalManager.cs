@@ -39,12 +39,15 @@
         private const double DistanceRatio = 0.25;
 
         private const double HomePollutionRatio = 0.5;
-        private const double HomeStadiumRatio = 0.5;
-        
+        private const double HomeElectricityRatio = (double)1 / 3;
+        private const double HomeStadiumRatio = (double)1 / 6;
+
         private const double WorkplaceStadiumRatio = 1;
         
         private const double TaxRatio = 0.8;
         private const double IndustrialCommercialBalanceRatio = 0.2;
+
+        private const double WorkplaceTaxElectricityFactor = 0.5;
         
         private const int MaxLogbookLength = 250;
         
@@ -159,13 +162,13 @@
                         throw new Exception("Wrong tax type");
                 }
             }
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = residentialTaxes,TaxType = TaxType.Residental, Placeable = new ResidentialZone()});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = residentialTaxes,TaxType = TaxType.Residental});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = commercialTaxes,TaxType = TaxType.Commercial, Placeable = new CommercialZone()});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = commercialTaxes,TaxType = TaxType.Commercial});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = industrialTaxes,TaxType = TaxType.Industrial, Placeable = new IndustrialZone()});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = industrialTaxes,TaxType = TaxType.Industrial});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
         }
@@ -249,11 +252,13 @@
 
             foreach (var workplaceZone in workplaceZones)
             {
+                double multiplier = 1;
+                if (workplaceZone.IsElectrified == false) multiplier = WorkplaceTaxElectricityFactor;
                 allTransactions.Add(CommitTransaction(workplaceZone switch
                 {
-                    IndustrialZone => Transactions.WorkplaceTaxCollection(TaxType.Industrial, _taxes.IndustrialTax,
+                    IndustrialZone => Transactions.WorkplaceTaxCollection(TaxType.Industrial, _taxes.IndustrialTax * multiplier,
                         workplaceZone.Count),
-                    CommercialZone => Transactions.WorkplaceTaxCollection(TaxType.Commercial, _taxes.CommercialTax,
+                    CommercialZone => Transactions.WorkplaceTaxCollection(TaxType.Commercial, _taxes.CommercialTax * multiplier,
                         workplaceZone.Count),
                     _ => throw new ArgumentOutOfRangeException()
                 }));
@@ -360,6 +365,7 @@
             AverageCitizenFactors = citizenSatisfactionSum / Population;
         }
 
+        // TODO: Don't forget to wire this in the MainModel!
         public void PassYear()
         {
             if (Budget <= 0)
@@ -381,19 +387,20 @@
             var homeFactors = citizen.Home switch
             {
                 { Owner: { } homeField } =>       SafetyRatio * homeField.PoliceDepartmentEffect +
-                                            (1 - SafetyRatio) * ((HomePollutionRatio * (1 - homeField.IndustrialEffect) +
-                                                                    HomeStadiumRatio * homeField.StadiumEffect)
+                                            (1 - SafetyRatio) * ((HomePollutionRatio * (1 - homeField.IndustrialEffect + homeField.ForestEffect) +
+                                                                    HomeStadiumRatio * homeField.StadiumEffect + 
+                                                                HomeElectricityRatio * (citizen.Home.IsElectrified ? 1 : 0))
                                                                    /
-                                                                   (HomePollutionRatio + HomeStadiumRatio)),
+                                                                   (HomePollutionRatio + HomeStadiumRatio + HomeElectricityRatio)),
                 _ => 0
             };
 
             var workplaceFactors = citizen.Workplace switch
             {
                 { Owner: { } workplaceField } =>       SafetyRatio * workplaceField.PoliceDepartmentEffect + 
-                                                 (1 - SafetyRatio) * ((WorkplaceStadiumRatio * workplaceField.StadiumEffect)
+                                                 (1 - SafetyRatio) * (WorkplaceStadiumRatio * workplaceField.StadiumEffect)
                                                                       /
-                                                                      (WorkplaceStadiumRatio)),
+                                                                      WorkplaceStadiumRatio,
                 _ => 0
             };
 
