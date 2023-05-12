@@ -63,7 +63,7 @@ namespace CCity.Model
 
         #region Constructors
 
-        public FieldManager()
+        public FieldManager(bool notTestMode= true)
         {
             Width = WIDTH;
             Height = HEIGHT;
@@ -101,7 +101,7 @@ namespace CCity.Model
                 (p) => GetNeighbours(p)
                 );
 
-            GenerateRandomForests();
+            if(notTestMode) GenerateRandomForests();
 
             Flammables = new HashSet<Placeable>();
             BurningBuildings = new HashSet<Placeable>();
