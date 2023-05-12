@@ -68,11 +68,7 @@ namespace CCity.Model
             _industrialZones = new();
             _growingForests = new();
 
-<<<<<<< CCity.Model/FieldManager.cs
             FireManager = new FireManager(this);
-=======
-            FireDepartments = new HashSet<FireDepartment>();
->>>>>>> CCity.Model/FieldManager.cs
             
             //starter public road
             Road starterRoad = new Road();
@@ -310,7 +306,7 @@ namespace CCity.Model
                 case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.Remove(residentialZone); break;
                 case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.Remove(commercialZone); break;
                 case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.Remove(industrialZone); break;
-                case FireDepartment fireDepartment: if (add) FireManager.AddFireDepartment(fireDepartment); else FireManager.RemoveFireDepartment(fireDepartment);
+                case FireDepartment fireDepartment: if (add) FireManager.AddFireDepartment(fireDepartment); else FireManager.RemoveFireDepartment(fireDepartment); break;
                 case Forest forest: if (add) _growingForests.Add(forest); else _growingForests.Remove(forest); break;
                 default: break;
             }
