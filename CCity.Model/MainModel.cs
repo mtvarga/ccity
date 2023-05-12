@@ -5,6 +5,12 @@ namespace CCity.Model
 {
     public class MainModel
     {
+        #region Constants
+
+        private const double MinSatisfaction = 0.2;
+        private const int MinPopulation = 15;
+
+        #endregion
         #region Fields
 
         private FieldManager _fieldManager;
@@ -216,6 +222,11 @@ namespace CCity.Model
         
         private void Tick()
         {
+            if (Satisfaction<MinSatisfaction && Population>MinPopulation || Satisfaction>MinSatisfaction && Population==0)
+            {
+                GameOver?.Invoke(this, EventArgs.Empty);
+                return;
+            }
             List<Field>? updatedFields = null;
             List<Field>? oldFireTruckLocations = null;
             
@@ -242,6 +253,7 @@ namespace CCity.Model
             var vacantCommercialZones = _fieldManager.CommercialZones(false).Cast<WorkplaceZone>().ToList();
             var vacantIndustrialZones = _fieldManager.IndustrialZones(false).Cast<WorkplaceZone>().ToList();
 
+            var movedOutCitizens = new List<Citizen>();
             var newCitizens = new List<Citizen>();
             
             /*if (vacantCommercialZones.Any() || vacantIndustrialZones.Any())
@@ -259,17 +271,26 @@ namespace CCity.Model
                         _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
                 }
             }*/
-            
+            movedOutCitizens = _citizenManager.DecreasePopulation();
+            if (movedOutCitizens.Any())
+                _globalManager.UpdateSatisfaction(false, movedOutCitizens, _citizenManager.Citizens);
+
+            List<Field> fields = _fieldManager.UpdateModifiedZonesSpread();
+            List<Zone> zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+
             if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
             {
                 newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones,Satisfaction);
+
+                if (newCitizens.Any())
+                    _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
             }
 
-            List<Field> fields = _fieldManager.UpdateModifiedZonesSpread();
+            fields = fields.Concat(_fieldManager.UpdateModifiedZonesSpread()).ToList();
             fields = fields.Concat(_fieldManager.GrowForests()).ToList();
-
-            if (newCitizens.Any())
-                _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
+            zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
 
             // TODO: Optimize this - add only affected zones to the list
             foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
@@ -286,10 +307,6 @@ namespace CCity.Model
             }
             
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
-
-
-            if (!newCitizens.Any()) 
-                return;
             PopulationChanged?.Invoke(this, EventArgs.Empty);
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }

@@ -17,7 +17,7 @@ namespace CCity.Model
 
         #region Properties
 
-        public List<Citizen> Citizens { get; }
+        public List<Citizen> Citizens { get; set; }
         
         public int Population => Citizens.Count;
 
@@ -103,10 +103,10 @@ namespace CCity.Model
                     citizen.MoveOut();
                     
                     result.Add(citizen);
-                    Citizens.Remove(citizen);
                 }
             }
-
+            foreach (var citizen in result)
+                Citizens.Remove(citizen);
             return result;
         }
 
