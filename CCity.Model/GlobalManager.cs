@@ -39,8 +39,9 @@
         private const double DistanceRatio = 0.25;
 
         private const double HomePollutionRatio = 0.5;
-        private const double HomeStadiumRatio = 0.5;
-        
+        private const double HomeElectricityRatio = (double)1 / 3;
+        private const double HomeStadiumRatio = (double)1 / 6;
+
         private const double WorkplaceStadiumRatio = 1;
         
         private const double TaxRatio = 0.8;
@@ -364,6 +365,7 @@
             AverageCitizenFactors = citizenSatisfactionSum / Population;
         }
 
+        // TODO: Don't forget to wire this in the MainModel!
         public void PassYear()
         {
             if (Budget <= 0)
@@ -385,19 +387,20 @@
             var homeFactors = citizen.Home switch
             {
                 { Owner: { } homeField } =>       SafetyRatio * homeField.PoliceDepartmentEffect +
-                                            (1 - SafetyRatio) * ((HomePollutionRatio * (1 - homeField.IndustrialEffect) +
-                                                                    HomeStadiumRatio * homeField.StadiumEffect)
+                                            (1 - SafetyRatio) * ((HomePollutionRatio * (1 - homeField.IndustrialEffect + homeField.ForestEffect) +
+                                                                    HomeStadiumRatio * homeField.StadiumEffect + 
+                                                                HomeElectricityRatio * (citizen.Home.IsElectrified ? 1 : 0))
                                                                    /
-                                                                   (HomePollutionRatio + HomeStadiumRatio)),
+                                                                   (HomePollutionRatio + HomeStadiumRatio + HomeElectricityRatio)),
                 _ => 0
             };
 
             var workplaceFactors = citizen.Workplace switch
             {
                 { Owner: { } workplaceField } =>       SafetyRatio * workplaceField.PoliceDepartmentEffect + 
-                                                 (1 - SafetyRatio) * ((WorkplaceStadiumRatio * workplaceField.StadiumEffect)
+                                                 (1 - SafetyRatio) * (WorkplaceStadiumRatio * workplaceField.StadiumEffect)
                                                                       /
-                                                                      (WorkplaceStadiumRatio)),
+                                                                      WorkplaceStadiumRatio,
                 _ => 0
             };
 
