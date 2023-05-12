@@ -349,6 +349,7 @@ namespace CCity.Model
             var workplaceZones = _fieldManager.CommercialZones(true).Cast<WorkplaceZone>()
                 .Concat(_fieldManager.IndustrialZones(true)).ToList();
             
+            _globalManager.PassYear();
             _globalManager.CollectTax(_fieldManager.ResidentialZones(true), workplaceZones);
             var allTransactions = new List<ITransaction>();
             for (int i = 0; i < _fieldManager.Width; i++)

@@ -31,7 +31,7 @@
         private const double MaxSafetyRatioPopulation = 1000;
         
         private const double MinNegativeBudgetRatio = 0;
-        private const double MaxNegativeBudgetRatio = 0.25;
+        private const double MaxNegativeBudgetRatio = 0.80;
         private const double NegativeBudgetRatioParts = 4;
 
         private const double HomeRatio = 0.5;
