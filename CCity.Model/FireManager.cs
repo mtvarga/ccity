@@ -77,7 +77,7 @@ internal class FireManager
     {
         foreach (var placeable in Flammables)
         {
-            if (Random.Next(0, 100) > ((IFlammable)placeable).Potential) 
+            if (Random.Next(0, 99) >= Convert.ToInt32(((IFlammable)placeable).Potential))
                 continue;
 
             Model.Fire.BreakOut(this, placeable);
@@ -206,8 +206,7 @@ internal class FireManager
 
     private void CancelFireTruck(FireTruck fireTruck) => fireTruck.Cancel(fireTruck.DepartedFromStation
         ? null
-        : Utilities.ShortestRoad(FieldManager.Fields, FieldManager.Width, FieldManager.Height, fireTruck.Station,
-            fireTruck.Location));
+        : Utilities.ShortestRoad(FieldManager.Fields, FieldManager.Width, FieldManager.Height, fireTruck.Station, new HashSet<Field> { fireTruck.Location }));
     
     private IEnumerable<FireTruck> AvailableFireTrucks() => FireDepartments
         .Where(f => !f.FireTruck.Active)

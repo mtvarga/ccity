@@ -21,7 +21,7 @@ namespace CCity.Model
         public override int PlacementCost => 100;
         public override int MaintenanceCost => 10;
         
-        public override byte Potential => IndustrialZonePotential; 
+        public override byte Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : IndustrialZonePotential ; 
 
         #endregion
 

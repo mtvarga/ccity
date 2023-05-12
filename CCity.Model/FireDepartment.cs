@@ -11,7 +11,7 @@ namespace CCity.Model
     {
         #region Constants
 
-        private const int effectRadius = 10;
+        private const int effectRadius = 3;
 
         #endregion
 

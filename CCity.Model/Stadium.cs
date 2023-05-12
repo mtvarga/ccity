@@ -30,7 +30,7 @@ namespace CCity.Model
 
         public override int NeededElectricity => 200;
 
-        byte IFlammable.Potential => StadiumPotential;
+        byte IFlammable.Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : StadiumPotential;
 
         bool IFlammable.Burning { get; set; }
 
