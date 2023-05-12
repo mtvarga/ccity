@@ -24,7 +24,7 @@ namespace CCity.Model
 
         public override int NeededElectricity => 20;
 
-        byte IFlammable.Potential => PoliceDepartmentPotential;
+        byte IFlammable.Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : PoliceDepartmentPotential;
 
         bool IFlammable.Burning { get; set; }
 

@@ -11,7 +11,7 @@ namespace CCity.Model
     {
         #region Properties
 
-        public Field? Owner { get; internal set; }
+        public virtual Field? Owner { get; internal set; }
         public abstract int PlacementCost { get; }
         public abstract int MaintenanceCost { get; }
         public virtual int NeededElectricity => 0;
