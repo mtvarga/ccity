@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.VisualBasic;
 
 namespace CCity.Model
@@ -17,8 +17,8 @@ namespace CCity.Model
         private CitizenManager _citizenManager;
         private GlobalManager _globalManager;
 
-        private int _counter;
-        private int _monthCounter;
+        DateTime _date;
+        DateTime _previousDate;
 
         #endregion
 
@@ -29,13 +29,13 @@ namespace CCity.Model
         public Field[,] Fields { get => _fieldManager.Fields; }
         public int Budget { get => _globalManager.Budget; }
         public Taxes Taxes { get => _globalManager.Taxes; }
-        public int Date { get; }
+        public DateTime Date { get  => _date; }
         public Speed Speed { get; private set; }
         public double Satisfaction { get => _globalManager.TotalSatisfaction; }
         public int Population { get => _citizenManager.Population; }
+        public LinkedList<ITransaction> Logbook { get => _globalManager.Logbook; }
         public int Width { get => _fieldManager.Width; }
         public int Height { get => _fieldManager.Height; }
-
         #endregion
 
         #region Constructors
@@ -46,9 +46,9 @@ namespace CCity.Model
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
 
-            _counter = 0;
-            _monthCounter = 0;
             Speed = Speed.Normal;
+
+            _date = DateTime.Now;
         }
 
         #endregion
@@ -61,16 +61,21 @@ namespace CCity.Model
             {
                 List<Field>  effectedFields = _fieldManager.Place(x, y, placeable);
                 List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-                _globalManager.Pay(placeable.PlacementCost);
+                _globalManager.CommitTransaction(Transactions.Placement(placeable));
+                _globalManager.AddOnlyOneToLogbook(Transactions.Placement(placeable));
                 _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
                 BudgetChanged?.Invoke(this, EventArgs.Empty);
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
 
                 FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
             }
-            catch (Exception ex)
+            catch (GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.Message));
+                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
+            catch(Exception)
+            {
+                ErrorOccured.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -80,21 +85,37 @@ namespace CCity.Model
             {
                 (Placeable placeable, List<Field>  effectedFields) = _fieldManager.Demolish(x, y);
                 List<Zone> zones = effectedFields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-                _globalManager.Pay(-(placeable.PlacementCost / 2));
+                _globalManager.CommitTransaction(Transactions.Takeback(placeable));
+                _globalManager.AddOnlyOneToLogbook(Transactions.Takeback(placeable));
                 _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
                 BudgetChanged?.Invoke(this, EventArgs.Empty);
                 SatisfactionChanged?.Invoke(this, EventArgs.Empty);
                 FieldsUpdated?.Invoke(this, new FieldEventArgs(effectedFields));
             }
-            catch(Exception ex)
+            catch(GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.Message));
+                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
+            catch (Exception)
+            {
+                ErrorOccured.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
         public void Upgrade(int x, int y)
         {
-            throw new NotImplementedException();
+            try
+            {
+                (IUpgradeable upgradeable, int cost) = _fieldManager.Upgrade(x, y);
+                _globalManager.CommitTransaction(Transactions.Upgrade((Placeable)upgradeable,cost));
+                _globalManager.AddOnlyOneToLogbook(Transactions.Upgrade((Placeable)upgradeable,cost));
+                BudgetChanged?.Invoke(this, EventArgs.Empty);
+                FieldsUpdated?.Invoke(this, new FieldEventArgs(new List<Field>() { ((Placeable)upgradeable).Owner!}));
+            }
+            catch (GameErrorException ex)
+            {
+                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
         }
 
         public void DeployFireTruck(int x, int y)
@@ -103,9 +124,13 @@ namespace CCity.Model
             {
                 _fieldManager.DeployFireTruck(x, y);
             }
-            catch (Exception e)
+            catch (GameErrorException ex)
             {
-                ErrorOccured?.Invoke(this, new ErrorEventArgs(e.Message));
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
+            catch(Exception)
+            {
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
         }
 
@@ -120,9 +145,13 @@ namespace CCity.Model
                 // A building was set on fire
                 EngageFireEmergency();
             }
-            catch (Exception e)
+            catch(GameErrorException ex)
             {
-                ErrorOccured?.Invoke(this, new ErrorEventArgs(e.Message));
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+            }
+            catch (Exception)
+            {
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(GameErrorType.Unhandled));
             }
             
             if (updatedFields != null)
@@ -149,30 +178,23 @@ namespace CCity.Model
 
         public void TimerTick()
         {
-            _counter = Speed switch
+
+            _previousDate = _date;
+            _date = Speed switch
             {
-                Speed.Slow => _counter + 1,
-                Speed.Normal => _counter + 16,
-                Speed.Fast => _counter + 256,
-                _ => _counter
+                Speed.Slow => _date.AddMinutes(10),
+                Speed.Normal => _date.AddHours(3),
+                Speed.Fast => _date.AddHours(45),
+                _ => _date
             };
+
+            DateChanged?.Invoke(this, EventArgs.Empty);
 
             Tick();
 
-            if (_counter / (double)4096 >= 1)
-            {
-                _monthCounter++;
-                _counter -= 4096;
-                
-                MonthlyTick();
-            }
-            
-            if (_monthCounter == 12)
-            {
-                _monthCounter = 0;
-                
-                YearlyTick();
-            }
+            if(_previousDate.Month != _date.Month) MonthlyTick();
+
+            if(_previousDate.Year != _date.Year) YearlyTick();
         }
 
         public void StartNewGame(string cityName, string mayorName)
@@ -183,8 +205,7 @@ namespace CCity.Model
             CityName = cityName;
             MayorName = mayorName;
 
-            _counter = 0;
-            _monthCounter = 0;
+            _date=DateTime.Now;
             Speed = Speed.Normal;
 
             NewGame?.Invoke(this, EventArgs.Empty);
@@ -197,11 +218,6 @@ namespace CCity.Model
         #endregion
 
         #region Private methods
-
-        private void ChangeDate()
-        {
-            throw new NotImplementedException();
-        }
         
         private void Tick()
         {
@@ -275,17 +291,22 @@ namespace CCity.Model
             
             if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
             {
-                newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
+                newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones,Satisfaction);
                     
                 if (newCitizens.Any())
                     _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
             }
             
-            // TODO: Optimize this!
-            List<Field> fields = new();
-            foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
+            List<Zone> affectedZones = new();
+
+            // TODO: Optimize this - add only affected zones to the list
+            foreach (Zone zone in _fieldManager.ResidentialZones(true)) affectedZones.Add(zone);
+            foreach (Zone zone in _fieldManager.CommercialZones(true)) affectedZones.Add(zone);
+            foreach (Zone zone in _fieldManager.IndustrialZones(true)) affectedZones.Add(zone);
+
+            //List fields will contain every zone's field
+            List<Field> fields = _fieldManager.UpdateModifiedZonesSpread(affectedZones);
+            fields = fields.Concat(_fieldManager.GrowForests()).ToList();
             
             var field = _fieldManager.IgniteRandomFlammable();
 
@@ -298,9 +319,9 @@ namespace CCity.Model
             
             FieldsUpdated?.Invoke(this, new FieldEventArgs(fields));
 
+
             if (!newCitizens.Any()) 
                 return;
-            
             PopulationChanged?.Invoke(this, EventArgs.Empty);
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -311,16 +332,17 @@ namespace CCity.Model
                 .Concat(_fieldManager.IndustrialZones(true)).ToList();
             
             _globalManager.CollectTax(_fieldManager.ResidentialZones(true), workplaceZones);
-            
+            var allTransactions = new List<ITransaction>();
             for (int i = 0; i < _fieldManager.Width; i++)
             for (int j = 0; j < _fieldManager.Height; j++)
             {
-                if (_fieldManager.Fields[i, j].Placeable is { } placeable)
+                if (_fieldManager.Fields[i, j].ActualPlaceable is { } placeable && placeable.MaintenanceCost>0)
                 {
-                    _globalManager.Pay(placeable.MaintenanceCost);
+                    allTransactions.Add(
+                    _globalManager.CommitTransaction(Transactions.Maintance(placeable)));
                 }
             }
-            
+            _globalManager.AddMaintenanceToLogbook(allTransactions);
             BudgetChanged?.Invoke(this, EventArgs.Empty);
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -346,6 +368,7 @@ namespace CCity.Model
         public event EventHandler<EventArgs>? SatisfactionChanged;
         public event EventHandler<EventArgs>? TaxChanged;
         public event EventHandler<EventArgs>? SpeedChanged;
+        public event EventHandler<EventArgs>? DateChanged;
         public event EventHandler<EventArgs>? NewGame;
         public event EventHandler<EventArgs>? GameOver;
 

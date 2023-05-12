@@ -31,7 +31,7 @@ namespace CCity.Model
         public double StadiumEffect => Math.Min(_stadiumEffect, MAX_STADIUM_EFFECT) / (double)MAX_STADIUM_EFFECT;
         public double FireDepartmentEffect => Math.Min(_fireDepartmentEffect, MAX_FIRE_DEPARTMENT_EFFECT) / (double)MAX_FIRE_DEPARTMENT_EFFECT;
         public double ForestEffect => Math.Min(_forestEffect, MAX_FOREST_EFFECT) / (double)MAX_FOREST_EFFECT;
-        public double IndustrialEffect => Math.Min(_industrialEffect, MAX_INDUSTRIAL_EFFECT) / (double)MAX_INDUSTRIAL_EFFECT;
+        public double IndustrialEffect => Math.Max(Math.Min(_industrialEffect, MAX_INDUSTRIAL_EFFECT) / (double)MAX_INDUSTRIAL_EFFECT,0);
 
         #endregion
 

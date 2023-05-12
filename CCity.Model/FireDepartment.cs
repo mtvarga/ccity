@@ -15,6 +15,7 @@ namespace CCity.Model
 
         #endregion
 
+
         #region Properties
 
         public override int PlacementCost => 100;

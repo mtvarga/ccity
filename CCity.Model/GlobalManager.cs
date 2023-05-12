@@ -46,6 +46,8 @@
         private const double TaxRatio = 0.8;
         private const double IndustrialCommercialBalanceRatio = 0.2;
         
+        private const int MaxLogbookLength = 250;
+        
         #endregion
 
         #region Fields
@@ -99,6 +101,9 @@
         private int IndustrialZoneCount { get; set; }
         
         private int Population { get; set; }
+        
+        public LinkedList<ITransaction> Logbook { get;}
+        
 
         #endregion
 
@@ -119,15 +124,102 @@
             Population = 0;
             CommercialZoneCount = 0;
             IndustrialZoneCount = 0;
+            Logbook = new LinkedList<ITransaction>();
         }
 
         #endregion
 
         #region Public methods
 
-        public void Pay(int price)
+        public void AddOnlyOneToLogbook(ITransaction transaction)
         {
-            var newBudget = Budget - price;
+            Logbook.AddFirst(transaction);
+            if (Logbook.Count > MaxLogbookLength)
+                Logbook.RemoveLast();
+        }
+        public void AddTaxToLogbook(List<ITransaction> transactions)
+        {
+            uint residentialTaxes = 0;
+            uint commercialTaxes = 0;
+            uint industrialTaxes = 0;
+            foreach (TaxTransaction transaction in transactions)
+            {
+                switch (transaction.TaxType)
+                {
+                    case TaxType.Residental:
+                        residentialTaxes += (uint) transaction.Amount;
+                        break;
+                    case TaxType.Commercial:
+                        commercialTaxes += (uint) transaction.Amount;
+                        break;
+                    case TaxType.Industrial:
+                        industrialTaxes += (uint) transaction.Amount;
+                        break;
+                    default:
+                        throw new Exception("Wrong tax type");
+                }
+            }
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = residentialTaxes,TaxType = TaxType.Residental, Placeable = new ResidentialZone()});
+            if (Logbook.Count > MaxLogbookLength)
+                Logbook.RemoveLast();
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = commercialTaxes,TaxType = TaxType.Commercial, Placeable = new CommercialZone()});
+            if (Logbook.Count > MaxLogbookLength)
+                Logbook.RemoveLast();
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = industrialTaxes,TaxType = TaxType.Industrial, Placeable = new IndustrialZone()});
+            if (Logbook.Count > MaxLogbookLength)
+                Logbook.RemoveLast();
+        }
+
+        public void AddMaintenanceToLogbook(List<ITransaction> transactions)
+        {
+            uint RoadMaintenance = 0;
+            uint ForestMaintenance = 0;
+            uint PoleMaintenance = 0;
+            foreach (PlaceableTransaction transaction in transactions)
+            {
+                switch (transaction.Placeable)
+                {
+                    case Road:
+                        RoadMaintenance += (uint) transaction.Amount;
+                        break;
+                    case Forest:
+                        ForestMaintenance += (uint) transaction.Amount;
+                        break;
+                    case Pole:
+                        PoleMaintenance += (uint) transaction.Amount;
+                        break;
+                    default:
+                        Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = transaction.Amount,Placeable = transaction.Placeable,TransactionType = PlaceableTransactionType.Maintenance});
+                        if (Logbook.Count > MaxLogbookLength)
+                            Logbook.RemoveLast();
+                        break;
+                }
+            }
+            Road road= new Road();
+            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = RoadMaintenance,Placeable = road,TransactionType = PlaceableTransactionType.Maintenance});
+            if (Logbook.Count > MaxLogbookLength)
+                Logbook.RemoveLast();
+            Forest forest = new Forest();
+            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = ForestMaintenance,Placeable = forest,TransactionType = PlaceableTransactionType.Maintenance});
+            if (Logbook.Count > MaxLogbookLength)
+                Logbook.RemoveLast();
+            Pole pole = new Pole();
+            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = PoleMaintenance,Placeable = pole,TransactionType = PlaceableTransactionType.Maintenance});
+            if (Logbook.Count > MaxLogbookLength)
+                Logbook.RemoveLast();
+        }
+        public ITransaction CommitTransaction(ITransaction transaction)
+        {
+            int newBudget = 0;
+            if (transaction.Add)
+            {
+                newBudget =Convert.ToInt32(Budget + transaction.Amount);
+            }
+            else
+            {
+                 newBudget =Convert.ToInt32(Budget - transaction.Amount);
+            }
+            
 
             NegativeBudgetYears = newBudget switch
             {
@@ -137,28 +229,38 @@
             };
 
             Budget = newBudget;
+            return transaction;
         }
-        
+
         public void CollectTax(List<ResidentialZone> residentialZones, List<WorkplaceZone> workplaceZones)
         {
+            var allTransactions = new List<ITransaction>();
             foreach (var residentialZone in residentialZones)
             {
                 foreach (var citizen in residentialZone.Citizens)
                 {
                     if (!citizen.Jobless)
-                        Pay(-Convert.ToInt32(Math.Round(ResTaxNorm * _taxes.ResidentalTax)));
+                    {
+                        allTransactions.Add(CommitTransaction(
+                            Transactions.ResidentialTaxCollection(TaxType.Residental, _taxes.ResidentalTax)));
+                    }
                 }
             }
-            
+
             foreach (var workplaceZone in workplaceZones)
-                Pay(-(workplaceZone switch
+            {
+                allTransactions.Add(CommitTransaction(workplaceZone switch
                 {
-                    IndustrialZone => Convert.ToInt32(Math.Round(IndTaxNorm * _taxes.IndustrialTax * workplaceZone.Count)),
-                    CommercialZone => Convert.ToInt32(Math.Round(ComTaxNorm * _taxes.CommercialTax * workplaceZone.Count)),
-                    _ => 0,
+                    IndustrialZone => Transactions.WorkplaceTaxCollection(TaxType.Industrial, _taxes.IndustrialTax,
+                        workplaceZone.Count),
+                    CommercialZone => Transactions.WorkplaceTaxCollection(TaxType.Commercial, _taxes.CommercialTax,
+                        workplaceZone.Count),
+                    _ => throw new ArgumentOutOfRangeException()
                 }));
+            } ;
+            AddTaxToLogbook(allTransactions);
         }
-        
+
         public bool ChangeTax(TaxType taxType, double amount)
         {
             double changedTax;

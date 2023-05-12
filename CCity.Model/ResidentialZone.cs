@@ -17,7 +17,7 @@ namespace CCity.Model
         #region Properties
 
         public override int PlacementCost => 100;
-        public override int MaintenanceCost => 10;
+        public override int MaintenanceCost => 0;
 
         public override byte Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : ResidentialZonePotential;
 
