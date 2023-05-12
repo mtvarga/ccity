@@ -263,21 +263,18 @@ namespace CCity.Model
             if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
             {
                 newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones,Satisfaction);
-                    
-                if (newCitizens.Any())
-                    _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
             }
-            
-            List<Zone> affectedZones = new();
+
+            List<Field> fields = _fieldManager.UpdateModifiedZonesSpread();
+            fields = fields.Concat(_fieldManager.GrowForests()).ToList();
+
+            if (newCitizens.Any())
+                _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
 
             // TODO: Optimize this - add only affected zones to the list
-            foreach (Zone zone in _fieldManager.ResidentialZones(true)) affectedZones.Add(zone);
-            foreach (Zone zone in _fieldManager.CommercialZones(true)) affectedZones.Add(zone);
-            foreach (Zone zone in _fieldManager.IndustrialZones(true)) affectedZones.Add(zone);
-
-            //List fields will contain every zone's field
-            List<Field> fields = _fieldManager.UpdateModifiedZonesSpread(affectedZones);
-            fields = fields.Concat(_fieldManager.GrowForests()).ToList();
+            foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
+            foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
             
             var field = _fieldManager.IgniteRandomBuilding();
 

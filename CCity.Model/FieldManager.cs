@@ -187,11 +187,10 @@ namespace CCity.Model
             return effectedFields;
         }
 
-        public List<Field> UpdateModifiedZonesSpread(List<Zone> zones)
+        public List<Field> UpdateModifiedZonesSpread()
         {
-            List<Field> modifiedFields = new();
-            foreach (Zone zone in zones) modifiedFields = modifiedFields.Concat(RefreshSpread(zone)).ToList();
-            return modifiedFields;
+            _electricitySpreader.RefreshRoots();
+            return _electricitySpreader.GetAndClearModifiedFields();
         }
 
         public Field IgniteBuilding(int x, int y)
