@@ -128,12 +128,25 @@ internal class FireManager
         if (fireTruck == null)
             // We cannot deploy any fire trucks -> the game will give an error message
             return null;
+
+        var destination = new HashSet<Field> { fire.Location };
+        
+        if (fire.Location.Placeable is IMultifield multifield)
+            destination.UnionWith(multifield.Occupies.Select(f => f.Owner!));
         
         // Find shortest road from the fire truck's location to the fire
-        var path = Utilities.ShortestRoad(FieldManager.Fields, FieldManager.Width, FieldManager.Height, fireTruck.Location, fire.Location);
+        var path = Utilities.ShortestRoad(FieldManager.Fields, FieldManager.Width, FieldManager.Height, fireTruck.Location, destination);
+
+        if (!path.Any())
+            return null;
         
         // Calculate the return path to the station
-        var returnPath = fireTruck.Moving ? Utilities.ShortestRoad(FieldManager.Fields, FieldManager.Width, FieldManager.Height, fireTruck.Station, fire.Location) : path;
+        var returnPath = fireTruck.Moving 
+            ? Utilities.ShortestRoad(FieldManager.Fields, FieldManager.Width, FieldManager.Height, fireTruck.Station, new HashSet<Field> { path.Last!.Value }) 
+            : path;
+
+        if (!returnPath.Any())
+            return null;
         
         // Deploy the fire truck
         fireTruck.Deploy(path, returnPath);
