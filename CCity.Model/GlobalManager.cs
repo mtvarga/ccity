@@ -45,6 +45,8 @@
         
         private const double TaxRatio = 0.8;
         private const double IndustrialCommercialBalanceRatio = 0.2;
+
+        private const double WorkplaceTaxElectricityFactor = 0.5;
         
         private const int MaxLogbookLength = 250;
         
@@ -159,13 +161,13 @@
                         throw new Exception("Wrong tax type");
                 }
             }
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = residentialTaxes,TaxType = TaxType.Residental, Placeable = new ResidentialZone()});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = residentialTaxes,TaxType = TaxType.Residental});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = commercialTaxes,TaxType = TaxType.Commercial, Placeable = new CommercialZone()});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = commercialTaxes,TaxType = TaxType.Commercial});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
-            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = industrialTaxes,TaxType = TaxType.Industrial, Placeable = new IndustrialZone()});
+            Logbook.AddFirst(new TaxTransaction{Add=true,Amount = industrialTaxes,TaxType = TaxType.Industrial});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
         }
@@ -249,11 +251,13 @@
 
             foreach (var workplaceZone in workplaceZones)
             {
+                double multiplier = 1;
+                if (workplaceZone.IsElectrified == false) multiplier = WorkplaceTaxElectricityFactor;
                 allTransactions.Add(CommitTransaction(workplaceZone switch
                 {
-                    IndustrialZone => Transactions.WorkplaceTaxCollection(TaxType.Industrial, _taxes.IndustrialTax,
+                    IndustrialZone => Transactions.WorkplaceTaxCollection(TaxType.Industrial, _taxes.IndustrialTax * multiplier,
                         workplaceZone.Count),
-                    CommercialZone => Transactions.WorkplaceTaxCollection(TaxType.Commercial, _taxes.CommercialTax,
+                    CommercialZone => Transactions.WorkplaceTaxCollection(TaxType.Commercial, _taxes.CommercialTax * multiplier,
                         workplaceZone.Count),
                     _ => throw new ArgumentOutOfRangeException()
                 }));
