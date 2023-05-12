@@ -205,6 +205,9 @@ namespace CCity.Model
             if (placeable == null || (fire = FireManager.Fire(placeable)) == null)
                 throw new GameErrorException(GameErrorType.DeployFireTruckBadBuilding);
 
+            if (fire.AssignedFireTruck != null)
+                throw new GameErrorException(GameErrorType.DeployFireTruckAlreadyAssigned);
+
             if (FireManager.DeployFireTruck(fire) == null)
                 throw new GameErrorException(GameErrorType.DeployFireTruckNoneAvaiable);
         }
