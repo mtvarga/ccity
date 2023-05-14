@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCity", "CCity\CCity.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CCity.Model", "CCity.Model\CCity.Model.csproj", "{14EFE480-7356-4370-8876-C50319D5DEAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCity.Model.Test", "CCity.Model.Test\CCity.Model.Test.csproj", "{F7BDB3EF-1235-4362-A233-58191FC65FBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{14EFE480-7356-4370-8876-C50319D5DEAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14EFE480-7356-4370-8876-C50319D5DEAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14EFE480-7356-4370-8876-C50319D5DEAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7BDB3EF-1235-4362-A233-58191FC65FBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7BDB3EF-1235-4362-A233-58191FC65FBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7BDB3EF-1235-4362-A233-58191FC65FBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7BDB3EF-1235-4362-A233-58191FC65FBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

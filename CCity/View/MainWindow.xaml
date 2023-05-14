@@ -9,7 +9,8 @@
         Height="650" 
         Width="1180"
         MinHeight="650"
-        MinWidth="1180">
+        MinWidth="1180"
+        WindowState="Maximized">
     <Grid>
 
     </Grid>

@@ -197,7 +197,7 @@ namespace CCity.Model
         }
 
         //Refreshing roots with parallel BFS
-        private void RefreshRoots()
+        public void RefreshRoots()
         {
             List<Action> rootEnablingActions = new List<Action>();
             

@@ -15,6 +15,8 @@ namespace CCity.Model
 
         public override int MaintenanceCost => 10;
 
+        public override bool IsPublic => true;
+
         #endregion
 
     }
