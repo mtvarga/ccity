@@ -12,6 +12,8 @@ namespace CCity.Model
 
         private const int effectRadius = 10;
 
+        private const byte StadiumPotential = 1;
+
         #endregion
 
         #region Fields
@@ -28,12 +30,12 @@ namespace CCity.Model
 
         public override int NeededElectricity => 200;
 
-        double IFlammable.Pontential => throw new NotImplementedException();
+        byte IFlammable.Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : StadiumPotential;
 
-        double IFlammable.Health => throw new NotImplementedException();
+        bool IFlammable.Burning { get; set; }
 
-        bool IFlammable.IsOnFire { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
+        ushort IFlammable.Health { get; set; } = IFlammable.FlammableMaxHealth;
+        
         int IMultifield.Width => 2;
 
         int IMultifield.Height => 2;

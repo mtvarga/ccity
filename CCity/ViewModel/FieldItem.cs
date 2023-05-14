@@ -13,26 +13,14 @@ namespace CCity.ViewModel
 
         #region Fields
 
-        //private int _level;
         private Texture _texture;
         private Color _minimapColor;
         private Color _overlayColor;
+        private Texture _additionalTexture;
 
         #endregion
 
         #region Properties
-
-        /*public int Level {
-            get { return _level; }
-            set
-            {
-                if(_level != value)
-                {
-                    _level = value;
-                    OnPropertyChanged();
-                }
-            }
-        }*/
 
         public Texture Texture {
             get { return _texture; }
@@ -69,6 +57,19 @@ namespace CCity.ViewModel
                 if(_overlayColor != value)
                 {
                     _overlayColor = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public Texture AdditionalTexture
+        {
+            get { return _additionalTexture; }
+            set
+            {
+                if (_additionalTexture != value)
+                {
+                    _additionalTexture = value;
                     OnPropertyChanged();
                 }
             }
