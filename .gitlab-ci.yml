@@ -4,7 +4,7 @@ image: mcr.microsoft.com/dotnet/sdk:6.0
 
 stages:
   - build
-  #- test
+  - test
   - deploy
 
 before_script:
@@ -31,20 +31,20 @@ build:view:
 
 # Test
 # (Uses Linux-based runner, because windows tag is NOT specified.)
-# test:model:
-#   stage: test
-#   before_script:    
-#     # Restore NuGet packages to the local .nuget folder (inside the project directory).
-#     - dotnet restore CCity.Tests --packages .nuget
-#   script:
-#     - dotnet test CCity.Tests
-#   # Cache and keep downloaded NuGet dependencies between CI pipelines
-#   cache:
-#     # The CI_COMMIT_REF_SLUG is a slug for the branch or tag name,
-#     # so there will be a separate cache for each branch.
-#     key: "unittest-$CI_COMMIT_REF_SLUG"
-#     paths:
-#       - .nuget
+test:model:
+  stage: test
+  before_script:    
+    # Restore NuGet packages to the local .nuget folder (inside the project directory).
+    - dotnet restore CCity.Model.Test --packages .nuget
+  script:
+    - dotnet test CCity.Model.Test
+  # Cache and keep downloaded NuGet dependencies between CI pipelines
+  cache:
+    # The CI_COMMIT_REF_SLUG is a slug for the branch or tag name,
+    # so there will be a separate cache for each branch.
+    key: "unittest-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .nuget
 
 # Documentation
 # (Uses Linux-based runner, because windows tag is NOT specified.)
@@ -62,5 +62,6 @@ pages:
     paths:
       - public
     expire_in: 1 day
-  # only:
-  #   - master
+  only:
+    - master
+    - develop
