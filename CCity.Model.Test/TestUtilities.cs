@@ -35,6 +35,7 @@ namespace CCity.Model.Test
             PowerPlant _ => new PowerPlant(),
             Stadium _ => new Stadium(),
             FireDepartment _ => new FireDepartment(),
+            Pole _ => new Pole(),
             _ => throw new ArgumentException()
         };
 

@@ -170,5 +170,25 @@ namespace CCity.Model.Test
                     if (_model.Fields[x, y].HasPlaceable)
                         Assert.IsFalse(_model.Fields[x, y].Placeable!.IsElectrified);
         }
+
+        [TestMethod]
+        public void PowerPlantCapacityWhenCitizenMovesIn()
+        {
+            _model.Place(19, 28, new Road());
+            _model.Place(19, 27, new ResidentialZone());
+            _model.Place(20, 27, new ResidentialZone());
+            _model.Place(21, 27, new CommercialZone());
+            _model.Place(21, 26, new CommercialZone());
+
+            int spreadBeforeMovingIn = _model.Fields[17, 28].Placeable!.CurrentSpreadValue[SpreadType.Electricity];
+
+            DateTime dateTwoYearsLater = _model.Date.AddYears(2);
+            while(_model.Population == 0 && !(dateTwoYearsLater.Year == _model.Date.Year && dateTwoYearsLater.Month == _model.Date.Month))
+            {
+                _model.TimerTick();
+            }
+
+            Assert.AreEqual(_model.Population * 2, _model.Fields[17, 28].Placeable!.CurrentSpreadValue[SpreadType.Electricity] - spreadBeforeMovingIn);
+        }
     }
 }
