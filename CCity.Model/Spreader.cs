@@ -45,8 +45,8 @@ namespace CCity.Model
             {
                 if (IsRoot(placeable)) _roots.Remove(placeable);
                 bool hadRoot = GetRoot(placeable) != null;
-                Placeable? strongestEntry = Unspread(placeable);
-                if (strongestEntry != null) Spread(strongestEntry);
+                List<Placeable> possibleEntries = Unspread(placeable);
+                foreach(Placeable possibleEntry in possibleEntries) Spread(possibleEntry);
                 if (_weighted && hadRoot) RefreshRoots();
             }
             else
@@ -139,7 +139,7 @@ namespace CCity.Model
 
         //Unspread from one point
         //Returns the strongest possible entry after finishing the unspreading
-        private Placeable? Unspread(Placeable placeable)
+        private List<Placeable> Unspread(Placeable placeable)
         {
             Queue<Placeable> BFSQueue = new Queue<Placeable>();
             BFSQueue.Enqueue(placeable);
@@ -155,7 +155,7 @@ namespace CCity.Model
         }
 
         //General unspread
-        private Placeable? Unspread(Queue<Placeable> BFSQueue)
+        private List<Placeable> Unspread(Queue<Placeable> BFSQueue)
         {
             List<Placeable> possibleEntries = new List<Placeable>();
             while (BFSQueue.Count > 0)
@@ -175,7 +175,8 @@ namespace CCity.Model
                 foreach (Placeable queuedPlaceable in queuedNeighbours) BFSQueue.Enqueue(queuedPlaceable);
             }
             //Returning the strongest possible entry
-            return possibleEntries.Where(e => Check(e)).MaxBy(e => GetRootCapacity(e));
+            //return possibleEntries.Where(e => Check(e)).MaxBy(e => GetRootCapacity(e));
+            return possibleEntries.Where(e => Check(e)).ToList();
         }
 
         #endregion

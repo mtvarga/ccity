@@ -12,12 +12,14 @@ namespace CCity.Model
         #region Constants
 
         private const byte PowerPlantPotential = 1;
+        private const int ElectricityCapacity = 1000;
         
         #endregion
 
         #region Fields
 
         List<Filler> _occupies;
+        bool _tested;
 
         #endregion
 
@@ -43,16 +45,17 @@ namespace CCity.Model
 
         #region Constructor
 
-        public PowerPlant()
+        public PowerPlant(bool tested = false)
         {
             _occupies = new();
+            _tested = tested;
         }
 
         public override void MakeRoot(SpreadType spreadType)
         {
             if (spreadType != SpreadType.Electricity) return;
             base.MakeRoot(spreadType);
-            MaxSpreadValue[spreadType] = () => 1000;
+            MaxSpreadValue[spreadType] = () => _tested ? 1000 : ElectricityCapacity;
         }
 
         #endregion
