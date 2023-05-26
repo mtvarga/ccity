@@ -3,7 +3,7 @@ using CCity.Model;
 namespace CCity.Model.Test
 {
     [TestClass]
-    public class CCityGameModelTest
+    public class PlaceDemolishTest
     {
         private MainModel _model = new MainModel(false);
 
@@ -66,21 +66,6 @@ namespace CCity.Model.Test
             _model.Place(1, 1, new PoliceDepartment());
             Assert.IsFalse(_model.Fields[1, 1].Placeable is PoliceDepartment);
             Assert.AreEqual(_model.LastErrorType,GameErrorType.PlaceAlreadyUsedField);
-        }
-
-        //Road publicity spread test 
-        [TestMethod]
-        public void RoadPublicitySpreadTest()
-        {
-            _model.Place(_model.Width / 2, _model.Height -2,new Road());
-            Assert.IsTrue(_model.Fields[_model.Width / 2, _model.Height -2].Placeable!.IsPublic);
-            _model.Place(_model.Width / 2-1, _model.Height - 2, new Road());
-            Assert.IsTrue(_model.Fields[_model.Width / 2-1, _model.Height - 2].Placeable!.IsPublic);
-            _model.Place(_model.Width / 2 - 1, _model.Height - 4, new Road());
-            Assert.IsFalse(_model.Fields[_model.Width / 2 - 1, _model.Height - 4].Placeable!.IsPublic);
-            _model.Place(_model.Width / 2 - 1, _model.Height - 3, new Road());
-            Assert.IsTrue(_model.Fields[_model.Width / 2 - 1, _model.Height - 3].Placeable!.IsPublic);
-            Assert.IsTrue(_model.Fields[_model.Width / 2 - 1, _model.Height - 4].Placeable!.IsPublic);
         }
 
         //Demolish succesful (can demolish all placeable)

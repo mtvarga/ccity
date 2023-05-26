@@ -20,7 +20,6 @@ namespace CCity.ViewModel
                 {
                     case Texture.None: return "Images/Textures/transparent.png";
                     default:
-                        Trace.WriteLine(GetPath(texture));
                         return GetPath(texture);
                 }
             }

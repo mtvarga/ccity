@@ -2,6 +2,8 @@ using CCity.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 
@@ -335,6 +337,9 @@ namespace CCity.ViewModel
             fieldItem.Texture = GetTextureFromFieldItem(fieldItem);
             fieldItem.MinimapColor = GetMinimapColorFromFieldItem(fieldItem);
             fieldItem.AdditionalTexture = GetAdditionalTextureFromFieldItem(fieldItem, fieldItem.AdditionalTexture);
+
+            (int x, int y) = GetCordinates(fieldItem.Number);
+            fieldItem.Text = x + ";" + y;
         }
 
         private Color GetOverlayColorFromFieldItem(FieldItem fieldItem)

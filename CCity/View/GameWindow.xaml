@@ -747,6 +747,7 @@
                                                     </Grid.Style>
                                                 </Grid>
                                                 <Grid Width="50" Panel.ZIndex="3">
+                                                    <Label Content="{Binding Text}" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Cyan"/>
                                                     <Image Width="50" Stretch="Uniform" VerticalAlignment="Bottom" Source="{Binding AdditionalTexture, Converter={StaticResource TextureEnumToPath}}" RenderOptions.BitmapScalingMode="HighQuality"/>
                                                     <Grid.Style>
                                                         <Style TargetType="Grid">
