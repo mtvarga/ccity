@@ -21,6 +21,10 @@ namespace CCity.View
     /// </summary>
     public partial class GameWindow : UserControl
     {
+
+        private Point _lastMouseDownPos;
+        private bool _isDragging;
+
         public GameWindow()
         {
             InitializeComponent();
@@ -35,9 +39,6 @@ namespace CCity.View
         {
             ((Grid)sender).Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
         }
-
-        private Point _lastMouseDownPos;
-        private bool _isDragging;
 
         private void MapScrollViewer_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -75,10 +76,10 @@ namespace CCity.View
                 var scrollViewer = (ScrollViewer)sender;
                 var currentMousePos = e.GetPosition(scrollViewer);
 
-                var delta = currentMousePos - _lastMouseDownPos;
+                var vector = currentMousePos - _lastMouseDownPos;
 
-                scrollViewer.ScrollToHorizontalOffset(scrollViewer.HorizontalOffset - delta.X);
-                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - delta.Y);
+                scrollViewer.ScrollToHorizontalOffset(scrollViewer.HorizontalOffset - vector.X);
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - vector.Y);
 
                 SetMinimapBorder(scrollViewer);
                 _lastMouseDownPos = currentMousePos;
@@ -87,7 +88,17 @@ namespace CCity.View
 
         private void MapScrollViewer_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_isDragging && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            if (_isDragging)
+            {
+                _isDragging = false;
+                SetMinimapBorder((ScrollViewer)sender);
+                Mouse.Capture(null);
+            }
+        }
+
+        private void UserControl_KeyUp(object sender, KeyEventArgs e)
+        {
+            if((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control && _isDragging)
             {
                 _isDragging = false;
                 SetMinimapBorder((ScrollViewer)sender);
@@ -99,7 +110,6 @@ namespace CCity.View
         {
             var scrollViewer = (ScrollViewer)sender;
 
-            // Set vertical offset to bottom
             scrollViewer.ScrollToBottom();
 
             var contentWidth = scrollViewer.ExtentWidth;

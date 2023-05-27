@@ -7,23 +7,14 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace CCity.ViewModel
+namespace CCity.ViewModel.Converters
 {
     public class ColorToSolidColorBrush : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is Color color)
-            {
-                return new SolidColorBrush(color);
-            }
-
-            return Brushes.Transparent;
-        }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) 
+            => value is Color color ? new SolidColorBrush(color) : Brushes.Transparent;
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
     }
 }

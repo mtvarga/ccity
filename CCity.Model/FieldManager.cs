@@ -232,6 +232,25 @@ namespace CCity.Model
         public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
         public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
         public IEnumerable<Field> FireTruckLocations() => FireManager.FireTruckLocations();
+
+        public ((byte, byte, byte, byte), List<Road>) GetFourRoadNeighbours(Road road)
+        {
+            byte[] ind = new byte[4];
+            List<Road> neighbours = new();
+            (int fieldX, int fieldY) = (road.Owner!.X, road.Owner!.Y);
+            List<(int, int)> coordinates = new() { (fieldX, fieldY - 1), (fieldX + 1, fieldY), (fieldX, fieldY + 1), (fieldX - 1, fieldY) };
+            for (int i = 0; i < 4; i++)
+            {
+                (int x, int y) = coordinates[i];
+                if (OnMap(x, y) && Fields[x, y].Placeable is Road actualRoad)
+                {
+                    ind[i] = 1;
+                    neighbours.Add(actualRoad);
+                }
+                else ind[i] = 0;
+            }
+            return ((ind[0], ind[1], ind[2], ind[3]), neighbours);
+        }
         
         #endregion
 
@@ -479,29 +498,6 @@ namespace CCity.Model
             effectedFields.Add(field);
             List<Field> modifiedFieldsBySpreading = SpreadPlaceableEffectRouter(placeable);
             return effectedFields.Concat(modifiedFieldsBySpreading).Concat(GetNeighbours(placeable).Select(e => e.Owner!)).ToList();
-        }
-
-        #endregion
-
-        #region Road related
-
-        public (int[], List<Road>) GetFourRoadNeighbours(Road road)
-        {
-            int[] indicators = new int[4];
-            List<Road> neighbours = new();
-            (int fieldX, int fieldY) = (road.Owner!.X, road.Owner!.Y);
-            List<(int, int)> coordinates = new() { (fieldX, fieldY - 1), (fieldX + 1, fieldY), (fieldX, fieldY + 1), (fieldX - 1, fieldY)};
-            for(int i = 0; i < 4; i++)
-            {
-                (int x, int y) = coordinates[i];
-                if (OnMap(x, y) && Fields[x, y].Placeable is Road actualRoad)
-                {
-                    indicators[i] = 1;
-                    neighbours.Add(actualRoad);
-                }
-                else indicators[i] = 0;
-            }
-            return (indicators, neighbours);
         }
 
         #endregion
