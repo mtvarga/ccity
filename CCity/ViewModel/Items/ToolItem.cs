@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CCity.ViewModel.Enums;
 
-namespace CCity.ViewModel
+namespace CCity.ViewModel.Items
 {
     public class ToolItem : ViewModelBase
     {
@@ -26,7 +27,6 @@ namespace CCity.ViewModel
 
         public Tool Tool { get; set; }
         public int Number { get; set; }
-        public string Text { get => Tool.ToString(); }
         public DelegateCommand? ClickCommand { get; set; }
 
     }

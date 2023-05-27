@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace CCity.ViewModel
+namespace CCity.ViewModel.Items
 {
     public class TransactionItem : ViewModelBase
     {

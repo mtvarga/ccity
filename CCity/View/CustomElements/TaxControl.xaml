@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="CCity.View.CustomElements.TaxControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:custom="clr-namespace:CCity.View.CustomElements"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Orientation="Horizontal" Margin="2" Height="28">
+        <Border Background="#FFF" CornerRadius="7 0 0 7">
+            <Grid HorizontalAlignment="Left" VerticalAlignment="Center" Width="42">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Label Margin="0" Padding="0" Content="{Binding TaxValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"/>
+                    <Label Margin="0" Padding="0" Content="%"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="30">
+            <custom:CustomButton Height="14" Cursor="Hand" CustomBackground="{StaticResource PrimaryColor}" CornerRadius="0 7 0 0" Command="{Binding TaxCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" CommandParameter="1" CustomContent="+"/>
+            <custom:CustomButton Height="14" Cursor="Hand" CustomBackground="{StaticResource PrimaryColor}" CornerRadius="0 0 7 0" Command="{Binding TaxCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" CommandParameter="-1" CustomContent="-"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

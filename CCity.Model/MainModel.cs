@@ -221,7 +221,7 @@ namespace CCity.Model
             NewGame?.Invoke(this, EventArgs.Empty);
         }
 
-        public (int[], List<Road>) GetFourRoadNeighbours(Road road) => _fieldManager.GetFourRoadNeighbours(road);
+        public ((byte t, byte r, byte b, byte l) indicators, List<Road> neighbours) GetFourRoadNeighbours(Road road) => _fieldManager.GetFourRoadNeighbours(road);
 
         public IEnumerable<Field> FireTruckLocations() => _fieldManager.FireTruckLocations();
         
