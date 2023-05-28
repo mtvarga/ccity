@@ -1,13 +1,3 @@
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using System.Linq;
-using System.Drawing;
-using System.Diagnostics;
-using System.Runtime.Intrinsics.X86;
-using System.ComponentModel.Design.Serialization;
-using System.ComponentModel.Design;
-using System.Reflection.Metadata.Ecma335;
-
 namespace CCity.Model
 {
     public class FieldManager
