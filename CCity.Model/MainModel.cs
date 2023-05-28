@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using Microsoft.VisualBasic;
-
 namespace CCity.Model
 {
     public class MainModel
@@ -20,7 +17,6 @@ namespace CCity.Model
         private CitizenManager _citizenManager;
         private GlobalManager _globalManager;
 
-        DateTime _date;
         DateTime _previousDate;
 
         #endregion
@@ -29,18 +25,20 @@ namespace CCity.Model
 
         public string CityName { get; private set; }
         public string MayorName { get; private set; }
-        public Field[,] Fields { get => _fieldManager.Fields; }
-        public int Budget { get => _globalManager.Budget; }
-        public Taxes Taxes { get => _globalManager.Taxes; }
-        public DateTime Date { get => _date; }
+        public DateTime Date { get; private set; }
         public Speed Speed { get; private set; }
-        public double Satisfaction { get => _globalManager.TotalSatisfaction; }
-        public int Population { get => _citizenManager.Population; }
-        public LinkedList<ITransaction> Logbook { get => _globalManager.Logbook; }
-        public int Width { get => _fieldManager.Width; }
-        public int Height { get => _fieldManager.Height; }
+        public Field[,] Fields => _fieldManager.Fields;
+        public int Budget => _globalManager.Budget;
+        public Taxes Taxes => _globalManager.Taxes;
+        public double Satisfaction => _globalManager.TotalSatisfaction;
+        public int Population => _citizenManager.Population;
+        public LinkedList<ITransaction> Logbook => _globalManager.Logbook;
+        public int Width => _fieldManager.Width;
+        public int Height => _fieldManager.Height;
+
         //for test
-        public GameErrorType LastErrorType { private set; get; }
+        public GameErrorType LastErrorType { get; private set; }
+
         #endregion
 
         #region Constructors
@@ -52,8 +50,10 @@ namespace CCity.Model
             _globalManager = new GlobalManager();
 
             Speed = Speed.Normal;
+            Date = DateTime.Now;
 
-            _date = DateTime.Now;
+            CityName = "";
+            MayorName = "";
         }
 
         #endregion
@@ -189,22 +189,22 @@ namespace CCity.Model
         public void TimerTick()
         {
 
-            _previousDate = _date;
-            _date = Speed switch
+            _previousDate = Date;
+            Date = Speed switch
             {
-                Speed.Slow => _date.AddMinutes(10),
-                Speed.Normal => _date.AddHours(3),
-                Speed.Fast => _date.AddHours(45),
-                _ => _date
+                Speed.Slow => Date.AddMinutes(10),
+                Speed.Normal => Date.AddHours(3),
+                Speed.Fast => Date.AddHours(45),
+                _ => Date
             };
 
             DateChanged?.Invoke(this, EventArgs.Empty);
 
             Tick();
 
-            if(_previousDate.Month != _date.Month) MonthlyTick();
+            if(_previousDate.Month != Date.Month) MonthlyTick();
 
-            if(_previousDate.Year != _date.Year) YearlyTick();
+            if(_previousDate.Year != Date.Year) YearlyTick();
         }
 
         public void StartNewGame(string cityName, string mayorName)
@@ -215,7 +215,7 @@ namespace CCity.Model
             CityName = cityName;
             MayorName = mayorName;
 
-            _date=DateTime.Now;
+            Date = DateTime.Now;
             Speed = Speed.Normal;
 
             NewGame?.Invoke(this, EventArgs.Empty);

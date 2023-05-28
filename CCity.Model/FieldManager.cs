@@ -403,13 +403,6 @@ namespace CCity.Model
                 {
                     UpdatePlaceableList(f.Placeable, f.Placeable.ListingCondition);
 
-                    //SWITCHING ON/OFF FIREDEPARTMENT COMES HERE (based on electricity and publicity)
-                    //Suggestion: use f.Placeable.IsPublic && placeable.IsElectrified bool
-                    //and try switching on when true, switching off otherwise
-                    //(logic explained below)
-
-                    //--------------------------------------------------------------------------
-
                     //Spreading the effect - IT HAS TO BE THE LAST METHOD IN THIS SECTION,
                     //BECAUSE OF - for example - THE APPLYMENT OF FIREDEPARTMENT EFFECT
                     //
