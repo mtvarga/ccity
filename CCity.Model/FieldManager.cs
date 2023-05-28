@@ -105,9 +105,8 @@ namespace CCity.Model
         {
             if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.PlaceOutOfFieldBoundries);
             Field field = Fields[x, y];
-            List<Field> modifiedFields = PlaceDemolishManager(field, placeable,true);
-            List<Field> modifiedFieldsBySpreading;
-            modifiedFieldsBySpreading = RefreshSpread(placeable);
+            List<Field> modifiedFields = PlaceDemolishManager(field, placeable, true);
+            List<Field> modifiedFieldsBySpreading = RefreshSpread(placeable);
             return modifiedFields.Concat(modifiedFieldsBySpreading).ToList();
         }
 
@@ -123,7 +122,7 @@ namespace CCity.Model
             if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.UpgradeOutOfFieldBoundries);
             Field field = Fields[x, y];
             if (field.Placeable is not IUpgradeable) throw new GameErrorException(GameErrorType.UpgradeNotUpgradeable);
-            IUpgradeable upgradeable = (IUpgradeable)(field.Placeable);
+            IUpgradeable upgradeable = (IUpgradeable)field.Placeable;
             int upgradeCost = upgradeable.NextUpgradeCost;
             upgradeable.Upgrade();
             return (upgradeable, upgradeCost);
@@ -139,13 +138,11 @@ namespace CCity.Model
         public (Placeable, List<Field>) Demolish(int x, int y)
         {
             if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.DemolishOutOfFieldBoundries);
-
             Field field = Fields[x, y];
             if (!field.HasPlaceable) throw new GameErrorException(GameErrorType.DemolishEmptyField);
             Placeable placeable = field.Placeable!.Root;
             List<Field> modifiedFields = PlaceDemolishManager(field,placeable,false);
-            List<Field> modifiedFieldsBySpreading;
-            modifiedFieldsBySpreading = RefreshSpread(placeable);
+            List<Field> modifiedFieldsBySpreading = RefreshSpread(placeable);
             UpdatePlaceableList(placeable, false);
             return (placeable, modifiedFields.Concat(modifiedFieldsBySpreading).ToList());
         }
