@@ -27,6 +27,7 @@ namespace CCity.Model
         private HashSet<ResidentialZone> _residentialZones;
         private HashSet<CommercialZone> _commercialZones;
         private HashSet<IndustrialZone> _industrialZones;
+        private HashSet<Zone> _zones;
         private HashSet<Forest> _growingForests;
 
         private FireManager FireManager { get; }
@@ -49,10 +50,10 @@ namespace CCity.Model
                 for (int j = 0; j < Height; j++)
                     Fields[i, j] = new Field(i, j);
 
-            _growingForests = new();
             _residentialZones = new();
             _commercialZones = new();
             _industrialZones = new();
+            _zones = new();
             _growingForests = new();
 
             FireManager = new FireManager(this);
@@ -249,7 +250,11 @@ namespace CCity.Model
         /// <param name="showUnavailable">Return unavailable IndustrialZones as well</param>
         /// <returns>List of IndustrialZones, only availables (vacant and electrified) by default</returns>
         public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
-        
+
+        /// <param name="showUnavailable">Return unavailable Zones as well</param>
+        /// <returns>List of Zones, only availables (vacant and electrified) by default</returns>
+        public List<Zone> Zones(bool showUnavailable) => _zones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
+
         /// <returns>List of Fields where FireTrucks are located</returns>
         public IEnumerable<Field> FireTruckLocations() => FireManager.FireTruckLocations();
 
@@ -350,9 +355,7 @@ namespace CCity.Model
         {
             switch (placeable)
             {
-                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.Remove(residentialZone); break;
-                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.Remove(commercialZone); break;
-                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.Remove(industrialZone); break;
+                case Zone zone: UpdateZoneList(zone, add); break;
                 case FireDepartment fireDepartment: if (add) FireManager.AddFireDepartment(fireDepartment); else FireManager.RemoveFireDepartment(fireDepartment); break;
                 case Forest forest: if (add) _growingForests.Add(forest); else _growingForests.Remove(forest); break;
                 default: break;
@@ -366,6 +369,19 @@ namespace CCity.Model
                     throw new Exception("Internal inconsistency: Attempted to remove remove tracking of flammable that is currently burning");
                 else
                     FireManager.RemoveFlammable(placeable);
+            }
+        }
+
+        private void UpdateZoneList(Zone zone, bool add)
+        {
+            if (add) _zones.Add(zone);
+            else _zones.Remove(zone);
+            switch (zone)
+            {
+                case ResidentialZone residentialZone: if (add) _residentialZones.Add(residentialZone); else _residentialZones.Remove(residentialZone); break;
+                case CommercialZone commercialZone: if (add) _commercialZones.Add(commercialZone); else _commercialZones.Remove(commercialZone); break;
+                case IndustrialZone industrialZone: if (add) _industrialZones.Add(industrialZone); else _industrialZones.Remove(industrialZone); break;
+                default: break;
             }
         }
 

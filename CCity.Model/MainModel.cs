@@ -295,24 +295,25 @@ namespace CCity.Model
 
             List<Field> fields = _fieldManager.UpdateModifiedZonesSpread();
             List<Zone> zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+
+            _globalManager.UpdateSatisfaction(
+                fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList(),
+                _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
 
             if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
             {
                 newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones,Satisfaction);
-
                 if (newCitizens.Any())
                     _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
             }
 
-            fields = fields.Concat(_fieldManager.UpdateModifiedZonesSpread()).ToList();
-            fields = fields.Concat(_fieldManager.GrowForests()).ToList();
-            zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+            fields = fields.Concat(_fieldManager.UpdateModifiedZonesSpread()).Concat(_fieldManager.GrowForests()).ToList();
 
-            foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
+            _globalManager.UpdateSatisfaction(
+                fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList(), 
+                _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+
+            foreach (Zone zone in _fieldManager.Zones(true)) fields.Add(zone.Owner!);
             
             var ignitedFields = _fieldManager.IgniteRandomFlammable();
 
