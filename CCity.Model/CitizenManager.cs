@@ -9,9 +9,9 @@ namespace CCity.Model
 
         private const double CitizenMoveOutThreshold = 0.25;
         private const int CloseProximityRadius = 10;
-        private const double DesireToMoveInThreshold = 0.5;
+        private const double DesireToMoveInThreshold = 0.4;
         private const double DistanceEffectThreshold = 0.2;
-        private const double MaxCitizenMoveInRate = 0.1;
+        private const double MaxCitizenMoveInRate = 0.2;
 
         #endregion
 
