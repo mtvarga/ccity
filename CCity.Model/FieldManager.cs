@@ -47,11 +47,13 @@ namespace CCity.Model
         private Spreader _publicitySpreader;
         private Spreader _electricitySpreader;
 
+        private bool _testModeRandomIgniteOff;
+
         #endregion
 
         #region Constructors
 
-        public FieldManager(bool notTestMode= true)
+        public FieldManager(bool testMode = false, bool testModeRandomIgniteOff = false)
         {
             Width = WIDTH;
             Height = HEIGHT;
@@ -89,7 +91,8 @@ namespace CCity.Model
                 (p) => GetNeighbours(p)
                 );
 
-            if(notTestMode) GenerateRandomForests();
+            if(!testMode) GenerateRandomForests();
+            testModeRandomIgniteOff = _testModeRandomIgniteOff;
         }
 
         #endregion
@@ -194,7 +197,11 @@ namespace CCity.Model
             return result;
         }
 
-        public List<Field> IgniteRandomFlammable() => FireManager.IgniteRandomFlammable();
+        public List<Field> IgniteRandomFlammable()
+        {
+            if (_testModeRandomIgniteOff) return new List<Field>();
+            return FireManager.IgniteRandomFlammable();
+        }
 
         public (List<Field> Updated, List<Field> Wrecked) UpdateFires() => FireManager.UpdateFires();
 

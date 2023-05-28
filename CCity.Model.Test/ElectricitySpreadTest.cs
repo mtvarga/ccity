@@ -10,7 +10,7 @@ namespace CCity.Model.Test
     [TestClass]
     public class ElectricitySpreadTest
     {
-        private MainModel _model = new MainModel(false);
+        private MainModel _model = new MainModel(true, true);
 
         [TestInitialize]
         public void Initialize()

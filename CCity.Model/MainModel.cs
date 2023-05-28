@@ -45,9 +45,9 @@ namespace CCity.Model
 
         #region Constructors
 
-        public MainModel(bool notTestMode=true)
+        public MainModel(bool testMode = false, bool testModeRandomIgniteOff = false)
         {
-            _fieldManager = new FieldManager(notTestMode);
+            _fieldManager = new FieldManager(testMode, testModeRandomIgniteOff);
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
 

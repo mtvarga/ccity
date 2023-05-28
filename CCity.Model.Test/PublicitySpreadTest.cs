@@ -9,13 +9,11 @@ namespace CCity.Model.Test
     [TestClass]
     public class PublicitySpreadTest
     {
-        private MainModel _model = new();
+        private MainModel _model = new MainModel(true);
 
         [TestInitialize]
         public void Initialize()
         {
-            _model = new MainModel(false);
-
             TestUtilities.DragPlacePlaceables(_model, new Road(), (22, 28), (16, 28));
             TestUtilities.DragPlacePlaceables(_model, new Road(), (20, 26), (24, 26));
             TestUtilities.DragPlacePlaceables(_model, new Road(), (20, 24), (24, 24));

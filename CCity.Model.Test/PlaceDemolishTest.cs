@@ -5,12 +5,12 @@ namespace CCity.Model.Test
     [TestClass]
     public class PlaceDemolishTest
     {
-        private MainModel _model = new MainModel(false);
+        private MainModel _model = new MainModel(true);
 
         [TestInitialize]
         public void Initialize()
         {
-            _model = new MainModel(false);
+            _model = new MainModel(true);
         }
 
 
