@@ -122,7 +122,7 @@ namespace CCity.Model
             }
             catch (GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
         }
 
@@ -289,21 +289,6 @@ namespace CCity.Model
             var movedOutCitizens = new List<Citizen>();
             var newCitizens = new List<Citizen>();
             
-            /*if (vacantCommercialZones.Any() || vacantIndustrialZones.Any())
-            {
-                workplaceOptimizedCitizens = _citizenManager.OptimizeWorkplaces(vacantCommercialZones, vacantIndustrialZones);
-
-                if (workplaceOptimizedCitizens.Any())
-                    _globalManager.UpdateSatisfaction(workplaceOptimizedCitizens);
-
-                if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
-                {
-                    newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
-                    
-                    if (newCitizens.Any())
-                        _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
-                }
-            }*/
             movedOutCitizens = _citizenManager.DecreasePopulation();
             if (movedOutCitizens.Any())
                 _globalManager.UpdateSatisfaction(false, movedOutCitizens, _citizenManager.Citizens);
@@ -325,7 +310,6 @@ namespace CCity.Model
             zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
             _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
 
-            // TODO: Optimize this - add only affected zones to the list
             foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
             foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
