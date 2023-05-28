@@ -92,7 +92,7 @@ namespace CCity.Model
                 );
 
             if(!testMode) GenerateRandomForests();
-            testModeRandomIgniteOff = _testModeRandomIgniteOff;
+            _testModeRandomIgniteOff = testModeRandomIgniteOff;
         }
 
         #endregion
