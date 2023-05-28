@@ -29,21 +29,17 @@ namespace CCity.Model
         public Field[,] Fields { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public int CommercialZoneCount { get => _commercialZones.Count; }
-        public int IndustrialZoneCount { get => _industrialZones.Count; }
-        
+        public int CommercialZoneCount => _commercialZones.Count;
+        public int IndustrialZoneCount => _industrialZones.Count;
+        public bool FirePresent => FireManager.FirePresent;
+        public bool FireTrucksDeployed => FireManager.FireTrucksDeployed;
+
         private HashSet<ResidentialZone> _residentialZones;
         private HashSet<CommercialZone> _commercialZones;
         private HashSet<IndustrialZone> _industrialZones;
-
         private HashSet<Forest> _growingForests;
-        
-        public bool FirePresent => FireManager.FirePresent;
-
-        public bool FireTrucksDeployed => FireManager.FireTrucksDeployed;
 
         private FireManager FireManager { get; }
-        
         private Spreader _publicitySpreader;
         private Spreader _electricitySpreader;
 
@@ -53,7 +49,7 @@ namespace CCity.Model
 
         #region Constructors
 
-        public FieldManager(bool testMode = false, bool testModeRandomIgniteOff = false)
+        public FieldManager(bool testModeGenerateForest = false, bool testModeRandomIgniteOff = false)
         {
             Width = WIDTH;
             Height = HEIGHT;
@@ -63,7 +59,6 @@ namespace CCity.Model
                 for (int j = 0; j < Height; j++)
                     Fields[i, j] = new Field(i, j);
 
-            //lists
             _growingForests = new();
             _residentialZones = new();
             _commercialZones = new();
@@ -72,7 +67,6 @@ namespace CCity.Model
 
             FireManager = new FireManager(this);
             
-            //starter public road
             Road starterRoad = new Road();
             PlaceOnField(Fields[ROOTX, ROOTY], starterRoad);
             starterRoad.MakeRoot(SpreadType.Publicity);
@@ -91,7 +85,7 @@ namespace CCity.Model
                 (p) => GetNeighbours(p)
                 );
 
-            if(!testMode) GenerateRandomForests();
+            if(!testModeGenerateForest) GenerateRandomForests();
             _testModeRandomIgniteOff = testModeRandomIgniteOff;
         }
 
@@ -110,7 +104,6 @@ namespace CCity.Model
         public List<Field> Place(int x, int y, Placeable placeable)
         {
             if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.PlaceOutOfFieldBoundries);
-
             Field field = Fields[x, y];
             List<Field> modifiedFields = PlaceDemolishManager(field, placeable,true);
             List<Field> modifiedFieldsBySpreading;
