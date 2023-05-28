@@ -99,6 +99,14 @@ namespace CCity.Model
 
         #region Public methods  
 
+        /// <summary>
+        /// Places a placeable on the given coordinates of the Field matrix
+        /// </summary>
+        /// <param name="x">X coordinate of the Field matrix</param>
+        /// <param name="y">Y coordinate of the Field matrix</param>
+        /// <param name="placeable">the Placeable to place</param>
+        /// <returns>List of Fields that have been modified as the result of placement</returns>
+        /// <exception cref="GameErrorException"></exception>
         public List<Field> Place(int x, int y, Placeable placeable)
         {
             if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.PlaceOutOfFieldBoundries);
@@ -110,6 +118,13 @@ namespace CCity.Model
             return modifiedFields.Concat(modifiedFieldsBySpreading).ToList();
         }
 
+        /// <summary>
+        /// Upgrades the placeable on the given coordinates of the Field matrix
+        /// </summary>
+        /// <param name="x">X coordinate of the Field matrix</param>
+        /// <param name="y">Y coordinate of the Field matrix</param>
+        /// <returns>The upgraded Placeable as IUpgradeable and the cost of the upgrade</returns>
+        /// <exception cref="GameErrorException"></exception>
         public (IUpgradeable, int) Upgrade(int x, int y)
         {
             if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.UpgradeOutOfFieldBoundries);
@@ -121,6 +136,13 @@ namespace CCity.Model
             return (upgradeable, upgradeCost);
         }
 
+        /// <summary>
+        /// Demolish the placeable from the given coordinates of the Field matrix
+        /// </summary>
+        /// <param name="x">X coordinate of the Field matrix</param>
+        /// <param name="y">Y coordinate of the Field matrix</param>
+        /// <returns>A tuple with the demolished placeable and with a list of Fields that have been modified as the result of placement</returns>
+        /// <exception cref="GameErrorException"></exception>
         public (Placeable, List<Field>) Demolish(int x, int y)
         {
             if (!OnMap(x, y)) throw new GameErrorException(GameErrorType.DemolishOutOfFieldBoundries);
@@ -135,6 +157,10 @@ namespace CCity.Model
             return (placeable, modifiedFields.Concat(modifiedFieldsBySpreading).ToList());
         }
 
+        /// <summary>
+        /// Grows forests one year
+        /// </summary>
+        /// <returns>List of Fields that have been modified as the result of growing</returns>
         public List<Field> GrowForests()
         {
             List<Field> effectedFields = new();
@@ -172,6 +198,10 @@ namespace CCity.Model
             return effectedFields;
         }
 
+        /// <summary>
+        /// Refreshes the spread of electircity roots
+        /// </summary>
+        /// <returns>List of Fields that have been modified as the result of refreshing</returns>
         public List<Field> UpdateModifiedZonesSpread()
         {
             _electricitySpreader.RefreshRoots();
@@ -235,12 +265,25 @@ namespace CCity.Model
             return FireManager.UpdateFireTrucks();
         }
 
+
+        /// <param name="showUnavailable">Return unavailable ResidentialZones as well</param>
+        /// <returns>List of ResidentialZones, only availables (vacant and electrified) by default</returns>
         public List<ResidentialZone> ResidentialZones(bool showUnavailable) => _residentialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
+
+        /// <param name="showUnavailable">Return unavailable CommercialZones as well</param>
+        /// <returns>List of CommercialZones, only availables (vacant and electrified) by default</returns>
         public List<CommercialZone> CommercialZones(bool showUnavailable) => _commercialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
+
+        /// <param name="showUnavailable">Return unavailable IndustrialZones as well</param>
+        /// <returns>List of IndustrialZones, only availables (vacant and electrified) by default</returns>
         public List<IndustrialZone> IndustrialZones(bool showUnavailable) => _industrialZones.Where(zone => !zone.Full && zone.IsElectrified || showUnavailable).ToList();
+        
+        /// <returns>List of Fields where FireTrucks are located</returns>
         public IEnumerable<Field> FireTruckLocations() => FireManager.FireTruckLocations();
 
-        public ((byte, byte, byte, byte), List<Road>) GetFourRoadNeighbours(Road road)
+        /// <param name="road">the road to </param>
+        /// <returns>A tuple with 4 elements indicating the presence (0) or absence (1) of a Road on the current side (top, right, bottom, left), and a list of these Road neighbours</returns>
+        public ((byte top, byte right, byte bottom, byte left), List<Road>) GetFourRoadNeighbours(Road road)
         {
             byte[] ind = new byte[4];
             List<Road> neighbours = new();
@@ -392,7 +435,6 @@ namespace CCity.Model
             {
                 if(f.Placeable != null)
                 {
-                    //TODO - electricity required for moving in
                     UpdatePlaceableList(f.Placeable, f.Placeable.ListingCondition);
 
                     //SWITCHING ON/OFF FIREDEPARTMENT COMES HERE (based on electricity and publicity)
