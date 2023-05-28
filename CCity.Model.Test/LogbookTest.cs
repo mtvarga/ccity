@@ -5,7 +5,7 @@ namespace CCity.Model.Test
     [TestClass]
     public class LogbookTest
     {
-        private MainModel _model = new MainModel(true);
+        private MainModel _model = new MainModel(true, true);
         [TestInitialize]
         public void Initialize()
         {
