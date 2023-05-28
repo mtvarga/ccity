@@ -154,7 +154,7 @@ namespace CCity.Model
         public List<Field> GrowForests()
         {
             List<Field> effectedFields = new();
-            foreach  (Forest  forest in _growingForests.ToList())
+            foreach (Forest forest in _growingForests.ToList())
             {
                 if(forest.CanGrow)
                 {
@@ -162,28 +162,20 @@ namespace CCity.Model
                     if (forest.WillAge)
                     {
                         List<Field> industrialZonesAround = GetPlaceableInRadius(forest.Owner!, EFFECT_RADIUS, p => p is IndustrialZone);
+
                         foreach (Field industrialZone in industrialZonesAround)
-                        {
                             effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
-                        }
-                        effectedFields.Concat(forest.Effect(SpreadForestEffect, false).ToList());
+
+                        effectedFields = effectedFields.Concat(forest.Effect(SpreadForestEffect, false)).ToList();
                         forest.Grow();
-                        effectedFields.Concat(forest.Effect(SpreadForestEffect, true).ToList());
+                        effectedFields = effectedFields.Concat(forest.Effect(SpreadForestEffect, true)).ToList();
+
                         foreach (Field industrialZone in industrialZonesAround)
-                        {
                             effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
-                        }
                     }
-                    else
-                    {
-                        forest.Grow();
-                    }
-                    
+                    else forest.Grow();
                 }
-                else
-                {
-                    _growingForests.Remove(forest);
-                }
+                else _growingForests.Remove(forest);
             }
             return effectedFields;
         }
@@ -315,17 +307,18 @@ namespace CCity.Model
         private List<Field> PlaceDemolishManager(Field field, Placeable placeable,bool place)
         {
             List<Field> effectedFields = new();
-            List<Field> forestsInRadius = GetPlaceableInRadius(field, FOREST_EFFECT_RADIUS, p => p is Forest);
-            foreach (Field forest in forestsInRadius)
-            {
-                effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, false)).ToList();
-            }
             List<Field> industrialZonesAround = new();
-            if (placeable is Forest) industrialZonesAround = GetPlaceableInRadius(field, EFFECT_RADIUS, p => p is IndustrialZone);
+            List<Field> forestsInRadius = GetPlaceableInRadius(field, FOREST_EFFECT_RADIUS, p => p is Forest);
+
+            foreach (Field forest in forestsInRadius)
+                effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, false)).ToList();
+
+            if (placeable is Forest)
+                industrialZonesAround = GetPlaceableInRadius(field, EFFECT_RADIUS, p => p is IndustrialZone);
+
             foreach (Field industrialZone in industrialZonesAround)
-            {
                 effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
-            }
+
             try
             {
                 if (place) effectedFields = effectedFields.Concat(PlaceOnField(field, placeable)).ToList();
@@ -334,31 +327,26 @@ namespace CCity.Model
             finally
             {
                 foreach (Field industrialZone in industrialZonesAround)
-                {
                     effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
-                }
+
                 foreach (Field forest in forestsInRadius)
-                {
                     effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, true)).ToList();
-                }
             }
+
             return effectedFields; 
         }
 
         private List<Field> PlaceOnField(Field field, Placeable placeable)
         {
-            if (!CanPlace(field, placeable))
-            {
-                throw new GameErrorException(GameErrorType.PlaceAlreadyUsedField);
-            }
-            List<Field> effectedFields = new() {field };
+            if (!CanPlace(field, placeable)) throw new GameErrorException(GameErrorType.PlaceAlreadyUsedField);
+            List<Field> effectedFields = new() { field };
             if (placeable is IMultifield multifield)
             {
                 List<(int, int)> fillerCoordinates = GetMultifieldFillerCoordinates(field, multifield);
                 foreach((int X, int Y) coord in fillerCoordinates)
                 {
                     Field currentField = Fields[coord.X, coord.Y];
-                    Filler filler = new Filler(multifield);
+                    Filler filler = new(multifield);
                     multifield.Occupies.Add(filler);
                     currentField.Place(filler);
                     effectedFields.Add(currentField);                    
@@ -391,8 +379,6 @@ namespace CCity.Model
             }
         }
 
-        //you can rename it, i was not creative sorry
-        //Method called in Place and Demolish (see references)
         private List<Field> RefreshSpread(Placeable placeable)
         {
             if (placeable == null) return new();
@@ -449,20 +435,17 @@ namespace CCity.Model
             return modifiedFields;
         }
 
-        private List<Field> SpreadPlaceableEffectRouter(Placeable placeable)
+        private List<Field> SpreadPlaceableEffectRouter(Placeable placeable) => placeable switch
         {
-            return placeable switch
-            {
-                Forest forest => forest.Effect(SpreadForestEffect, placeable.EffectSpreadingCondition),
-                _ => placeable.Effect(SpreadRadiusEffect, placeable.EffectSpreadingCondition)
-            };
-        }
+            Forest forest => forest.Effect(SpreadForestEffect, placeable.EffectSpreadingCondition),
+            _ => placeable.Effect(SpreadRadiusEffect, placeable.EffectSpreadingCondition)
+        };
 
         private List<Field> SpreadRadiusEffect(Placeable placeable, bool add, Action<Field, int> effectFunction, int radius = EFFECT_RADIUS)
         {
             List<Field> effectedFields = new();
             Field field = placeable.Owner!;
-            List<(int, int, double)> coordinates = (Utilities.GetPointsInRadiusWeighted(field, radius).ToList());
+            List<(int, int, double)> coordinates = Utilities.GetPointsInRadiusWeighted(field, radius).ToList();
             foreach ((int X, int Y, double weight) coord in coordinates)
             {
                 if (OnMap(coord.X, coord.Y))
@@ -497,7 +480,6 @@ namespace CCity.Model
             Placeable placeable = field.Placeable!;
             switch (placeable)
             {
-                //case FireDepartment fireDepartment: return fireDepartment.AvailableFiretrucks == 1; //every firetruck is available
                 case Zone zone: return zone.Empty;
                 case Road road:
                     field.Demolish();
@@ -509,8 +491,7 @@ namespace CCity.Model
                     }
                     Place(field.X, field.Y, road);
                     break;
-                case FireDepartment fireDepartment:
-                    return !fireDepartment.FireTruckDeployed;
+                case FireDepartment fireDepartment: return !fireDepartment.FireTruckDeployed;
             }
             return true;
         }
@@ -521,7 +502,6 @@ namespace CCity.Model
             List<Field> effectedFields = new();
             Placeable placeable = field.Placeable!.Root;
             field = placeable.Owner!;
-
             if (placeable is IMultifield multifield)
             {
                 foreach (Filler filler in multifield.Occupies)
@@ -531,8 +511,6 @@ namespace CCity.Model
                     effectedFields.Add(fillerField);
                 }
             }
-            //TEMP SOLUTION
-            //TO DO - consistent SpreadPlaceableEffect
             field.Demolish();
             effectedFields.Add(field);
             List<Field> modifiedFieldsBySpreading = SpreadPlaceableEffectRouter(placeable);
@@ -543,10 +521,7 @@ namespace CCity.Model
 
         #region Helpers
 
-        private bool OnMap(int x, int y)
-        {
-            return 0 <= x && x < Width && 0 <= y && y < Height;
-        }
+        private bool OnMap(int x, int y) => 0 <= x && x < Width && 0 <= y && y < Height;
 
         private List<Placeable> GetNeighboursBySide(Placeable placeable, int side)
         {
@@ -554,15 +529,11 @@ namespace CCity.Model
             Placeable mainPlaceable = placeable.Root;
             Field field = mainPlaceable.Owner!;
             if (field == null) return placeables;
-            int x = field.X;
-            int y = field.Y;
-            int width = 1;
-            int height = 1;
+            (int x, int y) = (field.X, field.Y);
+            (int width, int height) = (1, 1);
             if (mainPlaceable is IMultifield multifield)
-            {
-                width = multifield.Width;
-                height = multifield.Height;
-            }
+                (width, height) = (multifield.Width, multifield.Height);
+
             switch (side)
             {
                 case 0: IterateThroughSide(x, y - height, true, width, placeables); break; //top
@@ -573,22 +544,17 @@ namespace CCity.Model
             return placeables;
         }
 
-        internal List<Placeable> GetNeighbours(Placeable placeable)
-        {
-            List<Placeable> result = GetNeighboursBySide(placeable, 0)
+        internal List<Placeable> GetNeighbours(Placeable placeable) => GetNeighboursBySide(placeable, 0)
                 .Concat(GetNeighboursBySide(placeable, 1))
                 .Concat(GetNeighboursBySide(placeable, 2))
                 .Concat(GetNeighboursBySide(placeable, 3)).ToList();
-            return result;
-        }
+
         private void IterateThroughSide(int startX, int startY, bool xIterates, int iterationNumber, List<Placeable> placeables)
         {
-            int currentX = startX;
-            int currentY = startY;
+            (int currentX, int currentY) = (startX, startY);
             for (int i = 0; i < iterationNumber; i++)
             {
-                currentX = xIterates ? currentX + i : currentX;
-                currentY = xIterates ? currentY : currentY - i;
+                (currentX, currentY) = (xIterates ? currentX + i : currentX, xIterates ? currentY : currentY - i);
                 if (OnMap(currentX, currentY))
                 {
                     Field neighbour = Fields[currentX, currentY];
@@ -597,23 +563,18 @@ namespace CCity.Model
             }
         }
 
-        private List<(int, int)> GetMultifieldFillerCoordinates(Field field, IMultifield multifield)
+        private static List<(int, int)> GetMultifieldFillerCoordinates(Field field, IMultifield multifield)
         {
             List<(int, int)> coordinates = new List<(int, int)>();
-            int width = multifield.Width;
-            int height = multifield.Height;
-            int currentX;
-            int currentY;
+            (int width, int height) = (multifield.Width, multifield.Height);
+            int currentX, currentY;
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
                 {
-                    currentX = field.X + i;
-                    currentY = field.Y - j;
+                    (currentX, currentY) = (field.X + i, field.Y - j);
                     if (currentX != field.X || currentY != field.Y)
-                    {
                         coordinates.Add((field.X + i, field.Y - j));
-                    }
                 }
             }
             return coordinates;
@@ -623,16 +584,17 @@ namespace CCity.Model
         {
             List<(int, int)> getPointsBetween = Utilities.GetPointsBetween(s, t);
             getPointsBetween = getPointsBetween.Where(e => cond(Fields[e.Item1, e.Item2].Placeable!)).ToList();
-            List<Field> placeables = new List<Field>();
+            List<Field> placeables = new();
+
             foreach ((int X,int Y) coord in getPointsBetween)
-            {
                 placeables.Add(Fields[coord.X, coord.Y]);
-            }
+
             return placeables;
         }
+
         private List<Field> GetPlaceableInRadius(Field field, int radius, Func<Placeable, bool> cond)
         {
-            List<Field> placeables = new List<Field>();
+            List<Field> placeables = new();
             List<(int, int)> cordinates = (Utilities.GetPointsInRadius(field, radius)).ToList();
             foreach ((int X, int Y) coord in cordinates)
             {
@@ -649,7 +611,7 @@ namespace CCity.Model
 
         private void GenerateRandomForests()
         {
-            Random rand = new Random();
+            Random rand = new();
             int forestCount = rand.Next(3, 5);
             int i = 0;
             while (i < forestCount)
@@ -665,45 +627,37 @@ namespace CCity.Model
                     GenerateForestAround(field,forestSize,density);
                     i++;
                 }
-
             }
         }
 
         private void GenerateForestAround(Field field,int forestSize,int density)
         {
-            Random rand = new Random();
+            Random rand = new();
             List<(int, int)> cordinates = Utilities.GetPointsInRadius(field, forestSize).ToList();
+
             foreach ((int x,int y) cord  in cordinates)
-            {
-                if (rand.Next(0, 10) < density)
-                {
-                    if (OnMap(cord.x,cord.y) && !Fields[cord.x,cord.y].HasPlaceable)
-                    {
-                        Place(cord.x, cord.y, new Forest(true));
-                    }
-                }
-            }
+                if (rand.Next(0, 10) < density && OnMap(cord.x, cord.y) && !Fields[cord.x, cord.y].HasPlaceable)
+                    Place(cord.x, cord.y, new Forest(true));
         }
 
-        private List<Field> SpreadForestEffect(Placeable placeable,bool add,Action<Field,int> effectFunction,int radius)
+        private List<Field> SpreadForestEffect(Placeable placeable, bool add, Action<Field, int> effectFunction, int radius)
         {
             Forest forest = (Forest)placeable;
             List<Field> effectedFields = new();
             Field field = forest.Owner!;
-            List<(int,int)> cordinates = (Utilities.GetPointsInRadius(field,radius)).ToList();
-            foreach ((int X,int Y) coord in cordinates)
+            List<(int,int)> cordinates = Utilities.GetPointsInRadius(field,radius).ToList();
+            foreach ((int x,int y) in cordinates)
             {
-                if(OnMap(coord.X,coord.Y))
+                if(OnMap(x, y))
                 {
-                    Field effectedField = Fields[coord.X,coord.Y];
-                    if(GetPlaceablesBetween(field,effectedField,p => p is not null && p is not Road && p is not Pole).Count==0)
+                    Field effectedField = Fields[x, y];
+                    if(GetPlaceablesBetween(field, effectedField, p => p is not null && p is not Road && p is not Pole).Count == 0)
                     {
                         int effect = (int)Math.Round(MAX_EFFECT * forest.EffectRate);
                         if (!add) effect *= -1;
                         effectFunction(effectedField,effect);
                         effectedFields.Add(effectedField);
                     }
-                    
                 }
             }
             return effectedFields;
