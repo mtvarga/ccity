@@ -9,7 +9,7 @@ namespace CCity.Model.Test
     [TestClass]
     public class EffectSpreadTest
     {
-        private MainModel _model = new MainModel(true);
+        private MainModel _model = new MainModel(true, true);
 
         [TestInitialize]
         public void Initialize()

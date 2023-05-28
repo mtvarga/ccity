@@ -9,7 +9,6 @@ namespace CCity.Model.Test
         [TestInitialize]
         public void Initialize()
         {
-            _model = new MainModel(false);
             _model.Place(22,28,new Road());
             _model.Place(22,27,new Road());
             _model.Place(22,26,new Road()); 

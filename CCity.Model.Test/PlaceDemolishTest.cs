@@ -7,13 +7,6 @@ namespace CCity.Model.Test
     {
         private MainModel _model = new MainModel(true);
 
-        [TestInitialize]
-        public void Initialize()
-        {
-            _model = new MainModel(true);
-        }
-
-
         //Place successful (can place all placeable)
         [TestMethod]
         public void PlaceSuccessfulTest()
