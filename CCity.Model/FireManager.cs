@@ -82,6 +82,9 @@ internal class FireManager
             if (Random.Next(0, 99) >= Convert.ToInt32(((IFlammable)placeable).Potential))
                 continue;
 
+            if (placeable is Zone { Count: 0 })
+                continue;
+
             var fireLocation = Model.Fire.BreakOut(this, placeable)!.Location;
             result.Add(fireLocation);
             
