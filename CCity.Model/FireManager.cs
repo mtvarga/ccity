@@ -190,7 +190,9 @@ internal class FireManager
     
     private IEnumerable<Field> SpreadFire(Fire fire)
     {
-        var flammableNeighbors = FieldManager.GetNeighbours(fire.Location.Placeable!).Where(p => p is IFlammable).ToList();
+        var flammableNeighbors = FieldManager.GetNeighbours(fire.Location.Placeable!)
+            .Where(p => p is Zone { Empty: false } or not Zone and IFlammable)
+            .ToList();
 
         foreach (var neighbor in flammableNeighbors)
             Model.Fire.BreakOut(this, neighbor);
