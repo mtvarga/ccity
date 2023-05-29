@@ -336,7 +336,9 @@ namespace CCity.ViewModel
                 Tool.Pole,
                 Tool.Road,
                 Tool.Forest,
+                #if DEBUG
                 Tool.FlintAndSteel,
+                #endif
                 Tool.Bulldozer
             };
             Tools = new();
