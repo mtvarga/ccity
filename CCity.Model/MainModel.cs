@@ -1,6 +1,3 @@
-using System.Diagnostics;
-using Microsoft.VisualBasic;
-
 namespace CCity.Model
 {
     public class MainModel
@@ -20,7 +17,6 @@ namespace CCity.Model
         private CitizenManager _citizenManager;
         private GlobalManager _globalManager;
 
-        DateTime _date;
         DateTime _previousDate;
 
         #endregion
@@ -29,31 +25,35 @@ namespace CCity.Model
 
         public string CityName { get; private set; }
         public string MayorName { get; private set; }
-        public Field[,] Fields { get => _fieldManager.Fields; }
-        public int Budget { get => _globalManager.Budget; }
-        public Taxes Taxes { get => _globalManager.Taxes; }
-        public DateTime Date { get => _date; }
+        public DateTime Date { get; private set; }
         public Speed Speed { get; private set; }
-        public double Satisfaction { get => _globalManager.TotalSatisfaction; }
-        public int Population { get => _citizenManager.Population; }
-        public LinkedList<ITransaction> Logbook { get => _globalManager.Logbook; }
-        public int Width { get => _fieldManager.Width; }
-        public int Height { get => _fieldManager.Height; }
+        public Field[,] Fields => _fieldManager.Fields;
+        public int Budget => _globalManager.Budget;
+        public Taxes Taxes => _globalManager.Taxes;
+        public double Satisfaction => _globalManager.TotalSatisfaction;
+        public int Population => _citizenManager.Population;
+        public LinkedList<ITransaction> Logbook => _globalManager.Logbook;
+        public int Width => _fieldManager.Width;
+        public int Height => _fieldManager.Height;
+
         //for test
-        public GameErrorType LastErrorType { private set; get; }
+        public GameErrorType LastErrorType { get; private set; }
+
         #endregion
 
         #region Constructors
 
-        public MainModel(bool testMode = false, bool testModeRandomIgniteOff = false)
+        public MainModel(bool testModeGenerateForest = false, bool testModeRandomIgniteOff = false)
         {
-            _fieldManager = new FieldManager(testMode, testModeRandomIgniteOff);
+            _fieldManager = new FieldManager(testModeGenerateForest, testModeRandomIgniteOff);
             _citizenManager = new CitizenManager();
             _globalManager = new GlobalManager();
 
             Speed = Speed.Normal;
+            Date = DateTime.Now;
 
-            _date = DateTime.Now;
+            CityName = "";
+            MayorName = "";
         }
 
         #endregion
@@ -122,7 +122,7 @@ namespace CCity.Model
             }
             catch (GameErrorException ex)
             {
-                ErrorOccured.Invoke(this, new ErrorEventArgs(ex.ErrorType));
+                ErrorOccured?.Invoke(this, new ErrorEventArgs(ex.ErrorType));
             }
         }
 
@@ -189,22 +189,22 @@ namespace CCity.Model
         public void TimerTick()
         {
 
-            _previousDate = _date;
-            _date = Speed switch
+            _previousDate = Date;
+            Date = Speed switch
             {
-                Speed.Slow => _date.AddMinutes(10),
-                Speed.Normal => _date.AddHours(3),
-                Speed.Fast => _date.AddHours(45),
-                _ => _date
+                Speed.Slow => Date.AddMinutes(10),
+                Speed.Normal => Date.AddHours(3),
+                Speed.Fast => Date.AddHours(45),
+                _ => Date
             };
 
             DateChanged?.Invoke(this, EventArgs.Empty);
 
             Tick();
 
-            if(_previousDate.Month != _date.Month) MonthlyTick();
+            if(_previousDate.Month != Date.Month) MonthlyTick();
 
-            if(_previousDate.Year != _date.Year) YearlyTick();
+            if(_previousDate.Year != Date.Year) YearlyTick();
         }
 
         public void StartNewGame(string cityName, string mayorName)
@@ -215,7 +215,7 @@ namespace CCity.Model
             CityName = cityName;
             MayorName = mayorName;
 
-            _date=DateTime.Now;
+            Date = DateTime.Now;
             Speed = Speed.Normal;
 
             NewGame?.Invoke(this, EventArgs.Empty);
@@ -289,46 +289,31 @@ namespace CCity.Model
             var movedOutCitizens = new List<Citizen>();
             var newCitizens = new List<Citizen>();
             
-            /*if (vacantCommercialZones.Any() || vacantIndustrialZones.Any())
-            {
-                workplaceOptimizedCitizens = _citizenManager.OptimizeWorkplaces(vacantCommercialZones, vacantIndustrialZones);
-
-                if (workplaceOptimizedCitizens.Any())
-                    _globalManager.UpdateSatisfaction(workplaceOptimizedCitizens);
-
-                if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
-                {
-                    newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones);
-                    
-                    if (newCitizens.Any())
-                        _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
-                }
-            }*/
             movedOutCitizens = _citizenManager.DecreasePopulation();
             if (movedOutCitizens.Any())
                 _globalManager.UpdateSatisfaction(false, movedOutCitizens, _citizenManager.Citizens);
 
             List<Field> fields = _fieldManager.UpdateModifiedZonesSpread();
             List<Zone> zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+
+            _globalManager.UpdateSatisfaction(
+                fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList(),
+                _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
 
             if (vacantHomes.Any() && (vacantCommercialZones.Any() || vacantIndustrialZones.Any()))
             {
                 newCitizens = _citizenManager.IncreasePopulation(vacantHomes, vacantCommercialZones, vacantIndustrialZones,Satisfaction);
-
                 if (newCitizens.Any())
                     _globalManager.UpdateSatisfaction(true, newCitizens, _citizenManager.Citizens);
             }
 
-            fields = fields.Concat(_fieldManager.UpdateModifiedZonesSpread()).ToList();
-            fields = fields.Concat(_fieldManager.GrowForests()).ToList();
-            zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
-            _globalManager.UpdateSatisfaction(zones, _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+            fields = fields.Concat(_fieldManager.UpdateModifiedZonesSpread()).Concat(_fieldManager.GrowForests()).ToList();
 
-            // TODO: Optimize this - add only affected zones to the list
-            foreach (Zone zone in _fieldManager.ResidentialZones(true)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.CommercialZones(true)) fields.Add(zone.Owner!);
-            foreach (Zone zone in _fieldManager.IndustrialZones(true)) fields.Add(zone.Owner!);
+            _globalManager.UpdateSatisfaction(
+                fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList(), 
+                _fieldManager.CommercialZoneCount, _fieldManager.IndustrialZoneCount);
+
+            foreach (Zone zone in _fieldManager.Zones(true)) fields.Add(zone.Owner!);
             
             var ignitedFields = _fieldManager.IgniteRandomFlammable();
 
