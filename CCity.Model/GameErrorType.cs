@@ -15,6 +15,7 @@ namespace CCity.Model
         DemolishMainRoad,
         DemolishFieldHasCitizen,
         DemolishFieldPublicity,
+        DemolishFieldOnFire,
         DeployFireTruckNoFire,
         DeployFireTruckOutOfFieldBounds,
         DeployFireTruckBadBuilding,

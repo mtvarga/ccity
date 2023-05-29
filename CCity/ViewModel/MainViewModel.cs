@@ -679,6 +679,7 @@ namespace CCity.ViewModel
                 GameErrorType.DemolishMainRoad => "A főútat nem lehet lerombolni.",
                 GameErrorType.DemolishFieldHasCitizen => "Csak az üres zónát lehet visszaminősíteni.",
                 GameErrorType.DemolishFieldPublicity => "Az út rombolásával legalább egy épület elérhetetlenné válna.",
+                GameErrorType.DemolishFieldOnFire => "Nem lehet égő épületet törölni.",
                 GameErrorType.DeployFireTruckNoFire => "Csak égő épülethez küldhetsz tűzoltóautót.",
                 GameErrorType.DeployFireTruckOutOfFieldBounds => "Pályán kívüli mezőre nem küldhetsz tűzoltóautót.",
                 GameErrorType.DeployFireTruckBadBuilding => "Az épület nem éghető.",
