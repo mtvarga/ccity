@@ -220,7 +220,7 @@ internal class FireManager
         : Utilities.ShortestRoad(FieldManager.Fields, FieldManager.Width, FieldManager.Height, fireTruck.Station, new HashSet<Field> { fireTruck.Location }));
     
     private IEnumerable<FireTruck> AvailableFireTrucks() => FireDepartments
-        .Where(f => !f.FireTruck.Active)
+        .Where(f => f is { IsElectrified: true, FireTruck.Active: false })
         .Select(f => f.FireTruck);
     
     #endregion
