@@ -251,7 +251,7 @@ namespace CCity.Model
                 {
                     var citizens = wreckedFields
                         .Where(f => f.Placeable is Zone)
-                        .SelectMany(f => (f.Placeable as Zone)!.Citizens).ToList();
+                        .SelectMany(f => (f.Placeable as Zone)!.Citizens).ToHashSet().ToList();
 
                     // Move out citizens of the effected fields
                     updatedFields.AddRange(_citizenManager.DecreasePopulation(citizens));
