@@ -330,7 +330,7 @@ namespace CCity.Model
                 _globalManager.UpdateSatisfaction(false, movedOutCitizens, _citizenManager.Citizens);
 
             List<Field> fields = _fieldManager.UpdateModifiedZonesSpread();
-            List<Zone> zones = fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList();
+           
 
             _globalManager.UpdateSatisfaction(
                 fields.Where(e => e.Placeable is Zone).Select(e => (Zone)e.Placeable!).ToList(),
@@ -379,7 +379,7 @@ namespace CCity.Model
                 if (_fieldManager.Fields[i, j].ActualPlaceable is { } placeable && placeable.MaintenanceCost>0)
                 {
                     allTransactions.Add(
-                    _globalManager.CommitTransaction(Transactions.Maintance(placeable)));
+                    _globalManager.CommitTransaction(Transactions.Maintenance(placeable)));
                 }
             }
             _globalManager.AddMaintenanceToLogbook(allTransactions);

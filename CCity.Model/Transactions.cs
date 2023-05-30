@@ -1,13 +1,20 @@
-﻿using System.Text;
-
-namespace CCity.Model;
+﻿namespace CCity.Model;
 
 public static class Transactions
 {
+    
+    #region Constants 
     private const int ResTaxNorm = 150;
     private const int ComTaxNorm = 500;
     private const int IndTaxNorm = 750;
-
+    #endregion
+    
+    /// <summary>
+    /// Returns a transaction that represents a tax collection from a residential zone
+    /// </summary>
+    /// <param name="taxType"> The type of tax to be collected</param>
+    /// <param name="tax"> The tax rate</param>
+    /// <returns> A transaction that represents a tax collection from a residential zone</returns>s
     public static TaxTransaction ResidentialTaxCollection(TaxType taxType,double tax)
     {
         return new TaxTransaction
@@ -16,6 +23,14 @@ public static class Transactions
             TaxType = taxType,
         };
     }
+    
+    /// <summary>
+    ///  Returns a transaction that represents a tax collection from a workplace
+    /// </summary>
+    /// <param name="taxType"> The type of tax to be collected</param>
+    /// <param name="tax"> The tax rate</param>
+    /// <param name="citizenCount"> The number of citizens working in the workplace</param>
+    /// <returns> A transaction that represents a tax collection from a workplace</returns>
     public static TaxTransaction WorkplaceTaxCollection(TaxType taxType,double tax,int citizenCount)
     {
 
@@ -31,6 +46,11 @@ public static class Transactions
         };
     }
 
+    /// <summary>
+    /// Returns a transaction that represents a payment for placing a placeable
+    /// </summary>
+    /// <param name="p"> The placeable to be paid for</param>
+    /// <returns> A transaction that represents a payment for placing a placeable</returns>
     public static PlaceableTransaction Placement(Placeable p)
     {
         return new PlaceableTransaction
@@ -42,7 +62,12 @@ public static class Transactions
         };
     }
 
-    public static PlaceableTransaction Maintance(Placeable p)
+    /// <summary>
+    /// Returns a transaction that represents a payment for maintenance of a placeable
+    /// </summary>
+    /// <param name="p"> The placeable to be paid for</param>
+    /// <returns> A transaction that represents a payment for maintenance of a placeable</returns>
+    public static PlaceableTransaction Maintenance(Placeable p)
     {
         return new PlaceableTransaction
         {
@@ -53,6 +78,11 @@ public static class Transactions
         };
     }
 
+   /// <summary>
+   /// Returns a transaction that represents a payment for demolishing a placeable
+   /// </summary>
+   /// <param name="p"> The placeable to be paid for</param>
+   /// <returns> A transaction that represents a payment for demolishing a placeable</returns>
     public static PlaceableTransaction Takeback(Placeable p)
     {
         return new PlaceableTransaction
@@ -64,6 +94,12 @@ public static class Transactions
         };
     }
 
+   /// <summary>
+   /// Returns a transaction that represents a payment for upgrading a placeable
+   /// </summary>
+   /// <param name="p"> The placeable to be paid for</param>
+   /// <param name="cost"> The cost of the upgrade</param>
+   /// <returns> A transaction that represents a payment for upgrading a placeable</returns>
     public static PlaceableTransaction Upgrade(Placeable p,int cost)
     {
         return new PlaceableTransaction

@@ -69,6 +69,11 @@ namespace CCity.Model
         
         #region Public methods
 
+        /// <summary>
+        /// Adds a citizen to the zone
+        /// </summary>
+        /// <param name="citizen"> The citizen to be added</param>
+        /// <returns> True if the citizen was added, false if the zone is full</returns>
         public bool AddCitizen(Citizen citizen)
         {
             if (Count + 1 > Capacity) 
@@ -78,6 +83,11 @@ namespace CCity.Model
             return true;
         }
 
+        /// <summary>
+        /// Drops a citizen from the zone
+        /// </summary>
+        /// <param name="citizen"> The citizen to be dropped</param>
+        /// <returns> True if the citizen was dropped, false if the citizen was not in the zone</returns>
         public bool DropCitizen(Citizen citizen) => Citizens.Remove(citizen);
 
         public double Satisfaction()
@@ -87,6 +97,9 @@ namespace CCity.Model
             return sum / Count;
         }
         
+        /// <summary>
+        /// Upgrades the zone
+        /// </summary>
         public void Upgrade()
         {
             if (_level == Level.Advanced) return;
