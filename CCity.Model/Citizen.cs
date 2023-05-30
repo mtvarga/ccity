@@ -9,8 +9,6 @@
         #endregion
         
         #region Properties
-
-        public string Name { get; }
         
         public ResidentialZone Home { get; }
         
@@ -39,6 +37,12 @@
 
         #region Public methods
         
+        /// <summary>
+        /// Changes Citizen's workplace.
+        /// Drops Citizen from their current workplace and adds them to the new one.
+        /// </summary>
+        /// <param name="workplace">The new workplace.</param>
+        /// <exception cref="Exception"></exception>
         public void ChangeWorkplace(WorkplaceZone? workplace)
         {
             if (Workplace != null && workplace == null)
@@ -53,6 +57,11 @@
             CalculateHomeWorkplaceDistanceEffect();
         }
 
+        /// <summary>
+        /// Moves Citizen out of the city.
+        /// Drops Citizen from their Home and Workplace.
+        /// </summary>
+        /// <exception cref="Exception"></exception>
         public void MoveOut()
         {
             if (!Home.DropCitizen(this) || !(Workplace?.DropCitizen(this) ?? true))

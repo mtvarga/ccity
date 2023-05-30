@@ -1,7 +1,4 @@
-﻿
-using System.ComponentModel;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public class CitizenManager
     {
@@ -21,8 +18,6 @@ namespace CCity.Model
         public List<Citizen> Citizens { get; set; }
         
         public int Population => Citizens.Count;
-
-        //private List<Citizen> JoblessCitizens { get; }
         
         private bool NextWorkplaceIsCommercial { get; set; }
         
@@ -33,8 +28,6 @@ namespace CCity.Model
         public CitizenManager()
         {
             Citizens = new List<Citizen>();
-            // JoblessCitizens = new List<Citizen>();
-            
             NextWorkplaceIsCommercial = true;
         }
 
@@ -42,16 +35,22 @@ namespace CCity.Model
 
         #region Public methods
 
+        /// <summary>
+        /// Increases population by moving in citizens to vacant homes.
+        /// Checks if there are any vacant homes and workplaces.
+        /// Checks the desire of citizens to move in.
+        /// </summary>
+        /// <param name="vacantHomes"> List of vacant homes. </param>
+        /// <param name="vacantCommercialZones"> List of vacant commercial zones. </param>
+        /// <param name="vacantIndustrialZones"> List of vacant industrial zones. </param>
+        /// <param name="satisfaction"> Satisfaction of citizens. </param>
+        /// <returns> List of moved in citizens. </returns>
          public List<Citizen> IncreasePopulation(List<ResidentialZone> vacantHomes, List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones,double satisfaction)
         {
             var result = new List<Citizen>();
             WorkplaceZone? nextWorkplace = null;
             var allFreeHomeSlots = vacantHomes.Sum(home => home.Capacity);
             var allNewCitizens = 0;
-            // For now, the method will take all the vacant homes and put some citizens in them
-            // It might not fill up a home entirely -- there might still be empty slots left in a home or a workplace after this algorithm is done
-            // TODO: Improve algorithm? - Select some homes randomly and fill those up
-            // TODO: Implement some sort of updating of these vacant homes in FieldManager
             foreach (var home in vacantHomes)
             {
                 var freeSlots = home.Capacity - home.Count;
@@ -59,7 +58,6 @@ namespace CCity.Model
                     ? new Random(DateTime.Now.Millisecond).Next(3, Math.Min(6, freeSlots)) 
                     : freeSlots;
                 allNewCitizens += newCitizenCount;
-                var asd=allFreeHomeSlots* MaxCitizenMoveInRate;
                 if (allNewCitizens > Math.Max(4, allFreeHomeSlots * MaxCitizenMoveInRate)) 
                 {
                     break;
@@ -93,7 +91,11 @@ namespace CCity.Model
             return result;
         }
 
-
+        /// <summary>
+        /// Decreases population by moving out citizens.
+        /// Checks the satisfaction of citizens.
+        /// </summary>
+        /// <returns> List of moved out citizens. </returns>
         public List<Citizen> DecreasePopulation()
         {
             var result = new List<Citizen>();
@@ -112,6 +114,11 @@ namespace CCity.Model
             return result;
         }
 
+        /// <summary>
+        /// Decreases population by moving out citizens.
+        /// </summary>
+        /// <param name="citizens"> List of citizens to move out. </param>
+        /// <returns> List of moved out citizens. </returns>
         public List<Field> DecreasePopulation(List<Citizen> citizens)
         {
             var result = new List<Field>();
@@ -140,22 +147,15 @@ namespace CCity.Model
             var nearestCommercialZone = NearestWorkplace(home, vacantCommercialZones);
             var nearestIndustrialZone = NearestWorkplace(home, vacantIndustrialZones);
             var commercialZoneDistanceEffect = CalculateHomeWorkplaceDistanceEffect(home, nearestCommercialZone);
-            var indusrialZoneDistanceEffect = CalculateHomeWorkplaceDistanceEffect(home, nearestIndustrialZone);
-            if (commercialZoneDistanceEffect==indusrialZoneDistanceEffect || Math.Abs(commercialZoneDistanceEffect-indusrialZoneDistanceEffect)<DistanceEffectThreshold)
+            var industrialZoneDistanceEffect = CalculateHomeWorkplaceDistanceEffect(home, nearestIndustrialZone);
+            if (Math.Abs(commercialZoneDistanceEffect - industrialZoneDistanceEffect) == 0 || Math.Abs(commercialZoneDistanceEffect-industrialZoneDistanceEffect)<DistanceEffectThreshold)
             {
-                if (NextWorkplaceIsCommercial)
-                {
-                    result = nearestCommercialZone;
-                }
-                else
-                {
-                    result = nearestIndustrialZone;
-                }
+                result = NextWorkplaceIsCommercial ? nearestCommercialZone : nearestIndustrialZone;
                 NextWorkplaceIsCommercial = !NextWorkplaceIsCommercial;
             }
             else
             {
-                if (commercialZoneDistanceEffect > indusrialZoneDistanceEffect)
+                if (commercialZoneDistanceEffect > industrialZoneDistanceEffect)
                 {
                     result = nearestCommercialZone;
                     if (NextWorkplaceIsCommercial)
@@ -197,7 +197,7 @@ namespace CCity.Model
             var distanceEffect = CalculateHomeWorkplaceDistanceEffect(home,workplace);
             home.DistanceEffect = distanceEffect;
             var totalSatisfaction = satisfaction;
-            var industrialEffect = home.Owner.IndustrialEffect;
+            var industrialEffect = home.Owner!.IndustrialEffect;
             var forestEffect = home.Owner.ForestEffect;
             var result=totalSatisfaction/3+forestEffect/6+(1-industrialEffect)/6+distanceEffect/3;
             return result;
