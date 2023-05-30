@@ -61,7 +61,7 @@ namespace CCity.ViewModel
         public int Population => _model.Population;
         public Speed Speed => _model.Speed;
         public int CommercialTax => PercentToInt(_model.Taxes.CommercialTax);
-        public int ResidentialTax => PercentToInt(_model.Taxes.ResidentalTax);
+        public int ResidentialTax => PercentToInt(_model.Taxes.ResidentialTax);
         public int IndustrialTax => PercentToInt(_model.Taxes.IndustrialTax);
 
         #endregion

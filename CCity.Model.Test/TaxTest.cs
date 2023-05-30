@@ -61,16 +61,16 @@ namespace CCity.Model.Test
         [TestMethod]
         public void ChangeTaxTest()
         {
-            double residentaltaxBeforeChange = Math.Round(_model.Taxes.ResidentalTax,2);
+            double residentaltaxBeforeChange = Math.Round(_model.Taxes.ResidentialTax,2);
             double commercialtaxBeforeChange = Math.Round(_model.Taxes.CommercialTax,2);
             double industrialtaxBeforeChange = Math.Round(_model.Taxes.IndustrialTax,2);
             _model.ChangeTax(TaxType.Residental, 0.1);
             _model.ChangeTax(TaxType.Commercial, 0.1);
             _model.ChangeTax(TaxType.Industrial, 0.1);
-            Assert.AreEqual( Math.Round(residentaltaxBeforeChange+0.1,2),_model.Taxes.ResidentalTax);
+            Assert.AreEqual( Math.Round(residentaltaxBeforeChange+0.1,2),_model.Taxes.ResidentialTax);
             Assert.AreEqual(Math.Round(commercialtaxBeforeChange+0.1,2),_model.Taxes.CommercialTax);
             Assert.AreEqual(Math.Round(industrialtaxBeforeChange+0.1,2),_model.Taxes.IndustrialTax);
-            Assert.IsTrue(residentaltaxBeforeChange != _model.Taxes.ResidentalTax);
+            Assert.IsTrue(residentaltaxBeforeChange != _model.Taxes.ResidentialTax);
             Assert.IsTrue(commercialtaxBeforeChange != _model.Taxes.CommercialTax);
             Assert.IsTrue(industrialtaxBeforeChange != _model.Taxes.IndustrialTax);
         }
