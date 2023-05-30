@@ -7,11 +7,12 @@ namespace CCity.Model
     {
         #region Constants
 
-        private const double CitizenMoveOutThreshold = 0.25;
+        private const double CitizenMoveOutThreshold = 0.3;
         private const int CloseProximityRadius = 10;
         private const double DesireToMoveInThreshold = 0.4;
         private const double DistanceEffectThreshold = 0.2;
         private const double MaxCitizenMoveInRate = 0.2;
+        private const int MinPopulation = 15;
 
         #endregion
 
@@ -68,15 +69,16 @@ namespace CCity.Model
                     nextWorkplace = NextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
                     double desireToMoveIn = CalculateDesireToMoveIn(home,nextWorkplace,satisfaction);
                     home.DesireToMoveIn = desireToMoveIn;
+                    if (nextWorkplace == null)
+                        break;
                     if (nextWorkplace.Full)
                     {
                         (nextWorkplace is IndustrialZone ? vacantIndustrialZones : vacantCommercialZones).Remove(
                             nextWorkplace);
                         nextWorkplace = NextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
                     }
-                    if (nextWorkplace == null)
-                        break;
-                    if(Population>15 && desireToMoveIn < DesireToMoveInThreshold)
+                  
+                    if(Population>MinPopulation && desireToMoveIn < DesireToMoveInThreshold)
                         break;
                     var citizen = new Citizen(home, nextWorkplace);
                     
@@ -124,29 +126,6 @@ namespace CCity.Model
                 
                 citizen.MoveOut();
             }
-
-            return result;
-        }
-
-        public List<Citizen> OptimizeWorkplaces(List<WorkplaceZone> vacantCommercialZones, List<WorkplaceZone> vacantIndustrialZones)
-        {
-            var result = new List<Citizen>();
-            
-            /*foreach (var citizen in JoblessCitizens)
-            {
-                var nextWorkplace = NextWorkplace(citizen.Home, vacantCommercialZones, vacantIndustrialZones);
-                
-                if (nextWorkplace == null)
-                    break;
-                
-                citizen.ChangeWorkplace(nextWorkplace);
-                result.Add(citizen);
-                
-                if (nextWorkplace.Full)
-                    (NextWorkplaceIsCommercial ? vacantCommercialZones : vacantIndustrialZones).Remove(nextWorkplace);
-
-                NextWorkplaceIsCommercial = !NextWorkplaceIsCommercial;
-            }*/
 
             return result;
         }
