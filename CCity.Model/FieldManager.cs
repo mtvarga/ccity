@@ -89,7 +89,7 @@ namespace CCity.Model
         /// </summary>
         /// <param name="x">X coordinate of the Field matrix</param>
         /// <param name="y">Y coordinate of the Field matrix</param>
-        /// <param name="placeable">the Placeable to place</param>
+        /// <param name="placeable">The Placeable to place</param>
         /// <returns>List of Fields that have been modified as the result of placement</returns>
         /// <exception cref="GameErrorException"></exception>
         public List<Field> Place(int x, int y, Placeable placeable)
@@ -258,7 +258,7 @@ namespace CCity.Model
         /// <returns>List of Fields where FireTrucks are located</returns>
         public IEnumerable<Field> FireTruckLocations() => FireManager.FireTruckLocations();
 
-        /// <param name="road">the road to </param>
+        /// <param name="road">The road to </param>
         /// <returns>A tuple with 4 elements indicating the presence (0) or absence (1) of a Road on the current side (top, right, bottom, left), and a list of these Road neighbours</returns>
         public ((byte top, byte right, byte bottom, byte left), List<Road>) GetFourRoadNeighbours(Road road)
         {

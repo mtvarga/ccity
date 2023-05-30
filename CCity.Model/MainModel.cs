@@ -60,6 +60,12 @@ namespace CCity.Model
 
         #region Public methods
 
+        /// <summary>
+        /// Places a placeable on the given coordinates of the Field matrix
+        /// </summary>
+        /// <param name="x">X coordinate of the Field matrix</param>
+        /// <param name="y">Y coordinate of the Field matrix</param>
+        /// <param name="placeable">The Placeable to place</param>
         public void Place(int x, int y, Placeable placeable)
         {
             try
@@ -86,6 +92,11 @@ namespace CCity.Model
             }
         }
 
+        /// <summary>
+        /// Demolish the placeable from the given coordinates of the Field matrix
+        /// </summary>
+        /// <param name="x">X coordinate of the Field matrix</param>
+        /// <param name="y">Y coordinate of the Field matrix</param>
         public void Demolish(int x, int y)
         {
             try
@@ -110,6 +121,11 @@ namespace CCity.Model
             }
         }
 
+        /// <summary>
+        /// Upgrades the placeable on the given coordinates of the Field matrix
+        /// </summary>
+        /// <param name="x">X coordinate of the Field matrix</param>
+        /// <param name="y">Y coordinate of the Field matrix</param>
         public void Upgrade(int x, int y)
         {
             try
@@ -168,6 +184,12 @@ namespace CCity.Model
                 FieldsUpdated?.Invoke(this, new FieldEventArgs(updatedFields));
         } 
 
+
+        /// <summary>
+        /// Changes the tax by adding the amount (percentage) to the current tax value
+        /// </summary>
+        /// <param name="type">The type of the tax</param>
+        /// <param name="amount">The amount to add</param>
         public void ChangeTax(TaxType type, double amount)
         {
             if(!_globalManager.ChangeTax(type, amount))
@@ -177,6 +199,10 @@ namespace CCity.Model
             SatisfactionChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Changes the speed of the game
+        /// </summary>
+        /// <param name="speed">New speed</param>
         public void ChangeSpeed(Speed speed)
         {
             if (_fieldManager.FirePresent)
@@ -186,6 +212,9 @@ namespace CCity.Model
             SpeedChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Forwards the time based on the current speed
+        /// </summary>
         public void TimerTick()
         {
 
@@ -207,6 +236,11 @@ namespace CCity.Model
             if(_previousDate.Year != Date.Year) YearlyTick();
         }
 
+        /// <summary>
+        /// Resets the game state to default
+        /// </summary>
+        /// <param name="cityName">The name of the city</param>
+        /// <param name="mayorName">The name of the major</param>
         public void StartNewGame(string cityName, string mayorName)
         {
             _fieldManager = new FieldManager();
@@ -221,6 +255,8 @@ namespace CCity.Model
             NewGame?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <param name="road">The road to </param>
+        /// <returns>A tuple with 4 elements indicating the presence (0) or absence (1) of a Road on the current side (top, right, bottom, left), and a list of these Road neighbours</returns>
         public ((byte t, byte r, byte b, byte l) indicators, List<Road> neighbours) GetFourRoadNeighbours(Road road) => _fieldManager.GetFourRoadNeighbours(road);
 
         public IEnumerable<Field> FireTruckLocations() => _fieldManager.FireTruckLocations();
