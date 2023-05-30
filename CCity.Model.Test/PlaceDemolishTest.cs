@@ -5,7 +5,7 @@ namespace CCity.Model.Test
     [TestClass]
     public class PlaceDemolishTest
     {
-        private MainModel _model = new MainModel(true);
+        private MainModel _model = new MainModel(true,true);
 
         //Place successful (can place all placeable)
         [TestMethod]
@@ -51,14 +51,14 @@ namespace CCity.Model.Test
         public void PlaceUnSucsessulTest()
         {
             _model.Place(_model.Width - 1, _model.Height - 1, new Stadium());
-            Assert.AreEqual(_model.LastErrorType,GameErrorType.PlaceAlreadyUsedField);
+            Assert.AreEqual(GameErrorType.PlaceAlreadyUsedField, _model.LastErrorType);
             _model.Place(-1, 1, new Forest());
-            Assert.AreEqual(_model.LastErrorType,GameErrorType.PlaceOutOfFieldBoundries);
+            Assert.AreEqual(GameErrorType.PlaceOutOfFieldBoundries, _model.LastErrorType);
             _model.Place(1, 1, new Forest());
             Assert.IsTrue(_model.Fields[1, 1].Placeable is Forest);
             _model.Place(1, 1, new PoliceDepartment());
             Assert.IsFalse(_model.Fields[1, 1].Placeable is PoliceDepartment);
-            Assert.AreEqual(_model.LastErrorType,GameErrorType.PlaceAlreadyUsedField);
+            Assert.AreEqual(GameErrorType.PlaceAlreadyUsedField, _model.LastErrorType);
         }
 
         //Demolish succesful (can demolish all placeable)
@@ -128,39 +128,48 @@ namespace CCity.Model.Test
             Assert.IsFalse(_model.Fields[1, 1].HasPlaceable);
         }
 
-        //Demolish unsuccessful (TODO DEMOLISHFIELDHASCITIZEN)
+        //Demolish unsuccessful
         [TestMethod]
         public void DemolishUnsuccesfulTest()
         {
             _model.Demolish(-1, 1);
-            Assert.AreEqual(_model.LastErrorType, GameErrorType.DemolishOutOfFieldBoundries);
+            Assert.AreEqual(GameErrorType.DemolishOutOfFieldBoundries, _model.LastErrorType);
             _model.Demolish(1, 1);
             Assert.AreEqual(_model.LastErrorType, GameErrorType.DemolishEmptyField);
             _model.Demolish(_model.Width / 2, _model.Height-1);
-            Assert.AreEqual(_model.LastErrorType, GameErrorType.DemolishMainRoad);
+            Assert.AreEqual(GameErrorType.DemolishMainRoad, _model.LastErrorType);
 
 
             _model.Place(_model.Width / 2, _model.Height - 2, new Road());
             _model.Place(_model.Width / 2-1, _model.Height - 2, new PoliceDepartment());
             _model.Demolish(_model.Width / 2, _model.Height - 2);
-            Assert.AreEqual(_model.LastErrorType, GameErrorType.DemolishFieldPublicity);
+            Assert.IsTrue(_model.Fields[_model.Width / 2, _model.Height - 2].Placeable is Road);
+            Assert.AreEqual(GameErrorType.DemolishFieldPublicity, _model.LastErrorType);
+
         }
 
-        //Forest generation
+        //Demolish filed with citizen
         [TestMethod]
-        public void ForestGenerationTest()
+        public void DemolishFilledZone()
         {
-            _model = new MainModel();
-            bool containsForest = false;
-            foreach (Field field in _model.Fields)
-            {
-                if(field.Placeable is Forest)
-                {
-                    containsForest = true;
-                    break;
-                }
-            }
-            Assert.IsTrue(containsForest);
+            ResidentialZone residentialZone = new ResidentialZone();
+            Citizen citizen = new Citizen(residentialZone);
+            residentialZone.AddCitizen(citizen);
+            _model.Place(1,1,residentialZone);
+            _model.Demolish(1, 1);
+            Assert.AreEqual(GameErrorType.DemolishFieldHasCitizen, _model.LastErrorType);
+
+            IndustrialZone industrialZone = new IndustrialZone();
+            industrialZone.AddCitizen(citizen);
+            _model.Place(2, 1, industrialZone);
+            _model.Demolish(2, 1);
+            Assert.AreEqual(GameErrorType.DemolishFieldHasCitizen, _model.LastErrorType);
+
+            CommercialZone commercialZone = new CommercialZone();
+            commercialZone.AddCitizen(citizen);
+            _model.Place(3, 1, commercialZone);
+            _model.Demolish(3, 1);
+            Assert.AreEqual(GameErrorType.DemolishFieldHasCitizen, _model.LastErrorType);
         }
 
     }
