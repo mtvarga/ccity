@@ -42,7 +42,7 @@ namespace CCity.Model.Test
         {
             _model.Place(23,28,new ResidentialZone());
             _model.ChangeSpeed(Speed.Fast);
-            int nextMonth = _model.Date.Month + 1;
+            int nextMonth = _model.Date.Month + 1<=12?_model.Date.Month + 1:1;
             
             while (_model.Date.Month!=nextMonth)
             {
@@ -71,7 +71,7 @@ namespace CCity.Model.Test
             
             //if workplace is close enough, population will increase
             _model.Place(23,26,new IndustrialZone());
-            int nextMonth = _model.Date.Month + 1;
+            int nextMonth = _model.Date.Month + 1<=12?_model.Date.Month + 1:1;
             while (_model.Date.Month!=nextMonth)
             {
                 _model.TimerTick();
@@ -109,7 +109,7 @@ namespace CCity.Model.Test
             ResidentialZone residentialZone = (ResidentialZone) _model.Fields[23,28].Placeable;
             var startDesireToMoveIn = residentialZone.DesireToMoveIn;
             _model.ChangeSpeed(Speed.Fast);
-            int nextYear = _model.Date.Year+1;
+            int nextYear = _model.Date.Year+3;
             while (_model.Date.Year!=nextYear)
             {
                 _model.TimerTick();

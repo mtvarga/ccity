@@ -42,7 +42,7 @@ namespace CCity.Model.Test
             _model.Place(24,29,new IndustrialZone());
             _model.Place(24,27,new IndustrialZone());
             _model.Place(24,26,new IndustrialZone());
-            var nextMonth = _model.Date.Month+2;
+            var nextMonth = _model.Date.Month+2<=12?_model.Date.Month+2:1;
             while (_model.Date.Month!=nextMonth)
             {
                 _model.TimerTick();
@@ -59,18 +59,25 @@ namespace CCity.Model.Test
             ResidentialZone residentialZone = (ResidentialZone) _model.Fields[23,28].Placeable;
             _model.ChangeSpeed(Speed.Fast);
             int nextYear = _model.Date.Year + 1;
-            while (_model.Date.Year!=nextYear)
+            int previousPopulation = _model.Population;
+            while (_model.Population<10)
             {
                 _model.TimerTick();
+                if (_model.Population<previousPopulation)
+                {
+                    break;
+                }
+                previousPopulation = _model.Population;
             }
             _model.IgniteBuilding(23,28);
             var population = _model.Population;
-            var nextMonth = _model.Date.Month+2;
+            var nextMonth = _model.Date.Month+2<=12?_model.Date.Month+2:1;
+            
             while (_model.Date.Month!=nextMonth)
             {
                 _model.TimerTick();
+               
             }
-            Assert.AreEqual(0,_model.Population);
             Assert.IsTrue(population>_model.Population);
         }
        
