@@ -152,17 +152,17 @@ namespace CCity.Model
                     effectedFields.Add(forest.Owner!);
                     if (forest.WillAge)
                     {
-                        List<Field> industrialZonesAround = GetPlaceableInRadius(forest.Owner!, EFFECT_RADIUS, p => p is IndustrialZone);
+                        List<Field> industrialFieldsAround = GetPlaceableInRadius(forest.Owner!, EFFECT_RADIUS, p => p is IndustrialZone);
 
-                        foreach (Field industrialZone in industrialZonesAround)
-                            effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
+                        foreach (Field industrialField in industrialFieldsAround)
+                            effectedFields = effectedFields.Concat(industrialField.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
 
                         effectedFields = effectedFields.Concat(forest.Effect(SpreadForestEffect, false)).ToList();
                         forest.Grow();
                         effectedFields = effectedFields.Concat(forest.Effect(SpreadForestEffect, true)).ToList();
 
-                        foreach (Field industrialZone in industrialZonesAround)
-                            effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
+                        foreach (Field industrialField in industrialFieldsAround)
+                            effectedFields = effectedFields.Concat(industrialField.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
                     }
                     else forest.Grow();
                 }
@@ -302,17 +302,17 @@ namespace CCity.Model
         private List<Field> PlaceDemolishManager(Field field, Placeable placeable,bool place)
         {
             List<Field> effectedFields = new();
-            List<Field> industrialZonesAround = new();
+            List<Field> industrialFieldsAround = new();
             List<Field> forestsInRadius = GetPlaceableInRadius(field, FOREST_EFFECT_RADIUS, p => p is Forest);
 
             foreach (Field forest in forestsInRadius)
                 effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, false)).ToList();
 
             if (placeable is Forest)
-                industrialZonesAround = GetPlaceableInRadius(field, EFFECT_RADIUS, p => p is IndustrialZone);
+                industrialFieldsAround = GetPlaceableInRadius(field, EFFECT_RADIUS, p => p is IndustrialZone);
 
-            foreach (Field industrialZone in industrialZonesAround)
-                effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
+            foreach (Field industrialField in industrialFieldsAround)
+                effectedFields = effectedFields.Concat(industrialField.Placeable!.Effect(SpreadRadiusEffect, false)).ToList();
 
             try
             {
@@ -320,12 +320,13 @@ namespace CCity.Model
                 else effectedFields = effectedFields.Concat(DemolishFromField(field)).ToList();
             }
             finally
-            {
-                foreach (Field industrialZone in industrialZonesAround)
-                    effectedFields = effectedFields.Concat(industrialZone.Placeable!.Effect(SpreadRadiusEffect, true)).ToList();
+            { 
 
                 foreach (Field forest in forestsInRadius)
                     effectedFields = effectedFields.Concat(forest.Placeable!.Effect(SpreadForestEffect, true)).ToList();
+
+                foreach (Field industrialField in industrialFieldsAround)
+                    effectedFields = effectedFields.Concat(SpreadPlaceableEffectRouter(industrialField.Placeable!)).ToList();
             }
 
             return effectedFields; 
