@@ -2,12 +2,7 @@
 {
     public class GlobalManager
     {
-        #region Constants 
-        
-        private const int ResTaxNorm = 150;
-        private const int ComTaxNorm = 500;
-        private const int IndTaxNorm = 750;
-
+        #region Constants
         private const double MaxResTax = 0.50;
         private const double MaxComTax = 0.25;
         private const double MaxIndTax = 0.25;
@@ -86,7 +81,7 @@
                                         /
                                         (TaxRatio + IndustrialCommercialBalanceRatio);
 
-        private double TaxFactors => 1 - (ResTaxRatio * (Taxes.ResidentalTax - MinResTax) / (MaxResTax - MinResTax) +
+        private double TaxFactors => 1 - (ResTaxRatio * (Taxes.ResidentialTax - MinResTax) / (MaxResTax - MinResTax) +
                                           ComTaxRatio * (Taxes.CommercialTax - MinComTax) / (MaxComTax - MinComTax) +
                                           IndTaxRatio * (Taxes.IndustrialTax - MinIndTax) / (MaxIndTax - MinIndTax)) /
                                          (ResTaxRatio + ComTaxRatio + IndTaxRatio);
@@ -119,7 +114,7 @@
 
             _taxes = new Taxes
             {
-                ResidentalTax = 0.27,
+                ResidentialTax = 0.27,
                 CommercialTax = 0.15,
                 IndustrialTax = 0.05
             };
@@ -134,29 +129,42 @@
 
         #region Public methods
 
+        /// <summary>
+        /// Add a transaction to the logbook
+        /// If the logbook is full, remove the last transaction
+        /// </summary>
+        /// <param name="transaction">The transaction to add</param>
         public void AddOnlyOneToLogbook(ITransaction transaction)
         {
             Logbook.AddFirst(transaction);
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
         }
+        
+        /// <summary>
+        /// Add a list of tax transactions to the logbook
+        /// Group them by tax type
+        /// </summary>
+        /// <param name="transactions">The list of tax transactions to add</param>
+        /// <exception cref="Exception"></exception>
         public void AddTaxToLogbook(List<ITransaction> transactions)
         {
             uint residentialTaxes = 0;
             uint commercialTaxes = 0;
             uint industrialTaxes = 0;
-            foreach (TaxTransaction transaction in transactions)
+            foreach (var tmpTransaction in transactions)
             {
+                var transaction = (TaxTransaction)tmpTransaction;
                 switch (transaction.TaxType)
                 {
                     case TaxType.Residental:
-                        residentialTaxes += (uint) transaction.Amount;
+                        residentialTaxes +=transaction.Amount;
                         break;
                     case TaxType.Commercial:
-                        commercialTaxes += (uint) transaction.Amount;
+                        commercialTaxes += transaction.Amount;
                         break;
                     case TaxType.Industrial:
-                        industrialTaxes += (uint) transaction.Amount;
+                        industrialTaxes += transaction.Amount;
                         break;
                     default:
                         throw new Exception("Wrong tax type");
@@ -173,23 +181,29 @@
                 Logbook.RemoveLast();
         }
 
+        /// <summary>
+        /// Add a list of maintenance transactions to the logbook
+        /// Group them by placeable type
+        /// </summary>
+        /// <param name="transactions"></param>
         public void AddMaintenanceToLogbook(List<ITransaction> transactions)
         {
-            uint RoadMaintenance = 0;
-            uint ForestMaintenance = 0;
-            uint PoleMaintenance = 0;
-            foreach (PlaceableTransaction transaction in transactions)
+            uint roadMaintenance = 0;
+            uint forestMaintenance = 0;
+            uint poleMaintenance = 0;
+            foreach (var tmpTransaction in transactions)
             {
+                var transaction = (PlaceableTransaction)tmpTransaction;
                 switch (transaction.Placeable)
                 {
                     case Road:
-                        RoadMaintenance += (uint) transaction.Amount;
+                        roadMaintenance += transaction.Amount;
                         break;
                     case Forest:
-                        ForestMaintenance += (uint) transaction.Amount;
+                        forestMaintenance += transaction.Amount;
                         break;
                     case Pole:
-                        PoleMaintenance += (uint) transaction.Amount;
+                        poleMaintenance += transaction.Amount;
                         break;
                     default:
                         Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = transaction.Amount,Placeable = transaction.Placeable,TransactionType = PlaceableTransactionType.Maintenance});
@@ -199,29 +213,29 @@
                 }
             }
             Road road= new Road();
-            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = RoadMaintenance,Placeable = road,TransactionType = PlaceableTransactionType.Maintenance});
+            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = roadMaintenance,Placeable = road,TransactionType = PlaceableTransactionType.Maintenance});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
             Forest forest = new Forest();
-            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = ForestMaintenance,Placeable = forest,TransactionType = PlaceableTransactionType.Maintenance});
+            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = forestMaintenance,Placeable = forest,TransactionType = PlaceableTransactionType.Maintenance});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
             Pole pole = new Pole();
-            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = PoleMaintenance,Placeable = pole,TransactionType = PlaceableTransactionType.Maintenance});
+            Logbook.AddFirst(new PlaceableTransaction{Add=false,Amount = poleMaintenance,Placeable = pole,TransactionType = PlaceableTransactionType.Maintenance});
             if (Logbook.Count > MaxLogbookLength)
                 Logbook.RemoveLast();
         }
+        
+        /// <summary>
+        /// Commit a transaction to the budget
+        /// Check if the budget is negative
+        /// </summary>
+        /// <param name="transaction">The transaction to commit</param>
+        /// <returns>The committed transaction</returns>
         public ITransaction CommitTransaction(ITransaction transaction)
         {
             int newBudget = 0;
-            if (transaction.Add)
-            {
-                newBudget =Convert.ToInt32(Budget + transaction.Amount);
-            }
-            else
-            {
-                 newBudget =Convert.ToInt32(Budget - transaction.Amount);
-            }
+            newBudget = transaction.Add ? Convert.ToInt32(Budget + transaction.Amount) : Convert.ToInt32(Budget - transaction.Amount);
             
 
             NegativeBudgetYears = newBudget switch
@@ -235,6 +249,14 @@
             return transaction;
         }
 
+        /// <summary>
+        /// Collect taxes from all citizens and workplaces
+        /// Then commit the transactions to the budget
+        /// Then add the transactions to the logbook
+        /// </summary>
+        /// <param name="residentialZones"> List of residential zones</param>
+        /// <param name="workplaceZones">List of workplace zones</param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public void CollectTax(List<ResidentialZone> residentialZones, List<WorkplaceZone> workplaceZones)
         {
             var allTransactions = new List<ITransaction>();
@@ -245,7 +267,7 @@
                     if (!citizen.Jobless)
                     {
                         allTransactions.Add(CommitTransaction(
-                            Transactions.ResidentialTaxCollection(TaxType.Residental, _taxes.ResidentalTax)));
+                            Transactions.ResidentialTaxCollection(TaxType.Residental, _taxes.ResidentialTax)));
                     }
                 }
             }
@@ -262,10 +284,17 @@
                         workplaceZone.Count),
                     _ => throw new ArgumentOutOfRangeException()
                 }));
-            } ;
+            }
+
             AddTaxToLogbook(allTransactions);
         }
 
+        /// <summary>
+        /// Change the tax of a given type by a given amount
+        /// </summary>
+        /// <param name="taxType"> The type of tax to change</param>
+        /// <param name="amount"> The amount to change the tax by</param>
+        /// <returns>True if the tax was changed, false if the tax would be out of bounds</returns>
         public bool ChangeTax(TaxType taxType, double amount)
         {
             double changedTax;
@@ -273,12 +302,12 @@
             switch (taxType)
             {
                 case TaxType.Residental:
-                    changedTax = Math.Round(_taxes.ResidentalTax + amount, 2);
+                    changedTax = Math.Round(_taxes.ResidentialTax + amount, 2);
                     
                     if (changedTax < MinResTax || changedTax > MaxResTax)
                         return false;
                     
-                    _taxes.ResidentalTax = changedTax;
+                    _taxes.ResidentialTax = changedTax;
                     break;
                 case TaxType.Commercial:
                     changedTax = Math.Round(_taxes.CommercialTax + amount, 2);
@@ -303,6 +332,12 @@
             return true;
         }
         
+        /// <summary>
+        /// Update the satisfaction of all citizens
+        /// </summary>
+        /// <param name="zones"> List of all zones</param>
+        /// <param name="commercialZoneCount"> Number of commercial zones</param>
+        /// <param name="industrialZoneCount"> Number of industrial zones</param>
         public void UpdateSatisfaction(IEnumerable<Zone> zones, int commercialZoneCount, int industrialZoneCount)
         {
             CommercialZoneCount = commercialZoneCount;
@@ -311,6 +346,10 @@
             UpdateSatisfaction(zones.SelectMany(zone => zone.Citizens));
         }
         
+        /// <summary>
+        /// Update the satisfaction of all citizens
+        /// </summary>
+        /// <param name="citizens"> List of all citizens</param>
         public void UpdateSatisfaction(IEnumerable<Citizen> citizens)
         {
             if (Population <= 0)
@@ -328,6 +367,12 @@
             AverageCitizenFactors = citizenSatisfactionSum / Population;
         }
         
+        /// <summary>
+        /// Update the satisfaction of all citizens if they moved in or out
+        /// </summary>
+        /// <param name="movedIn"> True if the citizens moved in, false if they moved out</param>
+        /// <param name="changes"> List of citizens that moved in or out</param>
+        /// <param name="citizens"> List of all citizens</param>
         public void UpdateSatisfaction(bool movedIn, List<Citizen> changes, List<Citizen> citizens)
         {
             if (citizens.Count == 0)
@@ -364,14 +409,21 @@
 
             AverageCitizenFactors = citizenSatisfactionSum / Population;
         }
-
-        // TODO: Don't forget to wire this in the MainModel!
+        
+        /// <summary>
+        /// Pass a year and check if the budget is negative
+        /// </summary>
         public void PassYear()
         {
             if (Budget <= 0)
                 NegativeBudgetYears++;
         }
 
+        /// <summary>
+        /// Calculate the total satisfaction of a citizen
+        /// </summary>
+        /// <param name="zone"> The zone the citizen is in</param>
+        /// <returns></returns>
         public double CalculateSatisfaction(Zone zone) => zone.Empty switch
         {
             true => 0,
