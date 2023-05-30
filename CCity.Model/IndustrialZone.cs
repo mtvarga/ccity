@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CCity.Model
+﻿namespace CCity.Model
 {
     public class IndustrialZone : WorkplaceZone
     {
         #region Constants
 
-        private const int effectRadius = 10;
+        private const int EffectRadius = 10;
 
         private const byte IndustrialZonePotential = 2;
 
@@ -31,7 +25,7 @@ namespace CCity.Model
         {
             if (EffectSpreaded == add) return new();
             EffectSpreaded = add;
-            return spreadingFunction(this, add, (f, i) => f.ChangeIndustrialEffect(i), effectRadius);
+            return spreadingFunction(this, add, (f, i) => f.ChangeIndustrialEffect(i), EffectRadius);
         }
 
         #endregion
