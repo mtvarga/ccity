@@ -36,8 +36,8 @@ namespace CCity.Model
                 base.Owner = value;
             }
         }
-        
-        public FireTruck FireTruck { get; private set; }
+
+        public FireTruck FireTruck { get; private set; } = null!;
 
         internal bool FireTruckDeployed => FireTruck.Active || FireTruck.Moving;
 

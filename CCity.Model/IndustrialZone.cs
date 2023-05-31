@@ -6,7 +6,7 @@
 
         private const int EffectRadius = 10;
 
-        private const byte IndustrialZonePotential = 2;
+        private const float IndustrialZonePotential = 0.02f;
 
         #endregion
 
@@ -15,7 +15,7 @@
         public override int PlacementCost => 100;
         public override int MaintenanceCost => 0;
         
-        public override byte Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : IndustrialZonePotential ; 
+        public override float Potential => Owner?.FireDepartmentEffect > 0.5 || Empty ? 0 : IndustrialZonePotential ; 
 
         #endregion
 

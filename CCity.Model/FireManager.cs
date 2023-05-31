@@ -79,7 +79,7 @@ internal class FireManager
         
         foreach (var placeable in Flammables)
         {
-            if (Random.Next(0, 99) >= Convert.ToInt32(((IFlammable)placeable).Potential))
+            if (Random.NextSingle() >= ((IFlammable)placeable).Potential)
                 continue;
 
             var fireLocation = Model.Fire.BreakOut(this, placeable)!.Location;
@@ -187,7 +187,9 @@ internal class FireManager
     
     private IEnumerable<Field> SpreadFire(Fire fire)
     {
-        var flammableNeighbors = FieldManager.GetNeighbours(fire.Location.Placeable!).Where(p => p is IFlammable).ToList();
+        var flammableNeighbors = FieldManager.GetNeighbours(fire.Location.Placeable!)
+            .Where(p => p is Zone { Empty: false } or not Zone and IFlammable)
+            .ToList();
 
         foreach (var neighbor in flammableNeighbors)
             Model.Fire.BreakOut(this, neighbor);
@@ -217,7 +219,7 @@ internal class FireManager
         : Utilities.ShortestRoad(FieldManager.Fields, FieldManager.Width, FieldManager.Height, fireTruck.Station, new HashSet<Field> { fireTruck.Location }));
     
     private IEnumerable<FireTruck> AvailableFireTrucks() => FireDepartments
-        .Where(f => !f.FireTruck.Active)
+        .Where(f => f is { IsElectrified: true, FireTruck.Active: false })
         .Select(f => f.FireTruck);
     
     #endregion
