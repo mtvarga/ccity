@@ -79,10 +79,7 @@ internal class FireManager
         
         foreach (var placeable in Flammables)
         {
-            if (Random.Next(0, 99) >= Convert.ToInt32(((IFlammable)placeable).Potential))
-                continue;
-
-            if (placeable is Zone { Empty: true })
+            if (Random.NextSingle() >= ((IFlammable)placeable).Potential)
                 continue;
 
             var fireLocation = Model.Fire.BreakOut(this, placeable)!.Location;

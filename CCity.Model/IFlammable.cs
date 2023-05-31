@@ -10,14 +10,14 @@ namespace CCity.Model
     {
         #region Constants
 
-        public const ushort FlammableMaxHealth = 400;
+        public const ushort FlammableMaxHealth = 100 * MainModel.TicksPerSecond; // 100 secs to burn down
         
         #endregion
         
         #region Properties
 
         // For convenience, we store the potential of a flammable catching fire as an integer between 0 and 100.
-        public byte Potential { get; }
+        public float Potential { get; }
 
         public bool Burning { get; internal set; }
         

@@ -10,7 +10,7 @@ namespace CCity.Model
     {
         #region Constants
 
-        private const byte ResidentialZonePotential = 1;
+        private const float ResidentialZonePotential = 0.01f;
         
         #endregion
 
@@ -19,7 +19,7 @@ namespace CCity.Model
         public override int PlacementCost => 100;
         public override int MaintenanceCost => 0;
 
-        public override byte Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : ResidentialZonePotential;
+        public override float Potential => Owner?.FireDepartmentEffect > 0.5 || Empty ? 0 : ResidentialZonePotential;
 
         #endregion
     }
