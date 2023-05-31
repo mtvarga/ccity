@@ -14,12 +14,13 @@ namespace CCity.Model.Test
         [TestInitialize]
         public void Initialize()
         {
-            TestUtilities.DragPlacePlaceables(_model, new Road(), (22, 28), (22, 16));
-            TestUtilities.DragPlacePlaceables(_model, new Road(), (21, 24), (13, 24));
-            TestUtilities.DragPlacePlaceables(_model, new Pole(), (23, 28), (23, 18));
-            TestUtilities.DragPlacePlaceables(_model, new Pole(), (18, 21), (18, 27));
-            TestUtilities.DragPlacePlaceables(_model, new Pole(), (19, 25), (21, 25));
-            _model.Place(23, 17, new PowerPlant());
+            LevelBuilder.For(_model)
+                .Drag<Road>((22, 28), (22, 16))
+                .Drag<Road>((21, 24), (13, 24))
+                .Drag<Pole>((23, 28), (23, 18))
+                .Drag<Pole>((18, 21), (18, 27))
+                .Drag<Pole>((19, 25), (21, 25))
+                .Place(23, 17, new PowerPlant());
         }
 
         [TestMethod]

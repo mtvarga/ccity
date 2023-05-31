@@ -9,8 +9,10 @@ namespace CCity.Model.Test
         [TestInitialize]
         public void Initialize()
         {
-            TestUtilities.DragPlacePlaceables(_model, new Road(), (22, 28), (22, 1));
-            TestUtilities.DragPlacePlaceables(_model, new Pole(), (21, 26), (21, 1));
+            LevelBuilder.For(_model)
+                .Drag<Road>((22, 28), (22, 1))
+                .Drag<Pole>((21, 26), (21, 1));
+
             _model.Place(20,28,new PowerPlant());
         }
       

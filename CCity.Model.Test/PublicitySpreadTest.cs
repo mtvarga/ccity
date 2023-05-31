@@ -14,26 +14,14 @@ namespace CCity.Model.Test
         [TestInitialize]
         public void Initialize()
         {
-            TestUtilities.DragPlacePlaceables(_model, new Road(), (22, 28), (16, 28));
-            TestUtilities.DragPlacePlaceables(_model, new Road(), (20, 26), (24, 26));
-            TestUtilities.DragPlacePlaceables(_model, new Road(), (20, 24), (24, 24));
-            TestUtilities.DragPlacePlaceables(_model, new Road(), (16, 24), (18, 24));
-
-            List<(int, int)> singleRoads = new()
-            {
-                (22, 27),
-                (20, 25),
-                (24, 25),
-                (16, 27),
-                (16, 25),
-                (18, 25),
-                (18, 26),
-                (17, 26)
-            };
-            TestUtilities.PlaceSinglePlaceables(_model, new Road(), singleRoads);
-
-            _model.Place(21, 22, new PoliceDepartment());
-            _model.Place(25, 23, new Stadium());
+            LevelBuilder.For(_model)
+                .Drag<Road>((22, 28), (16, 28))
+                .Drag<Road>((20, 26), (24, 26))
+                .Drag<Road>((20, 24), (24, 24))
+                .Drag<Road>((16, 24), (18, 24))
+                .Place<Road>((22, 27), (20, 25), (24, 25), (16, 27), (16, 25), (18, 25), (18, 26), (17, 26))
+                .Place<PoliceDepartment>(21, 22)
+                .Place<Stadium>(25, 23);
         }
 
         //Testing if root road is public
