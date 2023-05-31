@@ -51,7 +51,7 @@ public class FireTest
         var randomFireModel = new MainModel(true);
         var fireEmergencyPresent = false;
         
-        LevelBuilder.For(Model)
+        LevelBuilder.For(randomFireModel)
             .Place<PoliceDepartment>(22, 28);
         
         randomFireModel.FieldsUpdated += delegate(object? _, FieldEventArgs args)
