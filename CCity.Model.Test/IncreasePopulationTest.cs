@@ -1,6 +1,4 @@
-﻿using CCity.Model;
-
-namespace CCity.Model.Test
+﻿namespace CCity.Model.Test
 {
     [TestClass]
     public class IncreasePopulationTest
@@ -87,8 +85,8 @@ namespace CCity.Model.Test
             _model.Place(23,28,new ResidentialZone());
             _model.Place(23, 26, new IndustrialZone());
             _model.Place(23,25,new CommercialZone());
-            WorkplaceZone industrialZone = (WorkplaceZone) _model.Fields[23,26].Placeable;
-            WorkplaceZone commercialZone = (WorkplaceZone) _model.Fields[23,25].Placeable;
+            WorkplaceZone industrialZone = (WorkplaceZone) _model.Fields[23,26].Placeable!;
+            WorkplaceZone commercialZone = (WorkplaceZone) _model.Fields[23,25].Placeable!;
             
             _model.ChangeSpeed(Speed.Fast);
             int nextYear = _model.Date.Year + 5;
@@ -106,8 +104,7 @@ namespace CCity.Model.Test
         {
             _model.Place(23,28,new ResidentialZone());
             _model.Place(23,15,new CommercialZone());
-            WorkplaceZone commercialZone = (WorkplaceZone) _model.Fields[23,15].Placeable;
-            ResidentialZone residentialZone = (ResidentialZone) _model.Fields[23,28].Placeable;
+            ResidentialZone residentialZone = (ResidentialZone) _model.Fields[23,28].Placeable!;
             var startDesireToMoveIn = residentialZone.DesireToMoveIn;
             _model.ChangeSpeed(Speed.Fast);
             int nextYear = _model.Date.Year+3;
@@ -146,8 +143,8 @@ namespace CCity.Model.Test
          _model.Place(26,28,new Road());
          _model.Place(24,27,new ResidentialZone());
          _model.Place(26,27,new CommercialZone());
-         ResidentialZone residentialZone = (ResidentialZone) _model.Fields[24,27].Placeable;
-         CommercialZone commercialZone = (CommercialZone) _model.Fields[26,27].Placeable;
+         ResidentialZone residentialZone = (ResidentialZone) _model.Fields[24,27].Placeable!;
+         CommercialZone commercialZone = (CommercialZone) _model.Fields[26,27].Placeable!;
          var nextYear = _model.Date.Year+1;
          while (_model.Date.Year!=nextYear)
          {
@@ -174,8 +171,8 @@ namespace CCity.Model.Test
          _model.Demolish(26,27);
          _model.Place(26,27,new ResidentialZone());
          _model.Place(24,27,new CommercialZone());
-         residentialZone = (ResidentialZone) _model.Fields[26,27].Placeable;
-         commercialZone = (CommercialZone) _model.Fields[24,27].Placeable;
+         residentialZone = (ResidentialZone) _model.Fields[26,27].Placeable!;
+         commercialZone = (CommercialZone) _model.Fields[24,27].Placeable!;
          Assert.IsFalse(residentialZone.IsElectrified);
          Assert.IsTrue(commercialZone.IsElectrified);
          

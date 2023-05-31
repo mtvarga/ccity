@@ -1,6 +1,4 @@
-﻿using CCity.Model;
-
-namespace CCity.Model.Test
+﻿namespace CCity.Model.Test
 {
     [TestClass]
     public class CitizenTest
@@ -24,19 +22,19 @@ namespace CCity.Model.Test
         [TestMethod]
         public void ChangeWorkplaceTest()
         {
-            Citizen citizen = new Citizen((ResidentialZone) _model.Fields[21,29].Placeable, (WorkplaceZone) _model.Fields[23,27].Placeable);
+            Citizen citizen = new Citizen(((ResidentialZone) _model.Fields[21,29].Placeable!), (WorkplaceZone) _model.Fields[23,27].Placeable!);
             var previousWorkplace = citizen.Workplace;
-            citizen.ChangeWorkplace((WorkplaceZone) _model.Fields[23,29].Placeable);
+            citizen.ChangeWorkplace((WorkplaceZone) _model.Fields[23,29].Placeable!);
             Assert.AreNotEqual(previousWorkplace,citizen.Workplace);
         }
 
         [TestMethod]
         public void MoveOutTest()
         {
-            Citizen citizen = new Citizen((ResidentialZone) _model.Fields[21,29].Placeable, (WorkplaceZone) _model.Fields[23,27].Placeable);
+            Citizen citizen = new Citizen(((ResidentialZone) _model.Fields[21,29].Placeable!), (WorkplaceZone) _model.Fields[23,27].Placeable!);
             var workplace = citizen.Workplace;
             var home = citizen.Home;
-            var previousCitizenCountAtWorkplace = workplace.Count;
+            var previousCitizenCountAtWorkplace = workplace!.Count;
             var previousCitizenCountAtHome = home.Count;
             citizen.MoveOut();
             Assert.AreEqual(previousCitizenCountAtWorkplace-1,workplace.Count);

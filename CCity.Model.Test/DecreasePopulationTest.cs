@@ -1,6 +1,4 @@
-﻿using CCity.Model;
-
-namespace CCity.Model.Test
+﻿namespace CCity.Model.Test
 {
     [TestClass]
     public class DecreasePopulationTest
@@ -22,9 +20,6 @@ namespace CCity.Model.Test
             _model.Place(23,28,new ResidentialZone());
             _model.Place(23,15,new CommercialZone());
             _model.Place(23,14,new IndustrialZone());
-            ResidentialZone residentialZone = (ResidentialZone) _model.Fields[23,28].Placeable;
-            CommercialZone commercialZone = (CommercialZone) _model.Fields[23,15].Placeable;
-            IndustrialZone industrialZone = (IndustrialZone) _model.Fields[23,14].Placeable;
             _model.ChangeSpeed(Speed.Fast);
             int nextYear = _model.Date.Year + 1;
             while (_model.Date.Year!=nextYear)
@@ -58,9 +53,7 @@ namespace CCity.Model.Test
         {
             _model.Place(23,28,new ResidentialZone());
             _model.Place(23,27,new CommercialZone());
-            ResidentialZone residentialZone = (ResidentialZone) _model.Fields[23,28].Placeable;
             _model.ChangeSpeed(Speed.Fast);
-            int nextYear = _model.Date.Year + 1;
             int previousPopulation = _model.Population;
             while (_model.Population<10)
             {
