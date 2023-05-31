@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace CCity.Model
 {
     public abstract class Zone : Placeable, IFlammable, IUpgradeable
@@ -35,7 +33,7 @@ namespace CCity.Model
 
         public List<Citizen> Citizens { get; }
 
-        public abstract byte Potential { get; }
+        public abstract float Potential { get; }
     
         bool IFlammable.Burning { get; set; }
 

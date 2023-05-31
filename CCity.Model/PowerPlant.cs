@@ -11,7 +11,7 @@ namespace CCity.Model
     {  
         #region Constants
 
-        private const byte PowerPlantPotential = 1;
+        private const float PowerPlantPotential = 0.01f;
         private const int ElectricityCapacity = 1000;
         
         #endregion
@@ -29,7 +29,7 @@ namespace CCity.Model
 
         public override int MaintenanceCost => 10;
 
-        byte IFlammable.Potential => Owner?.FireDepartmentEffect > 0 ? (byte)0 : PowerPlantPotential;
+        float IFlammable.Potential => Owner?.FireDepartmentEffect > 0.5 ? 0 : PowerPlantPotential;
         
         bool IFlammable.Burning { get; set; }
 

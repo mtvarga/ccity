@@ -477,6 +477,7 @@ namespace CCity.Model
         {
             if (field == Fields[ROOTX, ROOTY]) throw new GameErrorException(GameErrorType.DemolishMainRoad);
             if (!field.HasPlaceable) throw new GameErrorException(GameErrorType.DemolishEmptyField);
+            if (field.Placeable is IFlammable { Burning: true }) throw new GameErrorException(GameErrorType.DemolishFieldOnFire);
             Placeable placeable = field.Placeable!;
             switch (placeable)
             {
