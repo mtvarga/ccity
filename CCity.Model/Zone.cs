@@ -10,7 +10,7 @@ namespace CCity.Model
         #endregion
         #region Constants
         
-        private const int BasicUpgradeCost= 100;
+        private const int BasicUpgradeCost= 5000;
         private const int BeginnerCapacity = 10;
         private const int IntermediateCapacity = 30;
         private const int AdvancedCapacity = 100;

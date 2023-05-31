@@ -24,9 +24,9 @@ namespace CCity.Model
 
         #region Properties
 
-        public override int PlacementCost => 100;
+        public override int PlacementCost => 10000;
 
-        public override int MaintenanceCost => 10;
+        public override int MaintenanceCost => 2000;
 
         public override int NeededElectricity => 200;
 

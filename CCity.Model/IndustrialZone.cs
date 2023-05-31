@@ -12,7 +12,7 @@
 
         #region Properties
 
-        public override int PlacementCost => 100;
+        public override int PlacementCost => 500;
         public override int MaintenanceCost => 0;
         
         public override float Potential => Owner?.FireDepartmentEffect > 0.5 || Empty ? 0 : IndustrialZonePotential ; 
