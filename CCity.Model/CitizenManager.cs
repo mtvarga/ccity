@@ -69,19 +69,17 @@
                     home.DesireToMoveIn = desireToMoveIn;
                     if (nextWorkplace == null)
                         break;
-                    if (nextWorkplace.Full)
-                    {
-                        (nextWorkplace is IndustrialZone ? vacantIndustrialZones : vacantCommercialZones).Remove(
-                            nextWorkplace);
-                        nextWorkplace = NextWorkplace(home, vacantCommercialZones, vacantIndustrialZones);
-                    }
-                  
+                    
                     if(Population>MinPopulation && desireToMoveIn < DesireToMoveInThreshold)
                         break;
                     var citizen = new Citizen(home, nextWorkplace);
                     
                     Citizens.Add(citizen);
                     result.Add(citizen);
+                    if (nextWorkplace.Full)
+                    {
+                        (nextWorkplace is IndustrialZone ? vacantIndustrialZones : vacantCommercialZones).Remove(nextWorkplace);
+                    }
                 }
                 
                 if (nextWorkplace == null)
