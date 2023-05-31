@@ -50,7 +50,7 @@ namespace CCity.Model
             _globalManager = new GlobalManager();
 
             Speed = Speed.Normal;
-            Date = DateTime.Now;
+            Date = new DateTime(2023,01,01);
 
             CityName = "";
             MayorName = "";
@@ -249,7 +249,7 @@ namespace CCity.Model
             CityName = cityName;
             MayorName = mayorName;
 
-            Date = DateTime.Now;
+            Date = new DateTime(2023,01,01);
             Speed = Speed.Normal;
 
             NewGame?.Invoke(this, EventArgs.Empty);

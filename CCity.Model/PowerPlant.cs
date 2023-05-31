@@ -25,9 +25,9 @@ namespace CCity.Model
 
         #region Properties
 
-        public override int PlacementCost => 100;
+        public override int PlacementCost => 2000;
 
-        public override int MaintenanceCost => 10;
+        public override int MaintenanceCost => 500;
 
         float IFlammable.Potential => Owner?.FireDepartmentEffect > 0.5 ? 0 : PowerPlantPotential;
         

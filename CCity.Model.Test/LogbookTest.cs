@@ -1,6 +1,4 @@
-﻿using CCity.Model;
-
-namespace CCity.Model.Test
+﻿namespace CCity.Model.Test
 {
     [TestClass]
     public class LogbookTest
@@ -132,7 +130,7 @@ namespace CCity.Model.Test
                 placeableTransaction=Transactions.Placement(actualPlaceable);
             else throw new Exception("No Placeable found");
                 Assert.AreEqual(PlaceableTransactionType.Placement,placeableTransaction.TransactionType);
-            Assert.AreEqual(Convert.ToUInt32(100),placeableTransaction.Amount);
+            Assert.AreEqual(Convert.ToUInt32(actualPlaceable.PlacementCost),placeableTransaction.Amount);
             Assert.AreEqual(false,placeableTransaction.Add);
             Assert.IsInstanceOfType(placeableTransaction.Placeable,typeof(Road));
             Assert.IsInstanceOfType(_model.Logbook.ElementAt(0),typeof(PlaceableTransaction));
@@ -142,13 +140,13 @@ namespace CCity.Model.Test
         [TestMethod]
         public void AddTakebackToLogbookTest()
         {
-            PlaceableTransaction placeableTransaction;
+            var placeable = _model.Fields[23, 25].ActualPlaceable;
             _model.Demolish(23, 25);
             Assert.IsInstanceOfType(_model.Logbook.ElementAt(0),typeof(PlaceableTransaction));
             PlaceableTransaction takeback = (PlaceableTransaction) _model.Logbook.ElementAt(0);
             Assert.IsInstanceOfType(takeback.Placeable,typeof(FireDepartment));
             Assert.AreEqual(PlaceableTransactionType.Takeback,takeback.TransactionType);
-            Assert.AreEqual(Convert.ToUInt32(50),takeback.Amount);
+            Assert.AreEqual(Convert.ToUInt32(placeable!.PlacementCost/2),takeback.Amount);
             Assert.AreEqual(true,takeback.Add);
         }
         
@@ -156,13 +154,14 @@ namespace CCity.Model.Test
         [TestMethod]
         public void AddUpgradeToLogbookTest()
         {
-            PlaceableTransaction placeableTransaction;
+            IUpgradeable place = (IUpgradeable) _model.Fields[21, 28].ActualPlaceable!;
+            var upgradeCost = place.NextUpgradeCost;
             _model.Upgrade(21 ,28);
             Assert.IsInstanceOfType(_model.Logbook.ElementAt(0),typeof(PlaceableTransaction));
             PlaceableTransaction upgrade = (PlaceableTransaction) _model.Logbook.ElementAt(0);
             Assert.IsInstanceOfType(upgrade.Placeable,typeof(ResidentialZone));
             Assert.AreEqual(PlaceableTransactionType.Upgrade,upgrade.TransactionType);
-            Assert.AreEqual(Convert.ToUInt32(100),upgrade.Amount);
+            Assert.AreEqual(Convert.ToUInt32(upgradeCost),upgrade.Amount);
             Assert.AreEqual(false,upgrade.Add);
         }
     }
